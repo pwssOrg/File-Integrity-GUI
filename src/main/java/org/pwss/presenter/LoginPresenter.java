@@ -23,7 +23,13 @@ public class LoginPresenter {
         String username = view.getUsername();
         String password = view.getPassword();
 
-        authService.login(username, password)
+        // Feel Free To Delete / Modify my code and /or readd your code. Really nice work with thas class as well / Peter ;) 
+        Boolean loginResult = authService.login(username, password);
+
+        System.out.println(loginResult);
+
+        /* 
+        authService.loginAsync(username, password)
                 .thenAccept(success -> javax.swing.SwingUtilities.invokeLater(() -> {
                     if (success) {
                         view.dispose(); // close login window
@@ -36,5 +42,7 @@ public class LoginPresenter {
                     javax.swing.SwingUtilities.invokeLater(() -> view.showError("Error: " + ex.getMessage()));
                     return null;
                 });
+
+                */
     }
 }

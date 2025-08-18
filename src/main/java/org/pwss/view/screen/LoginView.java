@@ -1,7 +1,10 @@
 package org.pwss.view.screen;
 
 import javax.swing.*;
+
+
 import java.awt.*;
+
 
 public class LoginView extends JFrame {
     private final JTextField usernameField = new JTextField(20);
@@ -45,6 +48,7 @@ public class LoginView extends JFrame {
         panel.add(buttonPanel, gbc);
 
         add(panel);
+
     }
 
     // Getters for fields & buttons
@@ -67,4 +71,5 @@ public class LoginView extends JFrame {
     public void showError(String message) {
         JOptionPane.showMessageDialog(this, message, "Login Error", JOptionPane.ERROR_MESSAGE);
     }
+
 }
