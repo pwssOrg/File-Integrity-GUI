@@ -8,19 +8,19 @@ public enum Endpoint {
     /**
      * Endpoint for creating a user.
      */
-    CREATE_USER(Method.POST, "/api/users/create-user"),
+    CREATE_USER(HTTP_Method.POST, "/api/user/create-user"),
     /**
      * Endpoint for user login.
      */
-    LOGIN(Method.POST, "/api/users/login"),
+    LOGIN(HTTP_Method.POST, "/api/user/login"),
     /**
      * Endpoint for starting a file integrity scan.
      */
-    START_SCAN(Method.POST, "/api/file-integrity/start-scan"),
+    START_SCAN(HTTP_Method.POST, "/api/file-integrity/start-scan"),
     /**
      * Endpoint for stopping a file integrity scan.
      */
-    STOP_SCAN(Method.POST, "/api/file-integrity/stop-scan");
+    STOP_SCAN(HTTP_Method.POST, "/api/file-integrity/stop-scan");
 
     /**
      * The URL path associated with the endpoint.
@@ -29,14 +29,14 @@ public enum Endpoint {
     /**
      * The HTTP method associated with the endpoint.
      */
-    private final Method method;
+    private final HTTP_Method method;
 
     /**
      * Constructor for the Endpoint enum.
      *
      * @param url The URL path associated with the endpoint.
      */
-    Endpoint(Method method, String url) {
+    Endpoint(HTTP_Method method, String url) {
         this.method = method;
         this.url = url;
     }
@@ -46,7 +46,7 @@ public enum Endpoint {
      *
      * @return The HTTP method as a Method enum constant.
      */
-    public Method getMethod() {
+    public HTTP_Method getMethod() {
         return method;
     }
 
@@ -59,3 +59,7 @@ public enum Endpoint {
         return url;
     }
 }
+
+/**
+ * This Class was super nice Stefan :D 
+ */
