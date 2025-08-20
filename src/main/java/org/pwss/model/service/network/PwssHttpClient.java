@@ -1,20 +1,21 @@
 package org.pwss.model.service.network;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class PwssHttpClient {
+    /**
+     * A singleton instance of the `PwssHttpClient` class.
+     * Ensures that only one instance of the client is created and shared across the application.
+     */
+    private static PwssHttpClient instance;
+
     /**
      * The ObjectMapper instance used for JSON serialization and deserialization.
      * This is typically used to convert Java objects to JSON and vice versa.
@@ -46,11 +47,28 @@ public class PwssHttpClient {
      */
     private Session session;
 
-    public PwssHttpClient() {
+    /**
+     * Default headers to be included in every request.
+     * This can be used to set common headers like Content-Type, User-Agent, etc.
+     */
+    private final Map<String, String> defaultHeaders;
+
+    private PwssHttpClient() {
         this.objectMapper = new ObjectMapper();
         this.client = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(TIMEOUT_SECONDS))
                 .build();
+        this.defaultHeaders = Map.of(
+                "Content-Type", "application/json",
+                "Accept", "application/json"
+        );
+    }
+
+    public static synchronized PwssHttpClient getInstance() {
+        if (instance == null) {
+            instance = new PwssHttpClient();
+        }
+        return instance;
     }
 
     /**
@@ -58,10 +76,9 @@ public class PwssHttpClient {
      *
      * @param endpoint The `Endpoint` enum constant representing the API endpoint.
      * @param body     The request body as a String. Can be null or empty for methods like GET or DELETE.
-     * @param headers  A map of headers to include in the request. Can be null if no headers are needed.
      * @return A `CompletableFuture` containing the response body as a String.
      */
-    public CompletableFuture<String> requestAsync(Endpoint endpoint, String body, Map<String, String> headers) {
+    public CompletableFuture<HttpResponse<String>> requestAsync(Endpoint endpoint, String body) {
         HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(URI.create(getApiUrl(endpoint)))
                 .timeout(Duration.ofSeconds(10));
@@ -80,9 +97,12 @@ public class PwssHttpClient {
             }
         }
 
-        // Apply headers
-        if (headers != null) {
-            headers.forEach(builder::header);
+        // Apply default headers
+        defaultHeaders.forEach(builder::header);
+
+        // Apply session cookie if available
+        if (session != null && session.getSessionCookie().isPresent()) {
+            builder.header("Cookie", session.getSessionCookie().get());
         }
 
         // Build the request
@@ -90,7 +110,15 @@ public class PwssHttpClient {
 
         // Send the request asynchronously and return the response body as a CompletableFuture
         return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                .thenApply(HttpResponse::body);
+                .thenApply(response -> {
+                    // Session management: update session if headers contain Set-Cookie
+                    Session.from(response.headers()).ifPresent(newSession -> {
+                        this.session = newSession;
+                        System.out.println("Session Cookie Updated: " + newSession.getSessionCookie().orElse(""));
+                    });
+                    // Return the full response
+                    return response;
+                });
     }
 
     /**
@@ -99,76 +127,19 @@ public class PwssHttpClient {
      * @param <T>      The type of the object to parse the response body into.
      * @param endpoint The `Endpoint` enum constant representing the API endpoint.
      * @param body     The request body as a String. Can be null or empty for methods like GET or DELETE.
-     * @param headers  A map of headers to include in the request. Can be null if no headers are needed.
      * @param clazz    The `Class` object representing the type to parse the response body into.
      * @return A `CompletableFuture` containing the parsed object of type `T`.
      * @throws RuntimeException If the response body cannot be parsed into the specified type.
      */
-    public <T> CompletableFuture<T> requestAsync(Endpoint endpoint, String body, Map<String, String> headers, Class<T> clazz) {
-        return requestAsync(endpoint, body, headers)
-                .thenApply(responseBody -> {
+    public <T> CompletableFuture<T> requestAsync(Endpoint endpoint, String body, Class<T> clazz) {
+        return requestAsync(endpoint, body)
+                .thenApply(response -> {
                     try {
-                        return objectMapper.readValue(responseBody, clazz);
+                        return objectMapper.readValue(response.body(), clazz);
                     } catch (Exception e) {
                         throw new RuntimeException("Failed to parse response body", e);
                     }
                 });
-    }
-
-    /**
-     * You can delete (!) this method after you have seen the logic for login.  Nice Work Stefan! Added A make Script for you as well-
-     * And the rest of the HTTP Methods. Did you know about the Connection Method? You should , it is good :)  Ever heard of HTTP Tunnels? 
-     * We like them , Lund companies not so much <3 
-     * @param endpoint
-     * @param body
-     * @return
-     */
-    public boolean tmp_request_remove_later(Endpoint endpoint, String body){
-        final HttpURLConnection conn;
-        try {
-            URI uri = URI.create(getApiUrl(endpoint));
-            conn = (HttpURLConnection) URL.of(uri, null).openConnection();
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Content-Type", "application/json");
-
-
-            try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = body.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
-
-            // Read cookies from the response headers
-             final Map<String, List<String>> headerFields = conn.getHeaderFields();
-             final List<String> cookiesHeader = headerFields.get("Set-Cookie");
-             
-            // Define Session Cookie String
-            String sessionCookie ="";
-
-            if (cookiesHeader != null) {
-                for (String cookie : cookiesHeader) {
-                    // Extract and store the session cookie
-                    sessionCookie = cookie.split(";")[0];
-                }
-            }
-
-
-            // Note that this Session Cookie must be included for every request other than CreateUser and Login
-            session = new Session(headerFields, cookiesHeader, sessionCookie);
-
-
-
-            // Close the login connection
-            conn.disconnect();
-            int code = conn.getResponseCode();
-         
-            return code == HttpURLConnection.HTTP_ACCEPTED;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
-
-      
     }
 
     /**

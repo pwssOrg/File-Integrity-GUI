@@ -1,48 +1,51 @@
 package org.pwss.presenter;
 
+import org.pwss.model.service.ScanService;
 import org.pwss.view.screen.LoginView;
 import org.pwss.model.service.AuthService;
+import org.pwss.view.screen.ScanView;
 
-public class LoginPresenter {
-    private final LoginView view;
+import javax.swing.SwingUtilities;
+
+public class LoginPresenter extends BasePresenter<LoginView> {
     private final AuthService authService;
 
     public LoginPresenter(LoginView view, AuthService authService) {
-        this.view = view;
+        super(view);
         this.authService = authService;
-
-        initListeners();
     }
 
-    private void initListeners() {
-        view.getLoginButton().addActionListener(e -> attemptLogin());
-        view.getCancelButton().addActionListener(e -> System.exit(0));
+    @Override
+    protected void initListeners() {
+        getView().getLoginButton().addActionListener(e -> performLogin());
+        getView().getCancelButton().addActionListener(e -> System.exit(0));
     }
 
-    private void attemptLogin() {
+    private void performLogin() {
         String username = view.getUsername();
         String password = view.getPassword();
 
-        // Feel Free To Delete / Modify my code and /or readd your code. Really nice work with thas class as well / Peter ;) 
-        Boolean loginResult = authService.login(username, password);
-
-        System.out.println(loginResult);
-
-        /* 
         authService.loginAsync(username, password)
-                .thenAccept(success -> javax.swing.SwingUtilities.invokeLater(() -> {
+                .thenAccept(success -> SwingUtilities.invokeLater(() -> {
                     if (success) {
-                        view.dispose(); // close login window
-                        // TODO: show main application window
+                        view.showSuccess("Login successful!");
+                        // I am really not happy with this, I will try to come up with a proper navigation solution
+                        // To make this more maintainable and look more professional
+                        SwingUtilities.invokeLater(() -> {
+                            ScanView scanView = new ScanView();
+                            ScanService scanService = new ScanService();
+                            new ScanPresenter(scanView, scanService);
+
+                            view.setVisible(false); // Hide login view
+                            scanView.setVisible(true); // Show scan view
+                        });
                     } else {
                         view.showError("Invalid username or password.");
                     }
                 }))
                 .exceptionally(ex -> {
-                    javax.swing.SwingUtilities.invokeLater(() -> view.showError("Error: " + ex.getMessage()));
+                    SwingUtilities.invokeLater(() -> view.showError("Error: " + ex.getMessage()));
                     return null;
                 });
-
-                */
     }
 }

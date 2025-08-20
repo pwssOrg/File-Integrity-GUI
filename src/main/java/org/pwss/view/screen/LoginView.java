@@ -48,7 +48,6 @@ public class LoginView extends JFrame {
         panel.add(buttonPanel, gbc);
 
         add(panel);
-
     }
 
     // Getters for fields & buttons
@@ -68,8 +67,11 @@ public class LoginView extends JFrame {
         return cancelButton;
     }
 
+    public void showSuccess(String message) {
+        JOptionPane.showMessageDialog(this, message, "Login Success", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     public void showError(String message) {
         JOptionPane.showMessageDialog(this, message, "Login Error", JOptionPane.ERROR_MESSAGE);
     }
-
 }

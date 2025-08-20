@@ -3,59 +3,36 @@ package org.pwss.model.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pwss.model.service.network.Endpoint;
+import org.pwss.model.service.network.util.HttpUtility;
 import org.pwss.model.service.network.PwssHttpClient;
-
-
-
-import java.util.HashMap;
-
-import java.util.Map;
+import org.pwss.model.service.request.LoginRequest;
 import java.util.concurrent.CompletableFuture;
 
-record LoginRequest(String username, String password) {
-}
 /**
- * Nice Work Stefan
+ * The `AuthService` class provides methods for user authentication, specifically for logging in.
  */
 public class AuthService {
-
-    private final PwssHttpClient httpClient = new PwssHttpClient();
+    /**
+     * An instance of the ObjectMapper used for JSON serialization and deserialization.
+     */
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     public AuthService() {
     }
 
-
     /**
-     * This Method is invoking a temp non general method that Stefan will delete once he seen the workflow 
-     * {@link org.pwss.model.service.network.PwssHttpClient#tmp_request_remove_later(Endpoint, String)}
-     * @param username
-     * @param password
-     * @return
+     * Asynchronously logs in a user by sending their credentials to the login endpoint.
+     *
+     * @param username The username of the user attempting to log in.
+     * @param password The password of the user attempting to log in.
+     * @return A `CompletableFuture` that resolves to `true` if the login is successful, otherwise `false`.
+     * @throws RuntimeException If there is an error serializing the login request to JSON.
      */
-    public boolean login(String username, String password) {
-
-        try {
-            final String body = objectMapper.writeValueAsString(new LoginRequest(username, password));
-
-            return httpClient.tmp_request_remove_later(Endpoint.LOGIN, body);
-
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
     public CompletableFuture<Boolean> loginAsync(String username, String password) {
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Content-Type", "application/json");
         try {
             final String body = objectMapper.writeValueAsString(new LoginRequest(username, password));
-            return httpClient.requestAsync(Endpoint.LOGIN, body, headers)
-                    .thenApply(response -> {
-                        // TODO: parse response properly (e.g. JSON)
-                        return response.contains("success"); // placeholder
-                    });
+            return PwssHttpClient.getInstance().requestAsync(Endpoint.LOGIN, body)
+                    .thenApply(response -> HttpUtility.responseIsSuccess(response.statusCode()));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
