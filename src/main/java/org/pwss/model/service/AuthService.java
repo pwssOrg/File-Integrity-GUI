@@ -2,11 +2,14 @@ package org.pwss.model.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.pwss.exception.LoginFailedException;
 import org.pwss.model.service.network.Endpoint;
-import org.pwss.model.service.network.util.HttpUtility;
 import org.pwss.model.service.network.PwssHttpClient;
+import org.pwss.model.service.network.util.HttpUtility;
 import org.pwss.model.service.request.LoginRequest;
-import java.util.concurrent.CompletableFuture;
+
+import java.net.http.HttpResponse;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The `AuthService` class provides methods for user authentication, specifically for logging in.
@@ -21,20 +24,16 @@ public class AuthService {
     }
 
     /**
-     * Asynchronously logs in a user by sending their credentials to the login endpoint.
+     * Authenticates a user by sending their credentials to the LOGIN endpoint.
      *
      * @param username The username of the user attempting to log in.
      * @param password The password of the user attempting to log in.
-     * @return A `CompletableFuture` that resolves to `true` if the login is successful, otherwise `false`.
-     * @throws RuntimeException If there is an error serializing the login request to JSON.
+     * @return `true` if the login request is successful (HTTP status indicates success), otherwise `false`.
+     * @throws JsonProcessingException If an error occurs while serializing the login request to JSON.
      */
-    public CompletableFuture<Boolean> loginAsync(String username, String password) {
-        try {
+    public boolean login(String username, String password) throws JsonProcessingException, LoginFailedException, ExecutionException, InterruptedException {
             final String body = objectMapper.writeValueAsString(new LoginRequest(username, password));
-            return PwssHttpClient.getInstance().requestAsync(Endpoint.LOGIN, body)
-                    .thenApply(response -> HttpUtility.responseIsSuccess(response.statusCode()));
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.LOGIN, body);
+        return HttpUtility.responseIsSuccess(response.statusCode());
     }
 }

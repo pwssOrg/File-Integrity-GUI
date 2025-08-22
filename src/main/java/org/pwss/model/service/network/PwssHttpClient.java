@@ -1,6 +1,8 @@
 package org.pwss.model.service.network;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -8,6 +10,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class PwssHttpClient {
     /**
@@ -122,6 +125,20 @@ public class PwssHttpClient {
     }
 
     /**
+     * Sends a synchronous HTTP request to the specified endpoint using the given method and body.
+     * This method blocks the current thread until the request is completed.
+     *
+     * @param endpoint The `Endpoint` enum constant representing the API endpoint.
+     * @param body     The request body as a String. Can be null or empty for methods like GET or DELETE.
+     * @return The `HttpResponse` object containing the response from the server.
+     * @throws InterruptedException If the current thread is interrupted while waiting for the response.
+     * @throws ExecutionException   If an exception occurs while processing the request.
+     */
+    public HttpResponse<String> request(Endpoint endpoint, String body) throws InterruptedException, ExecutionException {
+        return requestAsync(endpoint, body).get();
+    }
+
+    /**
      * Sends an asynchronous HTTP request to the specified endpoint and parses the response body into an object of the specified type.
      *
      * @param <T>      The type of the object to parse the response body into.
@@ -129,17 +146,37 @@ public class PwssHttpClient {
      * @param body     The request body as a String. Can be null or empty for methods like GET or DELETE.
      * @param clazz    The `Class` object representing the type to parse the response body into.
      * @return A `CompletableFuture` containing the parsed object of type `T`.
-     * @throws RuntimeException If the response body cannot be parsed into the specified type.
      */
     public <T> CompletableFuture<T> requestAsync(Endpoint endpoint, String body, Class<T> clazz) {
         return requestAsync(endpoint, body)
-                .thenApply(response -> {
+                .thenCompose(response -> {
                     try {
-                        return objectMapper.readValue(response.body(), clazz);
+                        T parsed = objectMapper.readValue(response.body(), clazz);
+                        return CompletableFuture.completedFuture(parsed);
+                    } catch (IOException e) {
+                        // JSON parsing / mapping issue
+                        return CompletableFuture.failedFuture(e);
                     } catch (Exception e) {
-                        throw new RuntimeException("Failed to parse response body", e);
+                        // Any other unexpected error
+                        return CompletableFuture.failedFuture(e);
                     }
                 });
+    }
+
+    /**
+     * Sends a synchronous HTTP request to the specified endpoint and parses the response body into an object of the specified type.
+     * This method blocks the current thread until the request is completed.
+     *
+     * @param <T>      The type of the object to parse the response body into.
+     * @param endpoint The `Endpoint` enum constant representing the API endpoint.
+     * @param body     The request body as a String. Can be null or empty for methods like GET or DELETE.
+     * @param clazz    The `Class` object representing the type to parse the response body into.
+     * @return The parsed object of type `T`.
+     * @throws InterruptedException If the current thread is interrupted while waiting for the response.
+     * @throws ExecutionException   If an exception occurs while processing the request or parsing the response.
+     */
+    public <T> T request(Endpoint endpoint, String body, Class<T> clazz) throws InterruptedException, ExecutionException {
+        return requestAsync(endpoint, body, clazz).get();
     }
 
     /**

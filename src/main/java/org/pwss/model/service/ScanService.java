@@ -3,7 +3,9 @@ package org.pwss.model.service;
 import org.pwss.model.service.network.Endpoint;
 import org.pwss.model.service.network.util.HttpUtility;
 import org.pwss.model.service.network.PwssHttpClient;
-import java.util.concurrent.CompletableFuture;
+
+import java.net.http.HttpResponse;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The `ScanService` class provides methods to manage scans, specifically starting and stopping scans.
@@ -14,32 +16,22 @@ public class ScanService {
     }
 
     /**
-     * Asynchronously starts a scan by sending a request to the START_SCAN endpoint.
+     * Starts a scan by sending a request to the START_SCAN endpoint.
      *
-     * @return A `CompletableFuture` that resolves to `true` if the scan request is successful, otherwise `false`.
-     * @throws RuntimeException If an exception occurs during the request.
+     * @return `true` if the scan start request is successful (HTTP status indicates success), otherwise `false`.
      */
-    public CompletableFuture<Boolean> startScan() {
-        try {
-            return PwssHttpClient.getInstance().requestAsync(Endpoint.START_SCAN, null)
-                    .thenApply(response -> HttpUtility.responseIsSuccess(response.statusCode()));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public boolean startScan() throws ExecutionException, InterruptedException {
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN, null);
+        return HttpUtility.responseIsSuccess(response.statusCode());
     }
 
     /**
-     * Asynchronously stops a scan by sending a request to the STOP_SCAN endpoint.
+     * Stops a scan by sending a request to the STOP_SCAN endpoint.
      *
-     * @return A `CompletableFuture` that resolves to `true` if the scan stop request is successful, otherwise `false`.
-     * @throws RuntimeException If an exception occurs during the request.
+     * @return `true` if the scan stop request is successful (HTTP status indicates success), otherwise `false`.
      */
-    public CompletableFuture<Boolean> stopScan() {
-        try {
-            return PwssHttpClient.getInstance().requestAsync(Endpoint.STOP_SCAN, null)
-                    .thenApply(response -> HttpUtility.responseIsSuccess(response.statusCode()));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    public boolean stopScan() throws ExecutionException, InterruptedException {
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.STOP_SCAN, null);
+        return HttpUtility.responseIsSuccess(response.statusCode());
     }
 }

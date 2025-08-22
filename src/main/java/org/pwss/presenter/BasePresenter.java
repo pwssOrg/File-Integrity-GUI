@@ -6,7 +6,7 @@ import javax.swing.JFrame;
  * An abstract base class for presenters in the application.
  * Provides a common structure for managing a `JFrame` view and initializing event listeners.
  */
-public abstract class BasePresenter<View extends JFrame> {
+abstract class BasePresenter<View extends JFrame> {
     /**
      * The view instance managed by this presenter.
      * Represents the UI component associated with this presenter.

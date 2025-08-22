@@ -1,11 +1,13 @@
 package org.pwss.presenter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.pwss.exception.LoginFailedException;
+import org.pwss.model.service.AuthService;
 import org.pwss.model.service.ScanService;
 import org.pwss.view.screen.LoginView;
-import org.pwss.model.service.AuthService;
 import org.pwss.view.screen.ScanView;
 
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 public class LoginPresenter extends BasePresenter<LoginView> {
     private final AuthService authService;
@@ -25,27 +27,36 @@ public class LoginPresenter extends BasePresenter<LoginView> {
         String username = view.getUsername();
         String password = view.getPassword();
 
-        authService.loginAsync(username, password)
-                .thenAccept(success -> SwingUtilities.invokeLater(() -> {
-                    if (success) {
-                        view.showSuccess("Login successful!");
-                        // I am really not happy with this, I will try to come up with a proper navigation solution
-                        // To make this more maintainable and look more professional
-                        SwingUtilities.invokeLater(() -> {
-                            ScanView scanView = new ScanView();
-                            ScanService scanService = new ScanService();
-                            new ScanPresenter(scanView, scanService);
+        try {
+            boolean loginSuccess = authService.login(username, password);
 
-                            view.setVisible(false); // Hide login view
-                            scanView.setVisible(true); // Show scan view
-                        });
-                    } else {
-                        view.showError("Invalid username or password.");
-                    }
-                }))
-                .exceptionally(ex -> {
-                    SwingUtilities.invokeLater(() -> view.showError("Error: " + ex.getMessage()));
-                    return null;
-                });
+            SwingUtilities.invokeLater(() -> {
+                if (loginSuccess) {
+                    view.showSuccess("Login successful!");
+                    navigateToScanView();
+                } else {
+                    view.showError("Invalid username or password.");
+                }
+            });
+
+        } catch (JsonProcessingException e) {
+            SwingUtilities.invokeLater(() ->
+                    view.showError("Error preparing login request: " + e.getMessage()));
+        } catch (LoginFailedException e) {
+            SwingUtilities.invokeLater(() ->
+                    view.showError("Login request failed: " + e.getMessage()));
+        } catch (Exception e) {
+            SwingUtilities.invokeLater(() ->
+                    view.showError("An unexpected error occurred: " + e.getMessage()));
+        }
+    }
+
+    private void navigateToScanView() {
+        ScanView scanView = new ScanView();
+        ScanService scanService = new ScanService();
+        new ScanPresenter(scanView, scanService);
+
+        view.setVisible(false);
+        scanView.setVisible(true);
     }
 }
