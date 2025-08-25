@@ -16,7 +16,7 @@ public class LoginFailedException extends Exception{
      * @param message The detail message to be included in the exception.
      */
     public LoginFailedException(String message) {
-        super(message + " \nPWSS @Exception");
+        super(message + " \nPWSS-FE @Exception");
     }
 
     /**
