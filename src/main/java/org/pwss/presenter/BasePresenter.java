@@ -1,12 +1,12 @@
 package org.pwss.presenter;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 /**
  * An abstract base class for presenters in the application.
  * Provides a common structure for managing a `JFrame` view and initializing event listeners.
  */
-abstract class BasePresenter<View extends JFrame> {
+public abstract class BasePresenter<View extends JPanel> {
     /**
      * The view instance managed by this presenter.
      * Represents the UI component associated with this presenter.
@@ -35,7 +35,7 @@ abstract class BasePresenter<View extends JFrame> {
      *
      * @return The `View` instance representing the managed view.
      */
-    protected View getView() {
+    public View getView() {
         return view;
     }
 }

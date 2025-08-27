@@ -3,9 +3,9 @@ package org.pwss.presenter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.pwss.exception.LoginFailedException;
 import org.pwss.model.service.AuthService;
-import org.pwss.model.service.ScanService;
+import org.pwss.navigation.NavigationEvents;
+import org.pwss.navigation.Screen;
 import org.pwss.view.screen.LoginView;
-import org.pwss.view.screen.ScanView;
 
 import javax.swing.*;
 
@@ -33,7 +33,7 @@ public class LoginPresenter extends BasePresenter<LoginView> {
             SwingUtilities.invokeLater(() -> {
                 if (loginSuccess) {
                     view.showSuccess("Login successful!");
-                    navigateToScanView();
+                    NavigationEvents.navigateTo(Screen.SCAN);
                 } else {
                     view.showError("Invalid username or password.");
                 }
@@ -49,14 +49,5 @@ public class LoginPresenter extends BasePresenter<LoginView> {
             SwingUtilities.invokeLater(() ->
                     view.showError("An unexpected error occurred: " + e.getMessage()));
         }
-    }
-
-    private void navigateToScanView() {
-        ScanView scanView = new ScanView();
-        ScanService scanService = new ScanService();
-        new ScanPresenter(scanView, scanService);
-
-        view.setVisible(false);
-        scanView.setVisible(true);
     }
 }

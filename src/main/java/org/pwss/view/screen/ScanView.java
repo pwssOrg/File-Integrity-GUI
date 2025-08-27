@@ -3,27 +3,28 @@ package org.pwss.view.screen;
 import javax.swing.*;
 import java.awt.*;
 
-public class ScanView extends JFrame {
+public class ScanView extends JPanel {
 
     private final JButton startButton;
     private final JButton stopButton;
 
     public ScanView() {
-        setTitle("Scan View");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(300, 150);
-        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
 
-        // Initialize buttons
+        // Buttons
         startButton = new JButton("Start");
         stopButton = new JButton("Stop");
 
-        // Layout
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 40));
-        panel.add(startButton);
-        panel.add(stopButton);
+        // Inner panel for horizontal alignment
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 0));
+        buttonPanel.add(startButton);
+        buttonPanel.add(stopButton);
 
-        add(panel);
+        // Wrapper with GridBagLayout to center vertically + horizontally
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.add(buttonPanel, new GridBagConstraints());
+
+        add(wrapper, BorderLayout.CENTER);
     }
 
     public JButton getStartButton() {
