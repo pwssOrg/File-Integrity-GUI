@@ -1,6 +1,6 @@
 package org.pwss.presenter;
 
-import javax.swing.*;
+import javax.swing.JPanel;
 
 /**
  * An abstract base class for presenters in the application.

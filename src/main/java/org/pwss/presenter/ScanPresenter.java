@@ -1,10 +1,11 @@
 package org.pwss.presenter;
 
+import java.util.concurrent.ExecutionException;
+
+import javax.swing.SwingUtilities;
+
 import org.pwss.model.service.ScanService;
 import org.pwss.view.screen.ScanView;
-
-import javax.swing.*;
-import java.util.concurrent.ExecutionException;
 
 public class ScanPresenter extends BasePresenter<ScanView> {
     private final ScanService scanService;

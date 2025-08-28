@@ -1,12 +1,13 @@
 package org.pwss;
 
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.NavigationHandler;
 import org.pwss.navigation.Screen;
 import org.pwss.presenter.factory.AppPresenterFactory;
 import org.pwss.presenter.factory.PresenterFactory;
-
-import javax.swing.*;
 
 public class Start {
     public static void main(String[] args) {

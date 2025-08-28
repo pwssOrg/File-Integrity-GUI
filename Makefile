@@ -33,7 +33,7 @@ start:
 # Package the project
 .PHONY: package
 package: clean
-	$(MVN) package
+	$(MVN) package && echo "New Artifact Jar created in /target folder"
 
 # Print help text
 .PHONY: help

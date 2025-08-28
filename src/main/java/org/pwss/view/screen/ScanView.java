@@ -1,7 +1,13 @@
 package org.pwss.view.screen;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 public class ScanView extends JPanel {
 

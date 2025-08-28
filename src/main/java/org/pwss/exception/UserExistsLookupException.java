@@ -1,6 +1,6 @@
 package org.pwss.exception;
 
-public class UserExistsLookupException extends Exception {
+public final class UserExistsLookupException extends Exception {
 
     /**
      * Constructs a `UserExistsLookupException` with no detail message or cause.

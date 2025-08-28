@@ -1,6 +1,6 @@
 package org.pwss.exception;
 
-public class CreateUserException extends Exception {
+public final class CreateUserException extends Exception {
 
     /**
      * Constructs a `CreateUserException` with no detail message or cause.
