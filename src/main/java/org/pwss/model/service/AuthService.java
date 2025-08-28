@@ -53,6 +53,15 @@ public class AuthService {
     public boolean login(String username, String password) throws JsonProcessingException, LoginFailedException, ExecutionException, InterruptedException {
             final String body = objectMapper.writeValueAsString(new LoginUserRequest(username, password));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.LOGIN, body);
+        //Stefan  , om ni kör en "throws LoginFailedException på metoden så måste ni också göra en throw.
+        // Ni gjorde aldrig det innan och det hade aldrig hänt att det exception:ett hade kastats annars. 
+        // Om ni vill ha sådan exception logik eller inte är 100% upp till er , men blir förvirrande
+        // om ni inte använder det. 
+        // Exempel: 
+
+        if(response.statusCode() != 200 )
+        throw new LoginFailedException("Add Message here Stefan");
+ 
         return HttpUtility.responseIsSuccess(response.statusCode());
     }
 
