@@ -4,18 +4,23 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <!-- Project coordinates -->
     <groupId>org.pwss</groupId>
     <artifactId>file_integrity_gui</artifactId>
+    <packaging>jar</packaging>
     <version>0.1</version>
 
+    <!-- Properties for the project -->
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <project.mainClass>org.pwss.Start</project.mainClass>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <!-- Project dependencies -->
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <!-- Jackson Databind dependency for JSON processing -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -23,21 +28,61 @@
         </dependency>
     </dependencies>
 
+    <!-- Build configuration for the project -->
+    <build>
+        <plugins>
+            <!-- Plugin to execute Java classes from Maven -->
+            <plugin>
+            <!--https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin/3.5.1-->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.1</version> <!-- Use the latest version -->
+                <configuration>
+                    <mainClass>${project.mainClass}</mainClass>
+                </configuration>
+            </plugin>
 
-<build>
-  <plugins>
-    <!-- Other plugins -->
+            <!-- Plugin to configure Java compiler settings -->
+            <plugin>
+            <!--https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin/3.14.0-->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
 
-    <plugin>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>exec-maven-plugin</artifactId>
-      <version>3.5.1</version> <!-- Use the latest version -->
-      <configuration>
-        <mainClass>org.pwss.Start</mainClass>
-      </configuration>
-    </plugin>
-
-  </plugins>
-</build>
+            <!-- Plugin to create a JAR with dependencies -->
+            <plugin>
+            <!--https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin/3.7.1-->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <!-- Main class for the executable JAR -->
+                            <mainClass>${project.mainClass}</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <!-- Reference to include dependencies in the JAR -->
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+                <executions>
+                    <execution>
+                        <!-- Execute this plugin during the package phase -->
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

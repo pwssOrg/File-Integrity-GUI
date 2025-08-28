@@ -117,7 +117,7 @@ public class PwssHttpClient {
                     // Session management: update session if headers contain Set-Cookie
                     Session.from(response.headers()).ifPresent(newSession -> {
                         this.session = newSession;
-                        System.out.println("Session Cookie Updated: " + newSession.getSessionCookie().orElse(""));
+                       
                     });
                     // Return the full response
                     return response;
