@@ -1,8 +1,14 @@
 package org.pwss.model.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.pwss.exception.scan.ScanStatusException;
+import org.pwss.exception.scan.StartScanAllException;
+import org.pwss.exception.scan.StartScanByIdException;
+import org.pwss.exception.scan.StopScanException;
 import org.pwss.model.service.network.Endpoint;
-import org.pwss.model.service.network.util.HttpUtility;
 import org.pwss.model.service.network.PwssHttpClient;
+import org.pwss.model.service.request.scan.StartSingleScanRequest;
 
 import java.net.http.HttpResponse;
 import java.util.concurrent.ExecutionException;
@@ -11,27 +17,106 @@ import java.util.concurrent.ExecutionException;
  * The `ScanService` class provides methods to manage scans, specifically starting and stopping scans.
  */
 public class ScanService {
+    /**
+     * An instance of the ObjectMapper used for JSON serialization and deserialization.
+     */
+    private final ObjectMapper objectMapper;
 
     public ScanService() {
+        this.objectMapper = new ObjectMapper();
     }
 
     /**
      * Starts a scan by sending a request to the START_SCAN endpoint.
      *
-     * @return `true` if the scan start request is successful (HTTP status indicates success), otherwise `false`.
+     * @return `true` if the scan start request is successful, otherwise `false`.
+     * @throws StartScanAllException If the scan start attempt fails due to various reasons such as invalid credentials, no active monitored directories, scan already running, or server error.
+     * @throws ExecutionException If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException If the thread executing the request is interrupted.
      */
-    public boolean startScan() throws ExecutionException, InterruptedException {
+    public boolean startScan() throws StartScanAllException, ExecutionException, InterruptedException {
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN, null);
-        return HttpUtility.responseIsSuccess(response.statusCode());
+
+        return switch (response.statusCode()) {
+            case 200 -> true;
+            case 401 ->
+                    throw new StartScanAllException("Start scan all failed: User not authorized to perform this action.");
+            case 412 ->
+                    throw new StartScanAllException("Start scan all failed: No active monitored directories found.");
+            case 425 -> throw new StartScanAllException("Start scan all failed: Scan is already running.");
+            case 500 ->
+                    throw new StartScanAllException("Start scan all failed: An error occurred on the server while attempting to start the scan.");
+            default -> false;
+        };
+    }
+
+    /**
+     * Starts a scan for a specific monitored directory by its ID by sending a request to the START_SCAN_ID endpoint.
+     *
+     * @param id The ID of the monitored directory to start the scan for.
+     * @return `true` if the scan start request is successful, otherwise `false`.
+     * @throws StartScanByIdException  If the scan start attempt fails due to various reasons such as invalid credentials, monitored directory not found, monitored directory inactive, scan already running, or server error.
+     * @throws ExecutionException      If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException    If the thread executing the request is interrupted.
+     * @throws JsonProcessingException If an error occurs while serializing the start scan request to JSON.
+     */
+    public boolean startScanById(long id) throws StartScanByIdException, ExecutionException, InterruptedException, JsonProcessingException {
+        String body = objectMapper.writeValueAsString(new StartSingleScanRequest(id));
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN_ID, body);
+
+        return switch (response.statusCode()) {
+            case 200 -> true;
+            case 401 ->
+                    throw new StartScanByIdException("Start scan by id failed: User not authorized to perform this action.");
+            case 404 ->
+                    throw new StartScanByIdException("Start scan by id failed: Monitored directory with the given ID not found.");
+            case 412 ->
+                    throw new StartScanByIdException("Start scan by id failed: The monitored directory is inactive.");
+            case 425 -> throw new StartScanByIdException("Start scan by id failed: Scan is already running.");
+            case 500 ->
+                    throw new StartScanByIdException("Start scan by id failed: An error occurred on the server while attempting to start the scan.");
+            default -> false;
+        };
     }
 
     /**
      * Stops a scan by sending a request to the STOP_SCAN endpoint.
      *
-     * @return `true` if the scan stop request is successful (HTTP status indicates success), otherwise `false`.
+     * @return `true` if the scan stop request is successful, otherwise `false`.
+     * @throws StopScanException    If the scan stop attempt fails due to various reasons such as invalid credentials or server error.
+     * @throws ExecutionException   If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException If the thread executing the request is interrupted.
      */
-    public boolean stopScan() throws ExecutionException, InterruptedException {
+    public boolean stopScan() throws StopScanException, ExecutionException, InterruptedException {
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.STOP_SCAN, null);
-        return HttpUtility.responseIsSuccess(response.statusCode());
+
+        return switch (response.statusCode()) {
+            case 200 -> true;
+            case 401 -> throw new StopScanException("Stop scan failed: User not authorized to perform this action.");
+            case 500 ->
+                    throw new StopScanException("Stop scan failed: An error occurred on the server while attempting to stop the scan.");
+            default -> false;
+        };
+    }
+
+    /**
+     * Checks if a scan is currently running by sending a request to the SCAN_STATUS endpoint.
+     *
+     * @return `true` if a scan is running, otherwise `false`.
+     * @throws ScanStatusException  If the scan status check fails due to various reasons such as invalid credentials or server error.
+     * @throws ExecutionException   If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException If the thread executing the request is interrupted.
+     */
+    public boolean scanRunning() throws ScanStatusException, ExecutionException, InterruptedException {
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.SCAN_STATUS, null);
+
+        return switch (response.statusCode()) {
+            case 200 -> Boolean.parseBoolean(response.body());
+            case 401 ->
+                    throw new ScanStatusException("Scan status check failed: User not authorized to perform this action.");
+            case 500 ->
+                    throw new ScanStatusException("Scan status check failed: An error occurred on the server while attempting to check the scan status.");
+            default -> false;
+        };
     }
 }
