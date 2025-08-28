@@ -1,13 +1,14 @@
 package org.pwss.presenter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import javax.swing.SwingUtilities;
+
 import org.pwss.exception.LoginFailedException;
 import org.pwss.model.service.AuthService;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.view.screen.LoginView;
 
-import javax.swing.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class LoginPresenter extends BasePresenter<LoginView> {
     private final AuthService authService;

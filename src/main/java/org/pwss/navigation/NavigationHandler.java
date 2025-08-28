@@ -1,11 +1,13 @@
 package org.pwss.navigation;
 
-import org.pwss.presenter.BasePresenter;
-import org.pwss.presenter.factory.PresenterFactory;
-
-import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+import org.pwss.presenter.BasePresenter;
+import org.pwss.presenter.factory.PresenterFactory;
 
 /**
  * Handles navigation between different screens in the application.

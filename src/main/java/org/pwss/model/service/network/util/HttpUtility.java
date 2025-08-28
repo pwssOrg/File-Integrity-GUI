@@ -7,7 +7,9 @@ public final class HttpUtility {
      * @param responseCode The HTTP response code to evaluate.
      * @return `true` if the response code is in the range 200-299 (inclusive), otherwise `false`.
      */
-    public static boolean responseIsSuccess(int responseCode) {
+    public static final boolean responseIsSuccess(int responseCode) {
         return responseCode >= 200 && responseCode < 300;
     }
 }
+
+// This is to broad. We need to handle responses on an indivudal base , not on a range. 

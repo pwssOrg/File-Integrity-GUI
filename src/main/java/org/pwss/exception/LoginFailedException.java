@@ -1,6 +1,6 @@
 package org.pwss.exception;
 
-public class LoginFailedException extends Exception{
+public final class LoginFailedException extends Exception{
 
     /**
      * Constructs a `LoginFailedException` with no detail message or cause.
