@@ -98,6 +98,7 @@ public class PwssHttpClient {
                     builder.DELETE();
                 }
             }
+            default -> throw new IllegalArgumentException("Unexpected value: " + endpoint.getMethod());
         }
 
         // Apply default headers
