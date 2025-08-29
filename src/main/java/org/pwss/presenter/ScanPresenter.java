@@ -4,6 +4,8 @@ import java.util.concurrent.ExecutionException;
 
 import javax.swing.SwingUtilities;
 
+import org.pwss.exception.scan.StartScanAllException;
+import org.pwss.exception.scan.StopScanException;
 import org.pwss.model.service.ScanService;
 import org.pwss.view.screen.ScanView;
 
@@ -31,7 +33,7 @@ public class ScanPresenter extends BasePresenter<ScanView> {
                     view.showError("Failed to start scan.");
                 }
             });
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (ExecutionException | InterruptedException | StartScanAllException e) {
             SwingUtilities.invokeLater(() -> view.showError("Error starting scan: " + e.getMessage()));
         }
     }
@@ -46,7 +48,7 @@ public class ScanPresenter extends BasePresenter<ScanView> {
                     view.showError("Failed to stop scan.");
                 }
             });
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (ExecutionException | InterruptedException | StopScanException e) {
             SwingUtilities.invokeLater(() -> view.showError("Error stopping scan: " + e.getMessage()));
         }
     }
