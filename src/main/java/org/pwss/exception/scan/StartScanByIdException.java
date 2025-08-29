@@ -1,6 +1,6 @@
 package org.pwss.exception.scan;
 
-public class StartScanByIdException extends Exception {
+public final class StartScanByIdException extends Exception {
 
     /**
      * Constructs a `StartScanByIdException` with no detail message or cause.

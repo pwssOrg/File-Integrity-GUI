@@ -1,6 +1,6 @@
 package org.pwss.exception.scan;
 
-public class StartScanAllException extends Exception {
+public final class StartScanAllException extends Exception {
 
     /**
      * Constructs a `StartScanAllException` with no detail message or cause.

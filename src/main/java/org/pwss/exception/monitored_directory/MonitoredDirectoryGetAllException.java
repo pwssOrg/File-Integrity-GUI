@@ -1,6 +1,6 @@
 package org.pwss.exception.monitored_directory;
 
-public class MonitoredDirectoryGetAllException extends Exception {
+public final class MonitoredDirectoryGetAllException extends Exception {
 
     /**
      * Constructs a `MonitoredDirectoryGetAllException` with no detail message or cause.

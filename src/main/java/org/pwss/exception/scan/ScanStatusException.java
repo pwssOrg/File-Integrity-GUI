@@ -1,6 +1,6 @@
 package org.pwss.exception.scan;
 
-public class ScanStatusException extends Exception {
+public final class ScanStatusException extends Exception {
 
     /**
      * Constructs a `ScanStatusException` with no detail message or cause.

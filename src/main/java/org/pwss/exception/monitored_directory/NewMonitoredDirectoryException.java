@@ -1,6 +1,6 @@
 package org.pwss.exception.monitored_directory;
 
-public class NewMonitoredDirectoryException extends Exception {
+public final class NewMonitoredDirectoryException extends Exception {
 
     /**
      * Constructs a `NewMonitoredDirectoryException` with no detail message or cause.
