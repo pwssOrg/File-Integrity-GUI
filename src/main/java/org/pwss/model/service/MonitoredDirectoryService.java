@@ -138,9 +138,7 @@ public class MonitoredDirectoryService {
      * @throws JsonProcessingException               If an error occurs while serializing the request body.
      */
     public boolean newMonitoredDirectoryBaseline(int id) throws NewMonitoredDirectoryBaselineException, ExecutionException, InterruptedException, JsonProcessingException {
-        // Figure out a good way to handle this later
-        long endpointCode = 1234567890L;
-        String body = objectMapper.writeValueAsString(new NewBaselineRequest(id, endpointCode));
+        String body = objectMapper.writeValueAsString(new NewBaselineRequest(id, PwssHttpClient.ENDPOINT_CODE));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.MONITORED_DIRECTORY_NEW_BASELINE, body);
 
         return switch (response.statusCode()) {

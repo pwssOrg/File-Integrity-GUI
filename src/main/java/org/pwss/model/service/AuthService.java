@@ -9,6 +9,7 @@ import org.pwss.model.service.network.Endpoint;
 import org.pwss.model.service.network.PwssHttpClient;
 import org.pwss.model.service.request.user.CreateUserRequest;
 import org.pwss.model.service.request.user.LoginUserRequest;
+import org.pwss.model.service.response.LoginResponse;
 
 import java.net.http.HttpResponse;
 import java.util.concurrent.ExecutionException;
@@ -62,7 +63,7 @@ public class AuthService {
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.LOGIN, body);
 
         return switch (response.statusCode()) {
-            case 200 -> Boolean.parseBoolean(response.body());
+            case 200 -> objectMapper.readValue(response.body(), LoginResponse.class).successful();
             case 404 -> throw new LoginException("Login failed: User not found");
             case 500 -> throw new LoginException("Login failed: Server error during login");
             default -> false;
