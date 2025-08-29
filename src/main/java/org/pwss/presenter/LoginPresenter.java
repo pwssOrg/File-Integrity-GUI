@@ -34,7 +34,7 @@ public class LoginPresenter extends BasePresenter<LoginView> {
             SwingUtilities.invokeLater(() -> {
                 if (loginSuccess) {
                     view.showSuccess("Login successful!");
-                    NavigationEvents.navigateTo(Screen.SCAN);
+                    NavigationEvents.navigateTo(Screen.HOME);
                 } else {
                     view.showError("Invalid username or password.");
                 }

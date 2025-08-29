@@ -5,5 +5,5 @@ package org.pwss.model.service.request.monitored_directory;
  *
  * @param directoryId the ID of the monitored directory to retrieve
  */
-public record RetrieveDirectoryRequest(long directoryId) {
+public record GetDirectoryByIdRequest(long directoryId) {
 }
