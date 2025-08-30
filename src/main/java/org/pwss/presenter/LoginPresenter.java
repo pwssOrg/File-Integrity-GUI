@@ -2,7 +2,7 @@ package org.pwss.presenter;
 
 import javax.swing.SwingUtilities;
 
-import org.pwss.exception.LoginFailedException;
+import org.pwss.exception.user.LoginException;
 import org.pwss.model.service.AuthService;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
@@ -34,7 +34,7 @@ public class LoginPresenter extends BasePresenter<LoginView> {
             SwingUtilities.invokeLater(() -> {
                 if (loginSuccess) {
                     view.showSuccess("Login successful!");
-                    NavigationEvents.navigateTo(Screen.SCAN);
+                    NavigationEvents.navigateTo(Screen.HOME);
                 } else {
                     view.showError("Invalid username or password.");
                 }
@@ -43,7 +43,7 @@ public class LoginPresenter extends BasePresenter<LoginView> {
         } catch (JsonProcessingException e) {
             SwingUtilities.invokeLater(() ->
                     view.showError("Error preparing login request: " + e.getMessage()));
-        } catch (LoginFailedException e) {
+        } catch (LoginException e) {
             SwingUtilities.invokeLater(() ->
                     view.showError("Login request failed: " + e.getMessage()));
         } catch (Exception e) {

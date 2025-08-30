@@ -6,6 +6,7 @@ package org.pwss.model.service.network;
  */
 public enum Endpoint {
 
+    // User Endpoints
     /**
      * Endpoint for checking if a user exists.
      */
@@ -18,11 +19,13 @@ public enum Endpoint {
      * Endpoint for user login.
      */
     LOGIN(HTTP_Method.POST, A.BASE_URL + A.USER + "login"),
+
+
+    // Scan Endpoints
     /**
      * Endpoint for starting a file integrity scan of all directories.
      */
     START_SCAN(HTTP_Method.GET, A.BASE_URL + A.SCAN + "start/all"),
-
     /**
      * Endpoint for starting a file integrity scan of a specific directory.
      */
@@ -35,6 +38,8 @@ public enum Endpoint {
      * Endpoint for retrieving the status of a file integrity scan.
      */
     SCAN_STATUS(HTTP_Method.GET, A.BASE_URL + A.SCAN + "status"),
+
+    // Directory Endpoints
     /**
      * Endpoint for retrieving all monitored directories.
      */
@@ -54,7 +59,21 @@ public enum Endpoint {
     /**
      * Endpoint for updating an existing monitored directory.
      */
-    MONITORED_DIRECTORY_UPDATE(HTTP_Method.PUT, A.BASE_URL + A.DIRECTORY + "update");
+    MONITORED_DIRECTORY_UPDATE(HTTP_Method.PUT, A.BASE_URL + A.DIRECTORY + "update"),
+
+    // Scan History Endpoints
+    /**
+     * Endpoint for retrieving the scan summaries for a specific scan.
+     */
+    SUMMARY_SCAN(HTTP_Method.POST, A.BASE_URL + A.SCAN_SUMMARY + "scan"),
+    /**
+     * Endpoint for retrieving the scan summaries for a specific file.
+     */
+    SUMMARY_FILE(HTTP_Method.POST, A.BASE_URL + A.SCAN_SUMMARY + "file"),
+    /**
+     * Endpoint for retrieving the most recent scan summary.
+     */
+    SUMMARY_MOST_RECENT_SCAN(HTTP_Method.POST, A.BASE_URL + A.SCAN_SUMMARY + "most-recent");
 
     /**
      * The URL path associated with the endpoint.
@@ -111,13 +130,12 @@ final class A {
      * Path segment for scan-related endpoints.
      */
     static final String SCAN = "scan/";
-
+    /**
+     * Path segment for scan history-related endpoints.
+     */
+    static final String SCAN_SUMMARY = "summary/";
     /**
      * Path segment for user-related endpoints.
      */
     static final String USER = "user/";
 }
-
-/**
- * This Class was super nice Stefan :D
- */

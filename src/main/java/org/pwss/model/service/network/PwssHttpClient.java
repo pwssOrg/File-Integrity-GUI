@@ -45,6 +45,8 @@ public class PwssHttpClient {
      */
     private final long TIMEOUT_SECONDS = 10L;
 
+    public final static long ENDPOINT_CODE = 4350345983458934L;
+
     /**
      * Session variables like header fields and Session Cookie(s)
      */

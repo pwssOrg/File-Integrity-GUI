@@ -9,12 +9,12 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class ScanView extends JPanel {
+public class HomeView extends JPanel {
 
     private final JButton startButton;
     private final JButton stopButton;
 
-    public ScanView() {
+    public HomeView() {
         setLayout(new BorderLayout());
 
         // Buttons
