@@ -1,0 +1,19 @@
+name: SCA Scan - File Integrity GUI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  workflow_dispatch:
+ 
+jobs:
+  security-file-integrity_gui:
+    uses: pwssOrg/reusable-workflows/.github/workflows/sca_scan_base.yml@main
+    with:
+       working-path: .
+       name-of-snyk-step: Check for vulnerabilities in File Integrity GUI
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      USER_FOR_SNYK: ${{ secrets.READ_PACKAGE_USER_FOR_WORKFLOWS }}
+      READ_PACKAGE_TOKEN_INPUT: ${{ secrets.READ_PACKAGE_TOKEN_FOR_WORKFLOWS }}
