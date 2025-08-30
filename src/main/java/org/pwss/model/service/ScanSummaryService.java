@@ -52,10 +52,10 @@ public class ScanSummaryService {
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), ScanSummary[].class));
-            case 401 -> throw new GetSummaryForFileException("Get scan summaries for file failed: User not authorized to perform this action.");
-            case 404 -> throw new GetSummaryForFileException("Get scan summaries for file failed: No scan summaries found for the specified file.");
-            case 422 -> throw new GetSummaryForFileException("Get scan summaries for file failed: The provided file ID is invalid.");
-            case 500 -> throw new GetSummaryForFileException("Get scan summaries for file failed: An error occurred on the server while attempting to retrieve the scan summaries.");
+            case 401 -> throw new GetSummaryForFileException("Get summaries for file failed: User not authorized to perform this action.");
+            case 404 -> throw new GetSummaryForFileException("Get summaries for file failed: No scan summaries found for the specified file.");
+            case 422 -> throw new GetSummaryForFileException("Get summaries for file failed: The provided file ID is invalid.");
+            case 500 -> throw new GetSummaryForFileException("Get summaries for file failed: An error occurred on the server while attempting to retrieve the scan summaries.");
             default -> null;
         };
     }
@@ -66,10 +66,10 @@ public class ScanSummaryService {
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), ScanSummary[].class));
-            case 401 -> throw new GetSummaryForScanException("Get scan summaries for file failed: User not authorized to perform this action.");
-            case 404 -> throw new GetSummaryForScanException("Get scan summaries for file failed: No scan summaries found for the specified file.");
-            case 422 -> throw new GetSummaryForScanException("Get scan summaries for file failed: The provided scan ID is invalid.");
-            case 500 -> throw new GetSummaryForScanException("Get scan summaries for file failed: An error occurred on the server while attempting to retrieve the scan summaries.");
+            case 401 -> throw new GetSummaryForScanException("Get summaries for scan failed: User not authorized to perform this action.");
+            case 404 -> throw new GetSummaryForScanException("Get summaries for scan failed: No scan summaries found for the specified file.");
+            case 422 -> throw new GetSummaryForScanException("Get summaries for scan failed: The provided scan ID is invalid.");
+            case 500 -> throw new GetSummaryForScanException("Get summaries for scan failed: An error occurred on the server while attempting to retrieve the scan summaries.");
             default -> null;
         };
     }

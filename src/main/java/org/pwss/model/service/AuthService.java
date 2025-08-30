@@ -86,7 +86,7 @@ public class AuthService {
 
         return switch (response.statusCode()) {
             case 201 -> true;
-            case 409 -> throw new CreateUserException("Create user failed: ");
+            case 409 -> throw new CreateUserException("Create user failed: User already exists");
             case 500 -> throw new CreateUserException("Create user failed: Server error during creation");
             default -> false;
         };
