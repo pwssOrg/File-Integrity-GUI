@@ -1,4 +1,4 @@
-package org.pwss.exception;
+package org.pwss.exception.user;
 
 public final class CreateUserException extends Exception {
 

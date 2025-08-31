@@ -12,5 +12,5 @@ public enum Screen {
     /**
      * The home screen displayed after successful login.
      */
-    SCAN,
+    HOME,
 }

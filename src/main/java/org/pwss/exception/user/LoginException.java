@@ -1,11 +1,11 @@
-package org.pwss.exception;
+package org.pwss.exception.user;
 
-public final class LoginFailedException extends Exception{
+public final class LoginException extends Exception{
 
     /**
      * Constructs a `LoginFailedException` with no detail message or cause.
      */
-    public LoginFailedException() {
+    public LoginException() {
         super();
     }
 
@@ -15,7 +15,7 @@ public final class LoginFailedException extends Exception{
      *
      * @param message The detail message to be included in the exception.
      */
-    public LoginFailedException(String message) {
+    public LoginException(String message) {
         super(message + " \nPWSS-FE @Exception");
     }
 
@@ -24,7 +24,7 @@ public final class LoginFailedException extends Exception{
      *
      * @param cause The cause of the exception.
      */
-    public LoginFailedException(Throwable cause) {
+    public LoginException(Throwable cause) {
         super(cause);
     }
 
@@ -34,7 +34,7 @@ public final class LoginFailedException extends Exception{
      * @param message The detail message to be included in the exception.
      * @param cause   The cause of the exception.
      */
-    public LoginFailedException(String message, Throwable cause) {
+    public LoginException(String message, Throwable cause) {
         super(message, cause);
     }
 }
