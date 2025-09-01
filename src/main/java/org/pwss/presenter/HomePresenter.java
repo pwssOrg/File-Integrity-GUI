@@ -7,20 +7,20 @@ import javax.swing.SwingUtilities;
 import org.pwss.exception.scan.StartScanAllException;
 import org.pwss.exception.scan.StopScanException;
 import org.pwss.model.service.ScanService;
-import org.pwss.view.screen.HomeView;
+import org.pwss.view.screen.HomeScreen;
 
-public class HomePresenter extends BasePresenter<HomeView> {
+public class HomePresenter extends BasePresenter<HomeScreen> {
     private final ScanService scanService;
 
-    public HomePresenter(HomeView view, ScanService scanService) {
+    public HomePresenter(HomeScreen view, ScanService scanService) {
         super(view);
         this.scanService = scanService;
     }
 
     @Override
     protected void initListeners() {
-        view.getStartButton().addActionListener(e -> performStartScan());
-        view.getStopButton().addActionListener(e -> performStopScan());
+        getScreen().getStartButton().addActionListener(e -> performStartScan());
+        getScreen().getStopButton().addActionListener(e -> performStopScan());
     }
 
     private void performStartScan() {
@@ -28,13 +28,13 @@ public class HomePresenter extends BasePresenter<HomeView> {
             boolean startScanSuccess = scanService.startScan();
             SwingUtilities.invokeLater(() -> {
                 if (startScanSuccess) {
-                    view.showSuccess("Scan started successfully!");
+                    getScreen().showSuccess("Scan started successfully!");
                 } else {
-                    view.showError("Failed to start scan.");
+                    getScreen().showError("Failed to start scan.");
                 }
             });
         } catch (ExecutionException | InterruptedException | StartScanAllException e) {
-            SwingUtilities.invokeLater(() -> view.showError("Error starting scan: " + e.getMessage()));
+            SwingUtilities.invokeLater(() -> screen.showError("Error starting scan: " + e.getMessage()));
         }
     }
 
@@ -43,13 +43,13 @@ public class HomePresenter extends BasePresenter<HomeView> {
             boolean stopScanSuccess = scanService.stopScan();
             SwingUtilities.invokeLater(() -> {
                 if (stopScanSuccess) {
-                    view.showSuccess("Scan stopped successfully!");
+                    getScreen().showSuccess("Scan stopped successfully!");
                 } else {
-                    view.showError("Failed to stop scan.");
+                    getScreen().showError("Failed to stop scan.");
                 }
             });
         } catch (ExecutionException | InterruptedException | StopScanException e) {
-            SwingUtilities.invokeLater(() -> view.showError("Error stopping scan: " + e.getMessage()));
+            SwingUtilities.invokeLater(() -> getScreen().showError("Error stopping scan: " + e.getMessage()));
         }
     }
 }

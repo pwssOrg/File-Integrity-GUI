@@ -14,7 +14,7 @@ public enum Endpoint {
     /**
      * Endpoint for creating a user.
      */
-    CREATE_USER(HTTP_Method.POST, A.BASE_URL + A.USER + "create-user"),
+    CREATE_USER(HTTP_Method.POST, A.BASE_URL + A.USER + "create"),
     /**
      * Endpoint for user login.
      */

@@ -1,31 +1,32 @@
 package org.pwss.presenter;
 
-import javax.swing.JPanel;
+import org.pwss.view.screen.BaseScreen;
+
 
 /**
  * An abstract base class for presenters in the application.
- * Provides a common structure for managing a `JFrame` view and initializing event listeners.
+ * Provides a common structure for managing a `BaseScreen` view and initializing event listeners.
  */
-public abstract class BasePresenter<View extends JPanel> {
+public abstract class BasePresenter<Screen extends BaseScreen> {
     /**
      * The view instance managed by this presenter.
      * Represents the UI component associated with this presenter.
      */
-    protected View view;
+    protected Screen screen;
 
     /**
      * Constructs a `BasePresenter` with the specified view.
      * Initializes the view and sets up event listeners.
      *
-     * @param view The `View` instance to be managed by this presenter.
+     * @param screen The `Screen` instance to be managed by this presenter.
      */
-    public BasePresenter(View view) {
-        this.view = view;
+    public BasePresenter(Screen screen) {
+        this.screen = screen;
         initListeners();
     }
 
     /**
-     * Abstract method to initialize event listeners for the view.
+     * Abstract method to initialize event listeners for the Screen.
      * Subclasses must provide an implementation for this method.
      */
     protected abstract void initListeners();
@@ -33,9 +34,9 @@ public abstract class BasePresenter<View extends JPanel> {
     /**
      * Retrieves the view managed by this presenter.
      *
-     * @return The `View` instance representing the managed view.
+     * @return The `Screen` instance representing the managed view.
      */
-    public View getView() {
-        return view;
+    public Screen getScreen() {
+        return screen;
     }
 }

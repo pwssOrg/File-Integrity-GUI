@@ -47,7 +47,7 @@ public class NavigationHandler {
      */
     public void navigateTo(Screen screen) {
         BasePresenter<?> presenter = presenters.computeIfAbsent(screen, factory::createPresenter);
-        JPanel view = presenter.getView();
+        JPanel view = presenter.getScreen();
 
         frame.getContentPane().removeAll();
         frame.getContentPane().add(view);

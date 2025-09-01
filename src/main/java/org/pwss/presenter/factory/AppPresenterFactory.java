@@ -6,8 +6,8 @@ import org.pwss.navigation.Screen;
 import org.pwss.presenter.BasePresenter;
 import org.pwss.presenter.LoginPresenter;
 import org.pwss.presenter.HomePresenter;
-import org.pwss.view.screen.LoginView;
-import org.pwss.view.screen.HomeView;
+import org.pwss.view.screen.HomeScreen;
+import org.pwss.view.screen.LoginScreen;
 
 /**
  * A factory class responsible for creating presenters for different screens in the application.
@@ -25,9 +25,9 @@ public class AppPresenterFactory implements PresenterFactory {
     public BasePresenter<?> createPresenter(Screen screen) {
         switch (screen) {
             case LOGIN:
-                return new LoginPresenter(new LoginView(), new AuthService());
+                return new LoginPresenter(new LoginScreen(), new AuthService());
             case HOME:
-                return new HomePresenter(new HomeView(), new ScanService());
+                return new HomePresenter(new HomeScreen(), new ScanService());
             default:
                 throw new IllegalArgumentException("Unknown screen: " + screen);
         }

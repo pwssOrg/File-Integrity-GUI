@@ -7,19 +7,19 @@ import java.awt.Insets;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 
-public class LoginView extends JPanel {
+public class LoginScreen extends BaseScreen {
+    private final JLabel messageLabel = new JLabel("", JLabel.CENTER);
     private final JTextField usernameField = new JTextField(20);
     private final JPasswordField passwordField = new JPasswordField(20);
-    private final JButton loginButton = new JButton("Login");
+    private final JButton proceedButton = new JButton("");
     private final JButton cancelButton = new JButton("Cancel");
 
-    public LoginView() {
+    public LoginScreen() {
         setLayout(new BorderLayout()); // fills parent
 
         // Inner panel (form fields)
@@ -28,27 +28,34 @@ public class LoginView extends JPanel {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Username
+        // Message label (spanning 2 columns)
         gbc.gridx = 0;
         gbc.gridy = 0;
-        formPanel.add(new JLabel("Username:"), gbc);
+        gbc.gridwidth = 2;
+        formPanel.add(messageLabel, gbc);
+
+        // Username
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        formPanel.add(new JLabel("Username"), gbc);
         gbc.gridx = 1;
         formPanel.add(usernameField, gbc);
 
         // Password
         gbc.gridx = 0;
-        gbc.gridy = 1;
-        formPanel.add(new JLabel("Password:"), gbc);
+        gbc.gridy = 2;
+        formPanel.add(new JLabel("Password"), gbc);
         gbc.gridx = 1;
         formPanel.add(passwordField, gbc);
 
         // Buttons
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(loginButton);
+        buttonPanel.add(proceedButton);
         buttonPanel.add(cancelButton);
 
         gbc.gridx = 0;
-        gbc.gridy = 2;
+        gbc.gridy = 3;
         gbc.gridwidth = 2;
         formPanel.add(buttonPanel, gbc);
 
@@ -60,28 +67,51 @@ public class LoginView extends JPanel {
         add(wrapper, BorderLayout.CENTER);
     }
 
-    // Getters for fields & buttons
+    @Override
+    protected String getScreenName() {
+        return "Authentication";
+    }
+
+    /**
+     * Get trimmed username
+     *
+     * @return trimmed username from input field
+     */
     public String getUsername() {
         return usernameField.getText().trim();
     }
 
+    /**
+     * Get password as String
+     * @return password from input field
+     */
     public String getPassword() {
         return new String(passwordField.getPassword());
     }
 
-    public JButton getLoginButton() {
-        return loginButton;
+    /**
+     * Get proceed button for access in presenter
+     *
+     * @return JButton instance of proceed button in view hierarchy
+     */
+    public JButton getProceedButton() {
+        return proceedButton;
     }
 
+    /**
+     * Get cancel button for access in presenter
+     * @return JButton instance of cancel button in view hierarchy
+     */
     public JButton getCancelButton() {
         return cancelButton;
     }
 
-    public void showSuccess(String message) {
-        JOptionPane.showMessageDialog(this, message, "Login Success", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Login Error", JOptionPane.ERROR_MESSAGE);
+    /**
+     * Set message in message label
+     *
+     * @param message message to set in label
+     */
+    public void setMessage(String message) {
+        messageLabel.setText(message);
     }
 }
