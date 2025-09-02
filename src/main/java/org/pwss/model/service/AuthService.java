@@ -40,7 +40,7 @@ public class AuthService {
 
         return switch (response.statusCode()) {
             case 200 -> Boolean.parseBoolean(response.body());
-            case 404 -> throw new UserExistsLookupException("User existence check failed: No user found");
+            case 404 -> false;
             case 500 -> throw new UserExistsLookupException("User existence check failed: Server error");
             default ->
                     throw new UserExistsLookupException("User existence check failed: Unexpected status code " + response.statusCode());

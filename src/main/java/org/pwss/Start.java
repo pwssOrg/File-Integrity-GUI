@@ -15,7 +15,7 @@ public class Start {
             // Create the main frame
             JFrame frame = new JFrame("Scan Integrity Scanner");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(250, 250);
+            frame.setSize(350, 250);
             frame.setLocationRelativeTo(null); // center on screen
 
             // Create presenter factory

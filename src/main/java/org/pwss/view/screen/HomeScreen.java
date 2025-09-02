@@ -6,15 +6,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class HomeView extends JPanel {
-
+public class HomeScreen extends BaseScreen {
     private final JButton startButton;
     private final JButton stopButton;
 
-    public HomeView() {
+    public HomeScreen() {
         setLayout(new BorderLayout());
 
         // Buttons
@@ -33,19 +31,26 @@ public class HomeView extends JPanel {
         add(wrapper, BorderLayout.CENTER);
     }
 
+    @Override
+    protected String getScreenName() {
+        return "Home";
+    }
+
+    /**
+     * Get the Start button.
+     *
+     * @return The Start JButton.
+     */
     public JButton getStartButton() {
         return startButton;
     }
 
+    /**
+     * Get the Stop button.
+     *
+     * @return The Stop JButton.
+     */
     public JButton getStopButton() {
         return stopButton;
-    }
-
-    public void showSuccess(String message) {
-        JOptionPane.showMessageDialog(this, message, "Scan success", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, "Scan error", JOptionPane.ERROR_MESSAGE);
     }
 }
