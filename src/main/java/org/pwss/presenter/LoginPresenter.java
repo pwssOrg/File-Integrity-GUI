@@ -30,7 +30,8 @@ public class LoginPresenter extends BasePresenter<LoginScreen> {
     public LoginPresenter(LoginScreen view, AuthService authService) {
         super(view);
         this.authService = authService;
-        this.createUserMode = checkUserExists();
+        this.createUserMode = !checkUserExists();
+        updateUiState();
     }
 
     @Override
@@ -41,39 +42,45 @@ public class LoginPresenter extends BasePresenter<LoginScreen> {
 
     /**
      * Checks if any users exist in the system.
-     * If no users exist, updates the view to prompt for user creation.
      *
-     * @return true if no users exist (create user mode), false otherwise.
+     * @return true if users exist, false otherwise.
      */
     private boolean checkUserExists() {
         try {
-            if (!authService.userExists()) {
-                // Notify user that no users exist and they need to create one
-                getScreen().showInfo("No user found.\nCreate one by entering a username and password.");
-                // Update message label to indicate user creation
-                getScreen().setMessage("Create a user for the first login");
-                // Change button text to "Register"
-                getScreen().getProceedButton().setText("Register");
-                return true;
-            } else {
-                // Update message label to indicate normal login
-                getScreen().setMessage("Login with your username and password.");
-                // Change button text to "Login"
-                getScreen().getProceedButton().setText("Login");
-                return false;
-            }
+            return authService.userExists();
         } catch (UserExistsLookupException | ExecutionException e) {
             SwingUtilities.invokeLater(() ->
                     screen.showError("Error checking user existence: " + e.getMessage()));
+            return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             SwingUtilities.invokeLater(() ->
                     screen.showError("Operation interrupted: " + e.getMessage()));
+            return true;
         } catch (Exception e) {
             SwingUtilities.invokeLater(() ->
                     screen.showError("An unexpected error occurred: " + e.getMessage()));
+            return true;
         }
-        throw new IllegalStateException("Failed to determine user existence due to an error.");
+    }
+
+    /**
+     * Updates the UI state based on whether the application is in create user mode or normal login mode.
+     */
+    private void updateUiState() {
+        if (createUserMode) {
+            // Notify user that no users exist and they need to create one
+            getScreen().showInfo("No user found.\nCreate one by entering a username and password.");
+            // Update message label to indicate user creation
+            getScreen().setMessage("Create a user for the first login");
+            // Change button text to "Register"
+            getScreen().getProceedButton().setText("Register");
+        } else {
+            // Update message label to indicate normal login
+            getScreen().setMessage("Login with your username and password.");
+            // Change button text to "Login"
+            getScreen().getProceedButton().setText("Login");
+        }
     }
 
     /**

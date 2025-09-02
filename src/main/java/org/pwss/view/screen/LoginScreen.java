@@ -83,6 +83,7 @@ public class LoginScreen extends BaseScreen {
 
     /**
      * Get password as String
+     *
      * @return password from input field
      */
     public String getPassword() {
@@ -100,6 +101,7 @@ public class LoginScreen extends BaseScreen {
 
     /**
      * Get cancel button for access in presenter
+     *
      * @return JButton instance of cancel button in view hierarchy
      */
     public JButton getCancelButton() {

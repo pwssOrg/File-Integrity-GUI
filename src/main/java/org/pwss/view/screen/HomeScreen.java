@@ -47,6 +47,7 @@ public class HomeScreen extends BaseScreen {
 
     /**
      * Get the Stop button.
+     *
      * @return The Stop JButton.
      */
     public JButton getStopButton() {
