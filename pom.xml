@@ -67,6 +67,13 @@
             <version>2.20.0</version>
         </dependency>
 
+        <!-- IntelliJ GUI Designer runtime -->
+        <dependency>
+            <groupId>com.intellij</groupId>
+            <artifactId>forms_rt</artifactId>
+            <version>7.0.3</version>
+        </dependency>
+
         <!-- FlatLaf dependency for modern UI look and feel -->
         <!--https://mvnrepository.com/artifact/com.formdev/flatlaf/3.6.1-->
         <dependency>

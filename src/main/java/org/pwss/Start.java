@@ -2,11 +2,7 @@ package org.pwss;
 
 import javax.swing.*;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatIntelliJLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.NavigationHandler;
 import org.pwss.navigation.Screen;
@@ -23,7 +19,7 @@ public class Start {
             SwingUtilities.invokeLater(() -> {
                 // Create the main frame
                 JFrame frame = new JFrame("File Integrity Scanner");
-                frame.setResizable(false);
+                frame.setResizable(true);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setLocationRelativeTo(null); // center on screen
 
