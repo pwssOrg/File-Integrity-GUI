@@ -12,6 +12,19 @@ public class LoginScreen extends BaseScreen {
     private JLabel passwordLabel;
     private JPanel rootPanel;
 
+    
+
+    public LoginScreen() {
+        this.proceedButton = new JButton();
+        this.cancelButton = new JButton();
+        this.usernameField = new JTextField();
+        this.messageLabel = new JLabel();
+        this.usernameLabel = new JLabel();
+        this.passwordLabel = new JLabel();
+        this.rootPanel = new JPanel();
+    
+    }
+
     @Override
     protected String getScreenName() {
         return "Authentication";

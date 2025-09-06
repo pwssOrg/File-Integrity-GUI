@@ -1,6 +1,5 @@
 package org.pwss.model.entity;
 
-import java.util.Date;
 
 /**
  * Represents a scan operation performed on a monitored directory.

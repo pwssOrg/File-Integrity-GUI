@@ -1,7 +1,6 @@
 package org.pwss.presenter.factory;
 
-import org.pwss.model.service.AuthService;
-import org.pwss.model.service.ScanService;
+
 import org.pwss.navigation.Screen;
 import org.pwss.presenter.BasePresenter;
 import org.pwss.presenter.LoginPresenter;
