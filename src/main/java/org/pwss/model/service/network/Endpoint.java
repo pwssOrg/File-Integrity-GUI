@@ -38,6 +38,10 @@ public enum Endpoint {
      * Endpoint for retrieving the status of a file integrity scan.
      */
     SCAN_STATUS(HTTP_Method.GET, A.BASE_URL + A.SCAN + "status"),
+    /**
+     * Endpoint most recent scans for all active monitored directories.
+     */
+    MOST_RECENT_SCANS(HTTP_Method.GET, A.BASE_URL + A.SCAN + "active-directory/most-recent"),
 
     // Directory Endpoints
     /**

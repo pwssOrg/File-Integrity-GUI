@@ -25,9 +25,9 @@ public class AppPresenterFactory implements PresenterFactory {
     public BasePresenter<?> createPresenter(Screen screen) {
         switch (screen) {
             case LOGIN:
-                return new LoginPresenter(new LoginScreen(), new AuthService());
+                return new LoginPresenter(new LoginScreen());
             case HOME:
-                return new HomePresenter(new HomeScreen(), new ScanService());
+                return new HomePresenter(new HomeScreen());
             default:
                 throw new IllegalArgumentException("Unknown screen: " + screen);
         }

@@ -6,11 +6,14 @@ import org.pwss.exception.scan.ScanStatusException;
 import org.pwss.exception.scan.StartScanAllException;
 import org.pwss.exception.scan.StartScanByIdException;
 import org.pwss.exception.scan.StopScanException;
+import org.pwss.model.entity.Scan;
 import org.pwss.model.service.network.Endpoint;
 import org.pwss.model.service.network.PwssHttpClient;
 import org.pwss.model.service.request.scan.StartSingleScanRequest;
 
 import java.net.http.HttpResponse;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -117,6 +120,17 @@ public class ScanService {
             case 500 ->
                     throw new ScanStatusException("Scan status check failed: An error occurred on the server while attempting to check the scan status.");
             default -> false;
+        };
+    }
+
+    public List<Scan> getMostRecentScans() throws ExecutionException, InterruptedException, JsonProcessingException {
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.MOST_RECENT_SCANS, null);
+
+        return switch (response.statusCode()) {
+            case 200 -> List.of(objectMapper.readValue(response.body(), Scan[].class));
+            case 401 -> throw new RuntimeException("Failed to fetch most recent scans: User not authorized to perform this action.");
+            case 500 -> throw new RuntimeException("Failed to fetch most recent scans: Server error");
+            default -> Collections.emptyList();
         };
     }
 }

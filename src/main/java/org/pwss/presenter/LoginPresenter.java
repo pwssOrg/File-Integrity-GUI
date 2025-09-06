@@ -7,9 +7,9 @@ import org.pwss.exception.user.UserExistsLookupException;
 import org.pwss.model.service.AuthService;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
-import org.pwss.view.screen.LoginScreen;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.pwss.view.screen.LoginScreen;
 
 import java.util.concurrent.ExecutionException;
 
@@ -25,11 +25,10 @@ public class LoginPresenter extends BasePresenter<LoginScreen> {
      * Constructs a LoginPresenter with the specified view and authentication service.
      *
      * @param view        The LoginView instance to be managed by this presenter.
-     * @param authService The AuthService instance for handling authentication operations.
      */
-    public LoginPresenter(LoginScreen view, AuthService authService) {
+    public LoginPresenter(LoginScreen view) {
         super(view);
-        this.authService = authService;
+        this.authService = new AuthService();
         this.createUserMode = !checkUserExists();
         updateUiState();
     }

@@ -14,6 +14,7 @@ public abstract class BasePresenter<Screen extends BaseScreen> {
      */
     protected Screen screen;
 
+
     /**
      * Constructs a `BasePresenter` with the specified view.
      * Initializes the view and sets up event listeners.

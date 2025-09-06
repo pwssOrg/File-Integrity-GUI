@@ -65,6 +65,13 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.19.2</version>
         </dependency>
+
+        <!-- FlatLaf dependency for modern UI look and feel -->
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf</artifactId>
+            <version>3.6</version>
+        </dependency>
     </dependencies>
 
     <!-- Build configuration for the project -->

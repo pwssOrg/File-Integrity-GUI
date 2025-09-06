@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 
 import org.pwss.presenter.BasePresenter;
 import org.pwss.presenter.factory.PresenterFactory;
+import org.pwss.view.screen.BaseScreen;
 
 /**
  * Handles navigation between different screens in the application.
@@ -47,10 +48,11 @@ public class NavigationHandler {
      */
     public void navigateTo(Screen screen) {
         BasePresenter<?> presenter = presenters.computeIfAbsent(screen, factory::createPresenter);
-        JPanel view = presenter.getScreen();
+        BaseScreen baseScreen = presenter.getScreen();
 
         frame.getContentPane().removeAll();
-        frame.getContentPane().add(view);
+        frame.setSize(screen.frameWidth, screen.frameHeight);
+        frame.getContentPane().add(baseScreen.getRootPanel());
         frame.revalidate();
         frame.repaint();
     }

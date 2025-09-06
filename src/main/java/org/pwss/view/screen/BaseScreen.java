@@ -11,6 +11,14 @@ public abstract class BaseScreen extends JPanel {
      */
     protected abstract String getScreenName();
 
+
+    /**
+     * Get the root panel of the screen.
+     *
+     * @return The root JPanel.
+     */
+    public abstract JPanel getRootPanel();
+
     /**
      * Show a success message dialog.
      *
