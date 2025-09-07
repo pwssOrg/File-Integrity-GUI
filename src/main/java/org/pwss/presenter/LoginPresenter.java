@@ -30,13 +30,30 @@ public class LoginPresenter extends BasePresenter<LoginScreen> {
         super(view);
         this.authService = new AuthService();
         this.createUserMode = !checkUserExists();
-        updateUiState();
+        refreshView();
     }
 
     @Override
     protected void initListeners() {
         getScreen().getProceedButton().addActionListener(e -> onProceedButtonClick());
         getScreen().getCancelButton().addActionListener(e -> System.exit(0));
+    }
+
+    @Override
+    protected void refreshView() {
+        if (createUserMode) {
+            // Notify user that no users exist and they need to create one
+            getScreen().showInfo("No user found.\nCreate one by entering a username and password.");
+            // Update message label to indicate user creation
+            getScreen().setMessage("Create a user for the first login");
+            // Change button text to "Register"
+            getScreen().getProceedButton().setText("Register");
+        } else {
+            // Update message label to indicate normal login
+            getScreen().setMessage("Login with your username and password.");
+            // Change button text to "Login"
+            getScreen().getProceedButton().setText("Login");
+        }
     }
 
     /**
@@ -60,25 +77,6 @@ public class LoginPresenter extends BasePresenter<LoginScreen> {
             SwingUtilities.invokeLater(() ->
                     screen.showError("An unexpected error occurred: " + e.getMessage()));
             return true;
-        }
-    }
-
-    /**
-     * Updates the UI state based on whether the application is in create user mode or normal login mode.
-     */
-    private void updateUiState() {
-        if (createUserMode) {
-            // Notify user that no users exist and they need to create one
-            getScreen().showInfo("No user found.\nCreate one by entering a username and password.");
-            // Update message label to indicate user creation
-            getScreen().setMessage("Create a user for the first login");
-            // Change button text to "Register"
-            getScreen().getProceedButton().setText("Register");
-        } else {
-            // Update message label to indicate normal login
-            getScreen().setMessage("Login with your username and password.");
-            // Change button text to "Login"
-            getScreen().getProceedButton().setText("Login");
         }
     }
 

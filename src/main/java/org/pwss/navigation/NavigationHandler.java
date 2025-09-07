@@ -49,6 +49,8 @@ public class NavigationHandler {
     public void navigateTo(Screen screen) {
         BasePresenter<?> presenter = presenters.computeIfAbsent(screen, factory::createPresenter);
         BaseScreen baseScreen = presenter.getScreen();
+        // Ensure the presenter reloads its data when navigating to the screen
+        presenter.reloadData();
 
         frame.getContentPane().removeAll();
         frame.setSize(screen.frameWidth, screen.frameHeight);

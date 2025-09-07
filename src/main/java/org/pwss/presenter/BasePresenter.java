@@ -23,6 +23,7 @@ public abstract class BasePresenter<Screen extends BaseScreen> {
      */
     public BasePresenter(Screen screen) {
         this.screen = screen;
+        // Initialize event listeners
         initListeners();
     }
 
@@ -30,7 +31,22 @@ public abstract class BasePresenter<Screen extends BaseScreen> {
      * Abstract method to initialize event listeners for the Screen.
      * Subclasses must provide an implementation for this method.
      */
-    protected abstract void initListeners();
+    abstract void initListeners();
+
+    /**
+     * Abstract method to refresh or update the view.
+     * Subclasses must provide an implementation for this method.
+     */
+    abstract void refreshView();
+
+    /**
+     * Method to reload or refresh data displayed in the view.
+     * Subclasses can override this method to provide specific data reloading logic.
+     * The default implementation does nothing.
+     */
+    public void reloadData() {
+        // Default implementation does nothing
+    }
 
     /**
      * Retrieves the view managed by this presenter.

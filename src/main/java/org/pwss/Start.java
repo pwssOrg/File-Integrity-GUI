@@ -2,7 +2,7 @@ package org.pwss;
 
 import javax.swing.*;
 
-import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatDarculaLaf;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.NavigationHandler;
 import org.pwss.navigation.Screen;
@@ -13,7 +13,7 @@ public class Start {
     public static void main(String[] args) {
         try {
             // Set FlatLaf Look and Feel
-            UIManager.setLookAndFeel(new FlatDarkLaf());
+            UIManager.setLookAndFeel(new FlatDarculaLaf());
 
             // Create Main UI of the application on the Event Dispatch Thread
             SwingUtilities.invokeLater(() -> {

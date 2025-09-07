@@ -59,5 +59,19 @@ public class MonitoredDirectoryTableModel extends AbstractTableModel {
             default -> null;
         };
     }
+
+    /**
+     * Returns the MonitoredDirectory object at the specified row index.
+     *
+     * @param rowIndex the index of the row
+     * @return the MonitoredDirectory object at the specified row, or null if the index is out of bounds
+     */
+    public MonitoredDirectory getDirectoryAt(int rowIndex) {
+        if (rowIndex >= 0 && rowIndex < directories.size()) {
+            return directories.get(rowIndex);
+        }
+        return null;
+    }
+
 }
 
