@@ -8,7 +8,7 @@ import java.util.List;
 public class ScanTableModel extends AbstractTableModel {
     private final List<Scan> scans;
     private final String[] columnNames = {
-            "ID", "Scan Time", "Status", "Notes", "Directory", "Baseline"
+            "Directory", "Scan Time", "Status", "Notes"
     };
 
     public ScanTableModel(List<Scan> scans) {
@@ -34,13 +34,24 @@ public class ScanTableModel extends AbstractTableModel {
     public Object getValueAt(int rowIndex, int columnIndex) {
         Scan scan = scans.get(rowIndex);
         return switch (columnIndex) {
-            case 0 -> scan.id();
+            case 0 -> scan.monitoredDirectory().path();
             case 1 -> scan.scanTime().created();
             case 2 -> scan.status();
             case 3 -> scan.notes() != null ? scan.notes().notes() : "";
-            case 4 -> scan.monitoredDirectory() != null ? scan.monitoredDirectory().path() : "";
-            case 5 -> scan.isBaselineScan();
             default -> null;
         };
+    }
+
+    /**
+     * Returns the Scan object at the specified row index.
+     *
+     * @param rowIndex the index of the row in the table.
+     * @return the Scan object at the specified row index, or null if the index is out of bounds.
+     */
+    public Scan getScanAt(int rowIndex) {
+        if (rowIndex >= 0 && rowIndex < scans.size()) {
+            return scans.get(rowIndex);
+        }
+        return null;
     }
 }

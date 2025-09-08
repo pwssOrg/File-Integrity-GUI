@@ -1,5 +1,6 @@
 package org.pwss.presenter;
 
+import org.pwss.presenter.util.NavigationContext;
 import org.pwss.view.screen.BaseScreen;
 
 
@@ -14,6 +15,28 @@ public abstract class BasePresenter<Screen extends BaseScreen> {
      */
     protected Screen screen;
 
+    /**
+     * The navigation context for passing data between different parts of the application during navigation.
+     */
+    private NavigationContext context;
+
+    /**
+     * Retrieves the current navigation context.
+     *
+     * @return The `NavigationContext` instance associated with this presenter.
+     */
+    protected NavigationContext getContext() {
+        return context;
+    }
+
+    /**
+     * Sets the navigation context for the presenter.
+     *
+     * @param context
+     */
+    public void setContext(NavigationContext context) {
+        this.context = context;
+    }
 
     /**
      * Constructs a `BasePresenter` with the specified view.
@@ -55,5 +78,14 @@ public abstract class BasePresenter<Screen extends BaseScreen> {
      */
     public Screen getScreen() {
         return screen;
+    }
+
+    /**
+     * Method called when the view is shown.
+     * Subclasses can override this method to perform actions when the view becomes visible.
+     * The default implementation does nothing.
+     */
+    public void onShow() {
+        // Default implementation does nothing
     }
 }

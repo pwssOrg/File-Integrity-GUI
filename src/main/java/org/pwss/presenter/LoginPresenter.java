@@ -30,6 +30,10 @@ public class LoginPresenter extends BasePresenter<LoginScreen> {
         super(view);
         this.authService = new AuthService();
         this.createUserMode = !checkUserExists();
+    }
+
+    @Override
+    public void onShow() {
         refreshView();
     }
 
@@ -169,7 +173,7 @@ public class LoginPresenter extends BasePresenter<LoginScreen> {
                     } else {
                         screen.showInfo("Logged in successfully!");
                     }
-                    NavigationEvents.navigateTo(Screen.HOME);
+                    NavigationEvents.navigateTo(Screen.HOME, null);
                 } else {
                     screen.showError("Invalid username or password.");
                 }

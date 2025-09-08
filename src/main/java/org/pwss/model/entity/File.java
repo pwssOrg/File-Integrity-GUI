@@ -10,7 +10,7 @@ import java.util.Date;
  * @param basename  Base name of the file (name without directory path).
  * @param directory Directory path where the file is located.
  * @param size      Size of the file in bytes.
- * @param mTime     Last modification time of the file.
+ * @param mtime     Last modification time of the file.
  */
-public record File(long id, String path, String basename, String directory, long size, Date mTime) {
+public record File(long id, String path, String basename, String directory, long size, Date mtime) {
 }

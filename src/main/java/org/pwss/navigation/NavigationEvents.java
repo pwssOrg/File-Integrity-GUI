@@ -1,5 +1,7 @@
 package org.pwss.navigation;
 
+import org.pwss.presenter.util.NavigationContext;
+
 /**
  * Handles navigation events within the application.
  */
@@ -22,10 +24,11 @@ public class NavigationEvents {
      * Navigates to the specified screen by invoking the listener's `onNavigate` method.
      *
      * @param screen The `Screen` to navigate to.
+     * @param context The `NavigationContext` containing data for the new screen.
      */
-    public static void navigateTo(Screen screen) {
+    public static void navigateTo(Screen screen, NavigationContext context) {
         if (listener != null) {
-            listener.onNavigate(screen);
+            listener.onNavigate(screen, context);
         }
     }
 }

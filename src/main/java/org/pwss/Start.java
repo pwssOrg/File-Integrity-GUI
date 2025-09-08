@@ -33,7 +33,7 @@ public class Start {
                 NavigationEvents.setListener(navigator::navigateTo);
 
                 // Start with Login screen
-                navigator.navigateTo(Screen.LOGIN);
+                navigator.navigateTo(Screen.LOGIN, null);
 
                 // Finally, show the main frame hosting the screens :)
                 frame.setVisible(true);

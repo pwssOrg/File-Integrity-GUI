@@ -14,13 +14,17 @@ public class NewDirectoryPresenter extends BasePresenter<NewDirectoryScreen> {
     public NewDirectoryPresenter(NewDirectoryScreen screen) {
         super(screen);
         this.monitoredDirectoryService = new MonitoredDirectoryService();
+    }
+
+    @Override
+    public void onShow() {
         refreshView();
     }
 
     @Override
     void initListeners() {
         getScreen().getSelectPathButton().addActionListener(e -> openFolderPicker());
-        getScreen().getCancelButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.HOME));
+        getScreen().getCancelButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.HOME, null));
         getScreen().getCreateButton().addActionListener(e -> createNewDirectory());
     }
 
@@ -56,7 +60,7 @@ public class NewDirectoryPresenter extends BasePresenter<NewDirectoryScreen> {
             try {
                 monitoredDirectoryService.createNewMonitoredDirectory(selectedPath, includeSubdirectories, makeActive);
                 JOptionPane.showMessageDialog(getScreen().getRootPanel(), "Directory added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
-                NavigationEvents.navigateTo(Screen.HOME);
+                NavigationEvents.navigateTo(Screen.HOME, null);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(getScreen().getRootPanel(), "Failed to add directory: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }

@@ -2,13 +2,11 @@ package org.pwss.presenter.factory;
 
 
 import org.pwss.navigation.Screen;
-import org.pwss.presenter.BasePresenter;
-import org.pwss.presenter.LoginPresenter;
-import org.pwss.presenter.HomePresenter;
-import org.pwss.presenter.NewDirectoryPresenter;
+import org.pwss.presenter.*;
 import org.pwss.view.screen.HomeScreen;
 import org.pwss.view.screen.LoginScreen;
 import org.pwss.view.screen.NewDirectoryScreen;
+import org.pwss.view.screen.ScanDetailsScreen;
 
 /**
  * A factory class responsible for creating presenters for different screens in the application.
@@ -20,7 +18,6 @@ public class AppPresenterFactory implements PresenterFactory {
      *
      * @param screen The `Screen` for which the presenter is to be created.
      * @return A `BasePresenter<?>` instance corresponding to the specified screen.
-     * @throws IllegalArgumentException If the specified screen is unknown.
      */
     @Override
     public BasePresenter<?> createPresenter(Screen screen) {
@@ -28,7 +25,7 @@ public class AppPresenterFactory implements PresenterFactory {
             case LOGIN -> new LoginPresenter(new LoginScreen());
             case HOME -> new HomePresenter(new HomeScreen());
             case NEW_DIRECTORY -> new NewDirectoryPresenter(new NewDirectoryScreen());
-            default -> throw new IllegalArgumentException("Unknown screen: " + screen);
+            case SCAN_SUMMARY -> new ScanDetailsPresenter(new ScanDetailsScreen());
         };
     }
 }

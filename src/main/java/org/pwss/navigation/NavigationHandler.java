@@ -8,6 +8,7 @@ import javax.swing.JFrame;
 
 import org.pwss.presenter.BasePresenter;
 import org.pwss.presenter.factory.PresenterFactory;
+import org.pwss.presenter.util.NavigationContext;
 import org.pwss.view.screen.BaseScreen;
 
 /**
@@ -41,13 +42,16 @@ public class NavigationHandler {
     }
 
     /**
-     * Navigates to the specified screen by retrieving or creating its presenter,
-     * updating the frame's content pane with the presenter's view, and refreshing the frame.
+     * Navigates to the specified screen, creating its presenter if it doesn't already exist.
+     * The presenter is set with the provided navigation context, and its data is reloaded.
      *
-     * @param screen The `Screen` to navigate to.
+     * @param screen  The `Screen` to navigate to.
+     * @param context The `NavigationContext` containing data for the new screen.
      */
-    public void navigateTo(Screen screen) {
+    public void navigateTo(Screen screen, NavigationContext context) {
         BasePresenter<?> presenter = presenters.computeIfAbsent(screen, factory::createPresenter);
+        // Set the navigation context for the presenter
+        presenter.setContext(context);
         BaseScreen baseScreen = presenter.getScreen();
         // Ensure the presenter reloads its data when navigating to the screen
         presenter.reloadData();
@@ -57,5 +61,8 @@ public class NavigationHandler {
         frame.getContentPane().add(baseScreen.getRootPanel());
         frame.revalidate();
         frame.repaint();
+
+        // Notify the presenter that its screen is now visible
+        presenter.onShow();
     }
 }
