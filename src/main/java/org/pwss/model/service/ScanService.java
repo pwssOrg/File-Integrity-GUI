@@ -7,6 +7,7 @@ import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.service.network.Endpoint;
 import org.pwss.model.service.network.PwssHttpClient;
+import org.pwss.model.service.request.scan.GetMostRecentScansRequest;
 import org.pwss.model.service.request.scan.GetScanDiffsRequest;
 import org.pwss.model.service.request.scan.StartSingleScanRequest;
 
@@ -122,13 +123,46 @@ public class ScanService {
         };
     }
 
-    public List<Scan> getMostRecentScans() throws ExecutionException, InterruptedException, JsonProcessingException {
-        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.MOST_RECENT_SCANS, null);
+    /**
+     * Retrieves the most recent scans for a specified number of active monitored directories by sending a request to the MOST_RECENT_SCANS endpoint.
+     *
+     * @param nrOfScans The number of most recent scans to retrieve.
+     * @return A list of the most recent Scan objects if the request is successful.
+     * @throws GetMostRecentScansException If the attempt to retrieve the most recent scans fails due to various reasons such as invalid credentials, no active monitored directories, or server error.
+     * @throws ExecutionException         If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException       If the thread executing the request is interrupted.
+     * @throws JsonProcessingException    If an error occurs while processing JSON data.
+     */
+    public List<Scan> getMostRecentScans(long nrOfScans) throws GetMostRecentScansException, ExecutionException, InterruptedException, JsonProcessingException {
+        String body = objectMapper.writeValueAsString(new GetMostRecentScansRequest(nrOfScans));
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.MOST_RECENT_SCANS, body);
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), Scan[].class));
-            case 401 -> throw new RuntimeException("Failed to fetch most recent scans: User not authorized to perform this action.");
-            case 500 -> throw new RuntimeException("Failed to fetch most recent scans: Server error");
+            case 401 -> throw new GetMostRecentScansException("Failed to fetch most recent scans: User not authorized to perform this action.");
+            case 404 -> throw new GetMostRecentScansException("Failed to fetch most recent scans: No active monitored directories found.");
+            case 500 -> throw new GetMostRecentScansException("Failed to fetch most recent scans: Server error");
+            default -> Collections.emptyList();
+        };
+    }
+
+    /**
+     * Retrieves the most recent scans for all active monitored directories by sending a request to the MOST_RECENT_SCANS_ALL endpoint.
+     *
+     * @return A list of the most recent Scan objects if the request is successful.
+     * @throws GetAllMostRecentScansException If the attempt to retrieve the most recent scans fails due to various reasons such as invalid credentials, no active monitored directories, or server error.
+     * @throws ExecutionException         If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException       If the thread executing the request is interrupted.
+     * @throws JsonProcessingException    If an error occurs while processing JSON data.
+     */
+    public List<Scan> getMostRecentScansAll() throws GetAllMostRecentScansException, ExecutionException, InterruptedException, JsonProcessingException {
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.MOST_RECENT_SCANS_ALL, null);
+
+        return switch (response.statusCode()) {
+            case 200 -> List.of(objectMapper.readValue(response.body(), Scan[].class));
+            case 401 -> throw new GetAllMostRecentScansException("Failed to fetch most recent scans: User not authorized to perform this action.");
+            case 404 -> throw new GetAllMostRecentScansException("Failed to fetch most recent scans: No active monitored directories found.");
+            case 500 -> throw new GetAllMostRecentScansException("Failed to fetch most recent scans: Server error");
             default -> Collections.emptyList();
         };
     }
@@ -144,6 +178,5 @@ public class ScanService {
             case 500 -> throw new GetScanDiffsException("Failed to fetch scan diffs: Server error");
             default -> Collections.emptyList();
         };
-
     }
 }

@@ -53,7 +53,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
 
         // Fetch recent scans for display in the scan table
         try {
-            recentScans = scanService.getMostRecentScans();
+            recentScans = scanService.getMostRecentScansAll();
         } catch (ExecutionException | InterruptedException | JsonProcessingException e) {
             throw new RuntimeException(e);
         }
