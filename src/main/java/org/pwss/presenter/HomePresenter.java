@@ -164,7 +164,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             return; // already polling
         }
 
-        scanStatusTimer = new Timer(1000, e -> {
+        scanStatusTimer = new Timer(1500, e -> {
             try {
                 boolean running = scanService.scanRunning();
                 if (running != scanRunning) {

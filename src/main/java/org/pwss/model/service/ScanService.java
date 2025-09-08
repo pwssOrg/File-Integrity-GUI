@@ -2,13 +2,12 @@ package org.pwss.model.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pwss.exception.scan.ScanStatusException;
-import org.pwss.exception.scan.StartScanAllException;
-import org.pwss.exception.scan.StartScanByIdException;
-import org.pwss.exception.scan.StopScanException;
+import org.pwss.exception.scan.*;
+import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.service.network.Endpoint;
 import org.pwss.model.service.network.PwssHttpClient;
+import org.pwss.model.service.request.scan.GetScanDiffsRequest;
 import org.pwss.model.service.request.scan.StartSingleScanRequest;
 
 import java.net.http.HttpResponse;
@@ -132,5 +131,19 @@ public class ScanService {
             case 500 -> throw new RuntimeException("Failed to fetch most recent scans: Server error");
             default -> Collections.emptyList();
         };
+    }
+
+    public List<Diff> getDiffs(long scanId, long limit, String sortField, boolean ascending) throws GetScanDiffsException, ExecutionException, InterruptedException, JsonProcessingException {
+        String body = objectMapper.writeValueAsString(new GetScanDiffsRequest(scanId, limit, sortField, ascending));
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.SCAN_DIFFS, body);
+
+        return switch (response.statusCode()) {
+            case 200 -> List.of(objectMapper.readValue(response.body(), Diff[].class));
+            case 401 -> throw new GetScanDiffsException("Failed to fetch scan diffs: User not authorized to perform this action.");
+            case 404 -> throw new GetScanDiffsException("Failed to fetch scan diffs: Scan with the given ID not found.");
+            case 500 -> throw new GetScanDiffsException("Failed to fetch scan diffs: Server error");
+            default -> Collections.emptyList();
+        };
+
     }
 }

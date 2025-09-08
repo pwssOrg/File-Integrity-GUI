@@ -42,6 +42,11 @@ public enum Endpoint {
      * Endpoint most recent scans for all active monitored directories.
      */
     MOST_RECENT_SCANS(HTTP_Method.GET, A.BASE_URL + A.SCAN + "active-directory/most-recent"),
+    /**
+     * Endpoint for retrieving all scans.
+     */
+    SCAN_DIFFS(HTTP_Method.POST, A.BASE_URL + A.SCAN + "diffs"),
+
 
     // Directory Endpoints
     /**
