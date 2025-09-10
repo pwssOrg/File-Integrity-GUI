@@ -14,6 +14,7 @@ import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.service.MonitoredDirectoryService;
 import org.pwss.model.service.ScanService;
+import org.pwss.model.service.response.LiveFeedResponse;
 import org.pwss.model.table.MonitoredDirectoryTableModel;
 import org.pwss.model.table.ScanTableModel;
 import org.pwss.navigation.NavigationEvents;
@@ -53,8 +54,15 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             allMonitoredDirectories = monitoredDirectoryService.getAllDirectories();
             // Fetch recent scans for display in the scan table
             recentScans = scanService.getMostRecentScansAll();
+            // Check if a scan is currently running
+            boolean scanCurrentlyRunning = scanService.scanRunning();
+            // If a scan has started since the last check, initiate polling
+            if (scanCurrentlyRunning && !scanRunning) {
+                scanRunning = true;
+                startPollingScanLiveFeed();
+            }
         } catch (MonitoredDirectoryGetAllException | ExecutionException | InterruptedException |
-                 JsonProcessingException | GetAllMostRecentScansException e) {
+                 JsonProcessingException | GetAllMostRecentScansException | ScanStatusException e) {
             SwingUtilities.invokeLater(() -> screen.showError("Error getting data: " + e.getMessage()));
         }
         // Finally, refresh the view to reflect the updated data
@@ -71,7 +79,23 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         screen.getAddNewDirectoryButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.NEW_DIRECTORY, null));
         screen.getScanButton().addActionListener(e -> handleScanButtonClick(false));
         screen.getQuickScanButton().addActionListener(e -> handleScanButtonClick(false));
-        screen.getScanSingleButton().addActionListener(e -> handleScanButtonClick(true));
+        screen.getMonitoredDirectoriesTable().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && screen.getMonitoredDirectoriesTable().getSelectedRow() != -1) {
+                    int viewRow = screen.getMonitoredDirectoriesTable().getSelectedRow();
+                    int modelRow = screen.getMonitoredDirectoriesTable().convertRowIndexToModel(viewRow);
+
+                    MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) screen.getMonitoredDirectoriesTable().getModel();
+                    MonitoredDirectory dir = model.getDirectoryAt(modelRow);
+
+                    if (dir != null) {
+                        NavigationContext context = new NavigationContext();
+                        handleScanButtonClick(true);
+                    }
+                }
+            }
+        });
         // Double-click listener for recent scans table to view scan details
         screen.getRecentScanTable().addMouseListener(new MouseAdapter() {
             @Override
@@ -96,21 +120,20 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
     @Override
     protected void refreshView() {
         // Update UI components based on the current state
-        try {
-            boolean isScanRunning = scanService.scanRunning();
-            screen.getScanButton().setText(isScanRunning ? "Stop Scan" : "Full Scan");
-            screen.getScanSingleButton().setText(isScanRunning ? "Stop Scan" : "Scan Selected");
-            screen.getQuickScanButton().setText(isScanRunning ? "Stop Scan" : "Quick Scan");
-            screen.getScanProgressContainer().setVisible(scanRunning);
+        screen.getScanButton().setText(scanRunning ? "Stop Scan" : "Full Scan");
+        screen.getQuickScanButton().setText(scanRunning ? "Stop Scan" : "Quick Scan");
 
-            ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans);
-            screen.getRecentScanTable().setModel(mostRecentScansListModel);
+        // Scan running views
+        screen.getScanProgressContainer().setVisible(scanRunning);
+        screen.getLiveFeedContainer().setVisible(scanRunning);
+        screen.getLiveFeedTitle().setVisible(scanRunning);
+        screen.getLiveFeedDiffCount().setVisible(scanRunning);
 
-            MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(allMonitoredDirectories);
-            screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
-        } catch (ScanStatusException | ExecutionException | InterruptedException e) {
-            SwingUtilities.invokeLater(() -> screen.showError("Error updating UI state: " + e.getMessage()));
-        }
+        ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans);
+        screen.getRecentScanTable().setModel(mostRecentScansListModel);
+
+        MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(allMonitoredDirectories);
+        screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
     }
 
     /**
@@ -156,7 +179,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             SwingUtilities.invokeLater(() -> {
                 if (startScanSuccess) {
                     screen.showSuccess("Scan started successfully!");
-                    startScanStatusPolling(singleDirectory);
+                    startPollingScanLiveFeed();
                 } else {
                     screen.showError("Failed to start scan.");
                 }
@@ -185,30 +208,46 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
     }
 
     /**
-     * Starts polling the scan status at regular intervals.
-     *
-     * @param singleDirectory if true, indicates that a single directory scan was initiated.
+     * Starts polling the live feed for scan updates.
+     * This method sets up a timer to periodically fetch live feed updates
+     * and update the UI accordingly.
      */
-    private void startScanStatusPolling(boolean singleDirectory) {
-        if (scanStatusTimer != null && scanStatusTimer.isRunning()) {
-            return; // already polling
-        }
+    private void startPollingScanLiveFeed() {
+      if (scanStatusTimer != null && scanStatusTimer.isRunning()) {
+          return; // Polling is already active
+      }
 
-        scanStatusTimer = new Timer(1500, e -> {
-            try {
-                boolean running = scanService.scanRunning();
-                if (running != scanRunning) {
-                    scanRunning = running;
-                    refreshView(); // update UI if state changed
-                }
-                if (!running) {
-                    scanStatusTimer.stop(); // stop polling when scan ends
-                    fetchDataAndRefreshView(); // refresh data when scan ends to get latest scans
-                }
-            } catch (ScanStatusException | ExecutionException | InterruptedException ex) {
-                SwingUtilities.invokeLater(() -> screen.showError("Error checking scan status: " + ex.getMessage()));
-            }
-        });
-        scanStatusTimer.start();
+      scanStatusTimer = new Timer(1000, e -> {
+          try {
+              // Retrieve live feed updates
+              LiveFeedResponse liveFeed = scanService.getLiveFeed();
+
+              String currentLiveFeedText = screen.getLiveFeedText().getText();
+              String newEntry = liveFeed.livefeed();
+              // Format live feed entries for improved readability
+              newEntry = newEntry.replace("✅", "✅\n")
+                      .replace("⚠️", "⚠️\n");
+              // Append new entries to the existing feed
+              String updatedLiveFeedText = currentLiveFeedText + newEntry;
+              screen.getLiveFeedText().setText(updatedLiveFeedText);
+
+              // Update scanRunning state and refresh the UI if necessary
+              if (liveFeed.isScanRunning() != scanRunning) {
+                  scanRunning = liveFeed.isScanRunning();
+                  refreshView();
+              }
+              if (!liveFeed.isScanRunning()) {
+                  scanStatusTimer.stop(); // Terminate polling when the scan completes
+                  fetchDataAndRefreshView(); // Refresh data to display the latest scan results
+                  // Clear the live feed text area in preparation for the next scan
+                  screen.getLiveFeedText().setText("");
+                  // Notify the user of scan completion
+                  screen.showSuccess("Scan completed successfully!");
+              }
+          } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
+              SwingUtilities.invokeLater(() -> screen.showError("An error occurred while retrieving the live feed: " + ex.getMessage()));
+          }
+      });
+      scanStatusTimer.start();
     }
 }

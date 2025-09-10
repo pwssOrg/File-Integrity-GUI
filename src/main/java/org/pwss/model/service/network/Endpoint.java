@@ -35,6 +35,10 @@ public enum Endpoint {
      */
     STOP_SCAN(HTTP_Method.GET, A.BASE_URL + A.SCAN + "stop"),
     /**
+     * Endpoint for retrieving the live feed of a file integrity scan.
+     */
+    LIVE_FEED(HTTP_Method.GET, A.BASE_URL + A.SCAN + "live-feed"),
+    /**
      * Endpoint for retrieving the status of a file integrity scan.
      */
     SCAN_STATUS(HTTP_Method.GET, A.BASE_URL + A.SCAN + "status"),
