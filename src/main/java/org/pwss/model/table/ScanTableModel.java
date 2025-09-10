@@ -1,0 +1,57 @@
+package org.pwss.model.table;
+
+import org.pwss.model.entity.Scan;
+
+import javax.swing.table.AbstractTableModel;
+import java.util.List;
+
+public class ScanTableModel extends AbstractTableModel {
+    private final List<Scan> scans;
+    private final String[] columnNames = {
+            "Directory", "Scan Time", "Status", "Notes"
+    };
+
+    public ScanTableModel(List<Scan> scans) {
+        this.scans = scans;
+    }
+
+    @Override
+    public int getRowCount() {
+        return scans.size();
+    }
+
+    @Override
+    public int getColumnCount() {
+        return columnNames.length;
+    }
+
+    @Override
+    public String getColumnName(int column) {
+        return columnNames[column];
+    }
+
+    @Override
+    public Object getValueAt(int rowIndex, int columnIndex) {
+        Scan scan = scans.get(rowIndex);
+        return switch (columnIndex) {
+            case 0 -> scan.monitoredDirectory().path();
+            case 1 -> scan.scanTime().created();
+            case 2 -> scan.status();
+            case 3 -> scan.notes() != null ? scan.notes().notes() : "";
+            default -> null;
+        };
+    }
+
+    /**
+     * Returns the Scan object at the specified row index.
+     *
+     * @param rowIndex the index of the row in the table.
+     * @return the Scan object at the specified row index, or null if the index is out of bounds.
+     */
+    public Scan getScanAt(int rowIndex) {
+        if (rowIndex >= 0 && rowIndex < scans.size()) {
+            return scans.get(rowIndex);
+        }
+        return null;
+    }
+}

@@ -14,7 +14,7 @@ public enum Endpoint {
     /**
      * Endpoint for creating a user.
      */
-    CREATE_USER(HTTP_Method.POST, A.BASE_URL + A.USER + "create-user"),
+    CREATE_USER(HTTP_Method.POST, A.BASE_URL + A.USER + "create"),
     /**
      * Endpoint for user login.
      */
@@ -38,6 +38,19 @@ public enum Endpoint {
      * Endpoint for retrieving the status of a file integrity scan.
      */
     SCAN_STATUS(HTTP_Method.GET, A.BASE_URL + A.SCAN + "status"),
+    /**
+     * Endpoint most recent scans for given count of active monitored directories.
+     */
+    MOST_RECENT_SCANS(HTTP_Method.POST, A.BASE_URL + A.SCAN + "scan/most-recent"),
+    /**
+     * Endpoint most recent scans for all active monitored directories.
+     */
+    MOST_RECENT_SCANS_ALL(HTTP_Method.GET, A.BASE_URL + A.SCAN + "active-directory/most-recent"),
+    /**
+     * Endpoint for retrieving all scans.
+     */
+    SCAN_DIFFS(HTTP_Method.POST, A.BASE_URL + A.SCAN + "diffs"),
+
 
     // Directory Endpoints
     /**
