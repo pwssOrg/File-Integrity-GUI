@@ -20,6 +20,7 @@ import org.pwss.model.table.ScanTableModel;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.presenter.util.NavigationContext;
+import org.pwss.utils.LiveFeedUtils;
 import org.pwss.view.screen.HomeScreen;
 
 public class HomePresenter extends BasePresenter<HomeScreen> {
@@ -30,6 +31,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
     private List<Scan> recentScans;
 
     private boolean scanRunning;
+    private long totalDiffCount = 0;
     private Timer scanStatusTimer;
 
     public HomePresenter(HomeScreen view) {
@@ -123,6 +125,9 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         screen.getScanButton().setText(scanRunning ? "Stop Scan" : "Full Scan");
         screen.getQuickScanButton().setText(scanRunning ? "Stop Scan" : "Quick Scan");
 
+        // Update live feed diff count
+        screen.getLiveFeedDiffCount().setText("Diffs: " + totalDiffCount);
+
         // Scan running views
         screen.getScanProgressContainer().setVisible(scanRunning);
         screen.getLiveFeedContainer().setVisible(scanRunning);
@@ -207,6 +212,20 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         }
     }
 
+    private void onFinishScan(boolean completed) {
+        if (totalDiffCount > 0 && completed) {
+            screen.showInfo("Scan completed with differences found.");
+        } else {
+            screen.showSuccess("Scan completed with no differences found.");
+        }
+        // Reset diff count for the next scan
+        totalDiffCount = 0;
+        // Clear the live feed text area in preparation for the next scan
+        screen.getLiveFeedText().setText("");
+        // Refresh data to display the latest scan results
+        fetchDataAndRefreshView();
+    }
+
     /**
      * Starts polling the live feed for scan updates.
      * This method sets up a timer to periodically fetch live feed updates
@@ -223,13 +242,12 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
               LiveFeedResponse liveFeed = scanService.getLiveFeed();
 
               String currentLiveFeedText = screen.getLiveFeedText().getText();
-              String newEntry = liveFeed.livefeed();
-              // Format live feed entries for improved readability
-              newEntry = newEntry.replace("✅", "✅\n")
-                      .replace("⚠️", "⚠️\n");
-              // Append new entries to the existing feed
+              String newEntry = LiveFeedUtils.formatLiveFeedEntry(liveFeed.livefeed());
               String updatedLiveFeedText = currentLiveFeedText + newEntry;
               screen.getLiveFeedText().setText(updatedLiveFeedText);
+
+              // Update the total difference count based on new warnings
+              totalDiffCount += LiveFeedUtils.countWarnings(liveFeed.livefeed());
 
               // Update scanRunning state and refresh the UI if necessary
               if (liveFeed.isScanRunning() != scanRunning) {
@@ -238,14 +256,12 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
               }
               if (!liveFeed.isScanRunning()) {
                   scanStatusTimer.stop(); // Terminate polling when the scan completes
-                  fetchDataAndRefreshView(); // Refresh data to display the latest scan results
-                  // Clear the live feed text area in preparation for the next scan
-                  screen.getLiveFeedText().setText("");
-                  // Notify the user of scan completion
-                  screen.showSuccess("Scan completed successfully!");
+                  onFinishScan(true);
               }
           } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
               SwingUtilities.invokeLater(() -> screen.showError("An error occurred while retrieving the live feed: " + ex.getMessage()));
+              scanStatusTimer.stop(); // Stop polling on error
+              onFinishScan(false);
           }
       });
       scanStatusTimer.start();
