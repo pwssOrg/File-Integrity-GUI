@@ -125,9 +125,6 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         screen.getScanButton().setText(scanRunning ? "Stop Scan" : "Full Scan");
         screen.getQuickScanButton().setText(scanRunning ? "Stop Scan" : "Quick Scan");
 
-        // Update live feed diff count
-        screen.getLiveFeedDiffCount().setText("Diffs: " + totalDiffCount);
-
         // Scan running views
         screen.getScanProgressContainer().setVisible(scanRunning);
         screen.getLiveFeedContainer().setVisible(scanRunning);
@@ -214,7 +211,11 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
 
     private void onFinishScan(boolean completed) {
         if (totalDiffCount > 0 && completed) {
-            screen.showInfo("Scan completed with differences found.");
+            int choice = screen.showOptionDialog("Scan completed with differences found. View details?", new String[]{"Yes", "No"}, "Yes");
+            if (choice == 0) {
+                // TODO: Navigate to the scan summary screen for the latest scan
+                // Note we need to know if its a full scan or a single scan
+            }
         } else {
             screen.showSuccess("Scan completed with no differences found.");
         }
@@ -248,6 +249,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
 
               // Update the total difference count based on new warnings
               totalDiffCount += LiveFeedUtils.countWarnings(liveFeed.livefeed());
+                screen.getLiveFeedDiffCount().setText("Diffs: " + totalDiffCount);
 
               // Update scanRunning state and refresh the UI if necessary
               if (liveFeed.isScanRunning() != scanRunning) {

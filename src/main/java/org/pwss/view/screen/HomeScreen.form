@@ -96,7 +96,10 @@
               </scrollpane>
               <scrollpane id="fde6e" binding="liveFeedContainer">
                 <constraints>
-                  <grid row="1" column="1" row-span="8" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <grid row="1" column="1" row-span="8" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                    <minimum-size width="300" height="-1"/>
+                    <preferred-size width="300" height="-1"/>
+                  </grid>
                 </constraints>
                 <properties/>
                 <border type="none"/>
