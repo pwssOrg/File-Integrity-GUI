@@ -163,7 +163,7 @@ public class HomeScreen extends BaseScreen {
         editDirectoryButton.setText("Edit directory");
         panel1.add(editDirectoryButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         liveFeedDiffCount = new JLabel();
-        liveFeedDiffCount.setText("TODO: SHOW ACTUAL VALUE HERE");
+        liveFeedDiffCount.setText("");
         scanTab.add(liveFeedDiffCount, new GridConstraints(9, 1, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         scanButton = new JButton();
         scanButton.setText("Full scan");

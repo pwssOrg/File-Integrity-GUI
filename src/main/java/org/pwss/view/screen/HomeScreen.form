@@ -154,7 +154,7 @@
                   <grid row="9" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="TODO: SHOW ACTUAL VALUE HERE"/>
+                  <text value=""/>
                 </properties>
               </component>
               <component id="e6b18" class="javax.swing.JButton" binding="scanButton" default-binding="true">

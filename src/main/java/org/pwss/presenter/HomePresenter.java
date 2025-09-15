@@ -166,7 +166,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             boolean startScanSuccess;
             JTable table = screen.getMonitoredDirectoriesTable();
             MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) table.getModel();
-            if (singleDirectory){
+            if (singleDirectory) {
                 int viewRow = table.getSelectedRow();
                 if (viewRow == -1) {
                     startScanSuccess = false;
@@ -186,7 +186,8 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                     screen.showError("Failed to start scan.");
                 }
             });
-        } catch (ExecutionException | InterruptedException | StartScanAllException | StartScanByIdException | JsonProcessingException e) {
+        } catch (ExecutionException | InterruptedException | StartScanAllException | StartScanByIdException |
+                 JsonProcessingException e) {
             SwingUtilities.invokeLater(() -> screen.showError("Error starting scan: " + e.getMessage()));
         }
     }
@@ -239,39 +240,39 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
      * and update the UI accordingly.
      */
     private void startPollingScanLiveFeed() {
-      if (scanStatusTimer != null && scanStatusTimer.isRunning()) {
-          return; // Polling is already active
-      }
+        if (scanStatusTimer != null && scanStatusTimer.isRunning()) {
+            return; // Polling is already active
+        }
 
-      scanStatusTimer = new Timer(1000, e -> {
-          try {
-              // Retrieve live feed updates
-              LiveFeedResponse liveFeed = scanService.getLiveFeed();
+        scanStatusTimer = new Timer(1000, e -> {
+            try {
+                // Retrieve live feed updates
+                LiveFeedResponse liveFeed = scanService.getLiveFeed();
 
-              String currentLiveFeedText = screen.getLiveFeedText().getText();
-              String newEntry = LiveFeedUtils.formatLiveFeedEntry(liveFeed.livefeed());
-              String updatedLiveFeedText = currentLiveFeedText + newEntry;
-              screen.getLiveFeedText().setText(updatedLiveFeedText);
+                String currentLiveFeedText = screen.getLiveFeedText().getText();
+                String newEntry = LiveFeedUtils.formatLiveFeedEntry(liveFeed.livefeed());
+                String updatedLiveFeedText = currentLiveFeedText + newEntry;
+                screen.getLiveFeedText().setText(updatedLiveFeedText);
 
-              // Update the total difference count based on new warnings
-              totalDiffCount += LiveFeedUtils.countWarnings(liveFeed.livefeed());
+                // Update the total difference count based on new warnings
+                totalDiffCount += LiveFeedUtils.countWarnings(liveFeed.livefeed());
                 screen.getLiveFeedDiffCount().setText("Diffs: " + totalDiffCount);
 
-              // Update scanRunning state and refresh the UI if necessary
-              if (liveFeed.isScanRunning() != scanRunning) {
-                  scanRunning = liveFeed.isScanRunning();
-                  refreshView();
-              }
-              if (!liveFeed.isScanRunning()) {
-                  scanStatusTimer.stop(); // Terminate polling when the scan completes
-                  onFinishScan(true);
-              }
-          } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
-              SwingUtilities.invokeLater(() -> screen.showError("An error occurred while retrieving the live feed: " + ex.getMessage()));
-              scanStatusTimer.stop(); // Stop polling on error
-              onFinishScan(false);
-          }
-      });
-      scanStatusTimer.start();
+                // Update scanRunning state and refresh the UI if necessary
+                if (liveFeed.isScanRunning() != scanRunning) {
+                    scanRunning = liveFeed.isScanRunning();
+                    refreshView();
+                }
+                if (!liveFeed.isScanRunning()) {
+                    scanStatusTimer.stop(); // Terminate polling when the scan completes
+                    onFinishScan(true);
+                }
+            } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
+                SwingUtilities.invokeLater(() -> screen.showError("An error occurred while retrieving the live feed: " + ex.getMessage()));
+                scanStatusTimer.stop(); // Stop polling on error
+                onFinishScan(false);
+            }
+        });
+        scanStatusTimer.start();
     }
 }
