@@ -16,12 +16,15 @@ public class ScanDetailsPresenter extends BasePresenter<ScanDetailsScreen> {
     public ScanDetailsPresenter(ScanDetailsScreen screen) {
         super(screen);
         this.scanSummaryService = new ScanSummaryService();
+        this.scanSummaries = List.of();
     }
 
     @Override
     public void onShow() {
-        // Clear existing data
-        scanSummaries.clear();
+        if (scanSummaries != null && !scanSummaries.isEmpty()) {
+            // Clear existing data
+            scanSummaries.clear();
+        }
         // Fetch data from the service
         fetchData();
     }

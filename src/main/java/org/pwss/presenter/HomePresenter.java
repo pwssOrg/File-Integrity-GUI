@@ -213,11 +213,17 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         if (totalDiffCount > 0 && completed) {
             int choice = screen.showOptionDialog("Scan completed with differences found. View details?", new String[]{"Yes", "No"}, "Yes");
             if (choice == 0) {
-                // TODO: Navigate to the scan summary screen for the latest scan
+                // TODO: Discuss with @pwgit-create
+                // Navigate to the scan summary screen for the latest scan
                 // Note we need to know if its a full scan or a single scan
+                // Alternatively show the upcoming diff viewer screen
             }
-        } else {
+        } else if (completed) {
+            // Scan completed with no differences
             screen.showSuccess("Scan completed with no differences found.");
+        } else {
+            // Scan did not complete successfully
+            screen.showError("Scan did not complete successfully.");
         }
         // Reset diff count for the next scan
         totalDiffCount = 0;
