@@ -1,6 +1,6 @@
 package org.pwss.utils;
 
-public class LiveFeedUtils {
+public final class LiveFeedUtils {
 
     /**
      * Formats a raw live feed entry for improved readability.
