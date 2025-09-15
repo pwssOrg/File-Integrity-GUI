@@ -12,7 +12,7 @@ public enum Screen {
     /**
      * The home screen displayed after successful login.
      */
-    HOME(800, 600),
+    HOME(1280, 800),
 
     /**
      * The screen for creating a new monitored directory.
@@ -22,7 +22,7 @@ public enum Screen {
     /**
      * The screen for viewing scan summaries.
      */
-    SCAN_SUMMARY(800, 600);
+    SCAN_SUMMARY(1280, 800);
 
     /**
      * The width of the frame for this screen.

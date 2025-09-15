@@ -29,6 +29,15 @@ public abstract class BaseScreen extends JPanel {
     }
 
     /**
+     * Show a warning message dialog.
+     *
+     * @param message The warning message to display.
+     */
+    public void showWarning(String message) {
+        JOptionPane.showMessageDialog(this, message, getScreenName(), JOptionPane.WARNING_MESSAGE);
+    }
+
+    /**
      * Show an error message dialog.
      *
      * @param message The error message to display.
@@ -52,15 +61,16 @@ public abstract class BaseScreen extends JPanel {
      * @param message       The message to display.
      * @param options       The button labels.
      * @param defaultOption The default selected option (can be null).
+     * @par
      * @return The index of the option chosen, or -1 if closed.
      */
-    public int showOptionDialog(String message, String[] options, String defaultOption) {
+    public int showOptionDialog(int dialogType, String message, String[] options, String defaultOption) {
         return JOptionPane.showOptionDialog(
                 this,
                 message,
                 getScreenName(),
                 JOptionPane.DEFAULT_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
+                dialogType,
                 null,
                 options,
                 defaultOption

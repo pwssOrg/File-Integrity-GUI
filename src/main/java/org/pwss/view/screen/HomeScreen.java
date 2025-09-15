@@ -142,7 +142,7 @@ public class HomeScreen extends BaseScreen {
         monitoredDirectoriesTable.setAutoResizeMode(2);
         scrollPane2.setViewportView(monitoredDirectoriesTable);
         liveFeedContainer = new JScrollPane();
-        scanTab.add(liveFeedContainer, new GridConstraints(1, 1, 8, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(300, -1), new Dimension(300, -1), null, 0, false));
+        scanTab.add(liveFeedContainer, new GridConstraints(1, 1, 8, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(450, -1), new Dimension(450, -1), null, 0, false));
         liveFeedText = new JTextPane();
         liveFeedText.setEditable(false);
         liveFeedText.setText("");
