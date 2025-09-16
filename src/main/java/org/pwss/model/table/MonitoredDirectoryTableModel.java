@@ -33,7 +33,7 @@ public class MonitoredDirectoryTableModel extends AbstractTableModel {
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         return switch (columnIndex) {
-            case 1, 3, 4 -> Boolean.class;
+            case 1, 4 -> Boolean.class;
             default -> super.getColumnClass(columnIndex);
         };
     }
@@ -46,7 +46,7 @@ public class MonitoredDirectoryTableModel extends AbstractTableModel {
             case 0 -> dir.path();
             case 1 -> dir.isActive();
             case 2 -> dir.lastScanned();
-            case 3 -> dir.baselineEstablished();
+            case 3 -> dir.baselineEstablished() ? "Yes" : "No";
             case 4 -> dir.includeSubdirectories();
             default -> null;
         };

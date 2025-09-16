@@ -1,15 +1,17 @@
 package org.pwss.model.table;
 
+import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.ScanSummary;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.Date;
 import java.util.List;
 
-public class ScanSummaryTableModel extends AbstractTableModel {
-    private final List<ScanSummary> data;
-    private final String[] columns = {"File Name"};
+public class DiffTableModel extends AbstractTableModel {
+    private final List<Diff> data;
+    private final String[] columns = {"File Path", "Modified", "Detected"};
 
-    public ScanSummaryTableModel(List<ScanSummary> data) {
+    public DiffTableModel(List<Diff> data) {
         this.data = data;
     }
 
@@ -30,20 +32,22 @@ public class ScanSummaryTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        ScanSummary summary = data.get(rowIndex);
+        Diff diff = data.get(rowIndex);
         return switch (columnIndex) {
-            case 0 -> summary.file().basename();
+            case 0 -> diff.baseline().file().path();
+            case 1 -> diff.integrityFail().file().mtime();
+            case 2 -> diff.time().created();
             default -> null;
         };
     }
 
     /**
-     * Get the ScanSummary object at the specified row index.
+     * Get the Diff object at the specified row index.
      *
      * @param rowIndex the index of the row in the table.
-     * @return the ScanSummary object at the specified row index, or null if the index is out of bounds.
+     * @return the Diff object at the specified row index, or null if the index is out of bounds.
      */
-    public ScanSummary getSummaryAt(int rowIndex) {
+    public Diff getDiffAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < data.size()) {
             return data.get(rowIndex);
         }

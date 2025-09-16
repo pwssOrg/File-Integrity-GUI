@@ -30,6 +30,7 @@ public class HomeScreen extends BaseScreen {
     private JLabel liveFeedTitle;
     private JScrollPane liveFeedContainer;
     private JLabel liveFeedDiffCount;
+    private JPanel settingsTab;
 
     @Override
     protected String getScreenName() {
@@ -175,6 +176,9 @@ public class HomeScreen extends BaseScreen {
         historyTable.setAutoResizeMode(4);
         historyTable.setFillsViewportHeight(true);
         historyTab.add(historyTable, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        settingsTab = new JPanel();
+        settingsTab.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        tabbedPane.addTab("Settings", settingsTab);
         scanProgressContainer = new JPanel();
         scanProgressContainer.setLayout(new GridLayoutManager(1, 2, new Insets(10, 10, 10, 10), -1, -1));
         rootPanel.add(scanProgressContainer, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, true));
