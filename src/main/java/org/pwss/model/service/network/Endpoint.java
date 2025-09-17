@@ -45,7 +45,7 @@ public enum Endpoint {
     /**
      * Endpoint most recent scans for given count of active monitored directories.
      */
-    MOST_RECENT_SCANS(HTTP_Method.POST, A.BASE_URL + A.SCAN + "scan/most-recent"),
+    MOST_RECENT_SCANS(HTTP_Method.POST, A.BASE_URL + A.SCAN + "most-recent"),
     /**
      * Endpoint most recent scans for all active monitored directories.
      */

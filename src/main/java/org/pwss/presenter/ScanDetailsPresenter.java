@@ -43,6 +43,7 @@ public class ScanDetailsPresenter extends BasePresenter<ScanDetailsScreen> {
         fetchData();
     }
 
+    /** Fetches scan summaries and diffs from the service based on the scan ID in the context. */
     private void fetchData() {
         try {
             Long scanId = getContext().get("scanId", Long.class);
@@ -53,7 +54,7 @@ public class ScanDetailsPresenter extends BasePresenter<ScanDetailsScreen> {
                 diffs = scanService.getDiffs(scanId, 1000, null, true);
             }
         } catch (Exception e) {
-            screen.showError("Failed to fetch scan details data: " + e.getMessage());
+            screen.showError(e.getMessage());
         }
         // Refresh the view with the new data
         refreshView();

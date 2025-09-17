@@ -21,7 +21,7 @@
           <grid id="2c888" binding="homeTab" layout-manager="GridLayoutManager" row-count="3" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="10" left="10" bottom="10" right="10"/>
             <constraints>
-              <tabbedpane title="Home"/>
+              <tabbedpane title="🏠 Home"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -64,7 +64,7 @@
           <grid id="13250" binding="scanTab" layout-manager="GridLayoutManager" row-count="10" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="10" left="10" bottom="10" right="10"/>
             <constraints>
-              <tabbedpane title="Scan"/>
+              <tabbedpane title="🔎 Scan"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -170,7 +170,7 @@
           <grid id="9581f" binding="historyTab" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="true" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="10" left="10" bottom="10" right="10"/>
             <constraints>
-              <tabbedpane title="History"/>
+              <tabbedpane title="📖 History"/>
             </constraints>
             <properties/>
             <border type="none"/>
@@ -191,7 +191,7 @@
           <grid id="99fca" binding="settingsTab" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <tabbedpane title="Settings"/>
+              <tabbedpane title="⚙️ Settings"/>
             </constraints>
             <properties/>
             <border type="none"/>

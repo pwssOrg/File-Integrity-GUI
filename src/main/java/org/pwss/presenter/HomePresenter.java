@@ -61,7 +61,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             // If a scan has started since the last check, initiate polling
             if (scanCurrentlyRunning && !scanRunning) {
                 scanRunning = true;
-                startPollingScanLiveFeed();
+                startPollingScanLiveFeed(false);
             }
         } catch (MonitoredDirectoryGetAllException | ExecutionException | InterruptedException |
                  JsonProcessingException | GetAllMostRecentScansException | ScanStatusException e) {
@@ -181,7 +181,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             SwingUtilities.invokeLater(() -> {
                 if (startScanSuccess) {
                     screen.showSuccess("Scan started successfully!");
-                    startPollingScanLiveFeed();
+                    startPollingScanLiveFeed(singleDirectory);
                 } else {
                     screen.showError("Failed to start scan.");
                 }
@@ -210,14 +210,27 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         }
     }
 
-    private void onFinishScan(boolean completed) {
+    private void onFinishScan(boolean completed, boolean singleDirectory) {
+        // Refresh data to display the latest scan results
+        fetchDataAndRefreshView();
+        // Notify the user about the scan results
         if (totalDiffCount > 0 && completed) {
             int choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE, "Scan completed with differences found.\nView details?\nYou can always view results later in the recent scans table.", new String[]{"Yes", "No"}, "Yes");
             if (choice == 0) {
-                // TODO: Discuss with @pwgit-create
-                // Navigate to the scan summary screen for the latest scan
-                // Note we need to know if its a full scan or a single scan
-                // Alternatively show the upcoming diff viewer screen (separate ticket)
+                if (singleDirectory) {
+                    // If single directory scan, navigate to the scan summary of the most recent scan.
+                    try {
+                        Scan latestScan = scanService.getMostRecentScans(1).getFirst();
+                        NavigationContext context = new NavigationContext();
+                        context.put("scanId", latestScan.id());
+                        NavigationEvents.navigateTo(Screen.SCAN_SUMMARY, context);
+                    } catch (GetMostRecentScansException | ExecutionException | InterruptedException | JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                } else {
+                    // If full scan, set current tab to home screen where scans are listed so user can select.
+                    screen.getTabbedPane().setSelectedIndex(0);
+                }
             }
         } else if (completed) {
             // Scan completed with no differences
@@ -230,16 +243,15 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         totalDiffCount = 0;
         // Clear the live feed text area in preparation for the next scan
         screen.getLiveFeedText().setText("");
-        // Refresh data to display the latest scan results
-        fetchDataAndRefreshView();
     }
 
     /**
      * Starts polling the live feed for scan updates.
      * This method sets up a timer to periodically fetch live feed updates
      * and update the UI accordingly.
+     * @param singleDirectory if true, indicates that the scan is for a single directory; otherwise, for all directories.
      */
-    private void startPollingScanLiveFeed() {
+    private void startPollingScanLiveFeed(boolean singleDirectory) {
         if (scanStatusTimer != null && scanStatusTimer.isRunning()) {
             return; // Polling is already active
         }
@@ -265,12 +277,12 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                 }
                 if (!liveFeed.isScanRunning()) {
                     scanStatusTimer.stop(); // Terminate polling when the scan completes
-                    onFinishScan(true);
+                    onFinishScan(true, singleDirectory);
                 }
             } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
                 SwingUtilities.invokeLater(() -> screen.showError("An error occurred while retrieving the live feed: " + ex.getMessage()));
                 scanStatusTimer.stop(); // Stop polling on error
-                onFinishScan(false);
+                onFinishScan(false, singleDirectory);
             }
         });
         scanStatusTimer.start();
