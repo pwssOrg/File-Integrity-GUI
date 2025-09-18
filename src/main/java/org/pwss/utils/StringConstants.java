@@ -1,5 +1,8 @@
 package org.pwss.utils;
 
+/**
+ * A utility class that holds various string constants used throughout the application.
+ */
 public final class StringConstants {
     // General purpose strings
     public static final String GENERIC_YES = "Yes";
