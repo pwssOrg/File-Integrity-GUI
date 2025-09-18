@@ -4,6 +4,7 @@ import org.pwss.model.entity.Scan;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
+import java.util.Optional;
 
 public class ScanTableModel extends AbstractTableModel {
     private final List<Scan> scans;
@@ -48,10 +49,10 @@ public class ScanTableModel extends AbstractTableModel {
      * @param rowIndex the index of the row in the table.
      * @return the Scan object at the specified row index, or null if the index is out of bounds.
      */
-    public Scan getScanAt(int rowIndex) {
+    public Optional<Scan> getScanAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < scans.size()) {
-            return scans.get(rowIndex);
+            return Optional.of(scans.get(rowIndex));
         }
-        return null;
+        return Optional.empty();
     }
 }
