@@ -6,6 +6,7 @@ import org.pwss.model.entity.ScanSummary;
 import javax.swing.table.AbstractTableModel;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class DiffTableModel extends AbstractTableModel {
     private final List<Diff> data;
@@ -45,12 +46,13 @@ public class DiffTableModel extends AbstractTableModel {
      * Get the Diff object at the specified row index.
      *
      * @param rowIndex the index of the row in the table.
-     * @return the Diff object at the specified row index, or null if the index is out of bounds.
+     * @return an Optional containing the Diff object at the specified row index,
+     *         or an empty Optional if the index is out of bounds.
      */
-    public Diff getDiffAt(int rowIndex) {
+    public Optional<Diff> getDiffAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < data.size()) {
-            return data.get(rowIndex);
+            return Optional.of(data.get(rowIndex));
         }
-        return null;
+        return Optional.empty();
     }
 }

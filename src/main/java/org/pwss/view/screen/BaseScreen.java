@@ -57,11 +57,10 @@ public abstract class BaseScreen extends JPanel {
 
     /**
      * Show an option dialog with custom buttons.
-     *
+     * @param dialogType    The type of dialog (e.g., JOptionPane.WARNING_MESSAGE).
      * @param message       The message to display.
      * @param options       The button labels.
      * @param defaultOption The default selected option (can be null).
-     * @par
      * @return The index of the option chosen, or -1 if closed.
      */
     public int showOptionDialog(int dialogType, String message, String[] options, String defaultOption) {

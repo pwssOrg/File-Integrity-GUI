@@ -4,6 +4,7 @@ import org.pwss.model.entity.ScanSummary;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
+import java.util.Optional;
 
 public class ScanSummaryTableModel extends AbstractTableModel {
     private final List<ScanSummary> data;
@@ -41,12 +42,13 @@ public class ScanSummaryTableModel extends AbstractTableModel {
      * Get the ScanSummary object at the specified row index.
      *
      * @param rowIndex the index of the row in the table.
-     * @return the ScanSummary object at the specified row index, or null if the index is out of bounds.
+     * @return an Optional containing the ScanSummary object at the specified row index,
+     *         or an empty Optional if the index is out of bounds.
      */
-    public ScanSummary getSummaryAt(int rowIndex) {
+    public Optional<ScanSummary> getSummaryAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < data.size()) {
-            return data.get(rowIndex);
+            return Optional.of(data.get(rowIndex));
         }
-        return null;
+        return Optional.empty();
     }
 }

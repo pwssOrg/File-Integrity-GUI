@@ -3,6 +3,7 @@ package org.pwss.presenter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.*;
@@ -21,6 +22,7 @@ import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.presenter.util.NavigationContext;
 import org.pwss.utils.LiveFeedUtils;
+import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.HomeScreen;
 
 public class HomePresenter extends BasePresenter<HomeScreen> {
@@ -89,10 +91,9 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                     int modelRow = screen.getMonitoredDirectoriesTable().convertRowIndexToModel(viewRow);
 
                     MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) screen.getMonitoredDirectoriesTable().getModel();
-                    MonitoredDirectory dir = model.getDirectoryAt(modelRow);
+                    Optional<MonitoredDirectory> dir = model.getDirectoryAt(modelRow);
 
-                    if (dir != null) {
-                        NavigationContext context = new NavigationContext();
+                    if (dir.isPresent()) {
                         handleScanButtonClick(true);
                     }
                 }
@@ -107,11 +108,11 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                     int modelRow = screen.getRecentScanTable().convertRowIndexToModel(viewRow);
 
                     ScanTableModel model = (ScanTableModel) screen.getRecentScanTable().getModel();
-                    Scan scan = model.getScanAt(modelRow);
+                    Optional<Scan> scan = model.getScanAt(modelRow);
 
-                    if (scan != null) {
+                    if (scan.isPresent()) {
                         NavigationContext context = new NavigationContext();
-                        context.put("scanId", scan.id());
+                        context.put("scanId", scan.get().id());
                         NavigationEvents.navigateTo(Screen.SCAN_SUMMARY, context);
                     }
                 }
@@ -122,8 +123,8 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
     @Override
     protected void refreshView() {
         // Update UI components based on the current state
-        screen.getScanButton().setText(scanRunning ? "Stop Scan" : "Full Scan");
-        screen.getQuickScanButton().setText(scanRunning ? "Stop Scan" : "Quick Scan");
+        screen.getScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
+        screen.getQuickScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
 
         // Scan running views
         screen.getScanProgressContainer().setVisible(scanRunning);
@@ -152,7 +153,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                 performStartScan(singleDirectory);
             }
         } catch (ScanStatusException | ExecutionException | InterruptedException e) {
-            SwingUtilities.invokeLater(() -> screen.showError("Error starting scan: " + e.getMessage()));
+            SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_START_ERROR + e.getMessage()));
         }
     }
 
@@ -172,23 +173,27 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                     startScanSuccess = false;
                 } else {
                     int modelRow = table.convertRowIndexToModel(viewRow);
-                    MonitoredDirectory dir = model.getDirectoryAt(modelRow);
-                    startScanSuccess = scanService.startScanById(dir.id());
+                    Optional<MonitoredDirectory> dir = model.getDirectoryAt(modelRow);
+                    if (dir.isPresent()) {
+                        startScanSuccess = scanService.startScanById(dir.get().id());
+                    } else {
+                        startScanSuccess = false;
+                    }
                 }
             } else {
                 startScanSuccess = scanService.startScan();
             }
             SwingUtilities.invokeLater(() -> {
                 if (startScanSuccess) {
-                    screen.showSuccess("Scan started successfully!");
+                    screen.showSuccess(StringConstants.SCAN_STARTED_SUCCESS);
                     startPollingScanLiveFeed(singleDirectory);
                 } else {
-                    screen.showError("Failed to start scan.");
+                    screen.showError(StringConstants.SCAN_STARTED_FAILURE);
                 }
             });
         } catch (ExecutionException | InterruptedException | StartScanAllException | StartScanByIdException |
                  JsonProcessingException e) {
-            SwingUtilities.invokeLater(() -> screen.showError("Error starting scan: " + e.getMessage()));
+            SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_START_ERROR + e.getMessage()));
         }
     }
 
@@ -200,13 +205,13 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             boolean stopScanSuccess = scanService.stopScan();
             SwingUtilities.invokeLater(() -> {
                 if (stopScanSuccess) {
-                    screen.showSuccess("Scan stopped successfully!");
+                    screen.showSuccess(StringConstants.SCAN_STOPPED_SUCCESS);
                 } else {
-                    screen.showError("Failed to stop scan.");
+                    screen.showError(StringConstants.SCAN_STOPPED_FAILURE);
                 }
             });
         } catch (ExecutionException | InterruptedException | StopScanException e) {
-            SwingUtilities.invokeLater(() -> screen.showError("Error stopping scan: " + e.getMessage()));
+            SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_STOP_ERROR + e.getMessage()));
         }
     }
 
@@ -215,7 +220,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         fetchDataAndRefreshView();
         // Notify the user about the scan results
         if (totalDiffCount > 0 && completed) {
-            int choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE, "Scan completed with differences found.\nView details?\nYou can always view results later in the recent scans table.", new String[]{"Yes", "No"}, "Yes");
+            int choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE, StringConstants.SCAN_COMPLETED_DIFFS, new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO}, StringConstants.GENERIC_YES);
             if (choice == 0) {
                 if (singleDirectory) {
                     // If single directory scan, navigate to the scan summary of the most recent scan.
@@ -225,7 +230,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                         context.put("scanId", latestScan.id());
                         NavigationEvents.navigateTo(Screen.SCAN_SUMMARY, context);
                     } catch (GetMostRecentScansException | ExecutionException | InterruptedException | JsonProcessingException e) {
-                        throw new RuntimeException(e);
+                        screen.showError(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX + e.getMessage());
                     }
                 } else {
                     // If full scan, set current tab to home screen where scans are listed so user can select.
@@ -234,10 +239,10 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             }
         } else if (completed) {
             // Scan completed with no differences
-            screen.showSuccess("Scan completed with no differences found.");
+            screen.showSuccess(StringConstants.SCAN_COMPLETED_NO_DIFFS);
         } else {
             // Scan did not complete successfully
-            screen.showError("Scan did not complete successfully.");
+            screen.showError(StringConstants.SCAN_NOT_COMPLETED);
         }
         // Reset diff count for the next scan
         totalDiffCount = 0;
@@ -268,7 +273,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
 
                 // Update the total difference count based on new warnings
                 totalDiffCount += LiveFeedUtils.countWarnings(liveFeed.livefeed());
-                screen.getLiveFeedDiffCount().setText("Diffs: " + totalDiffCount);
+                screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
 
                 // Update scanRunning state and refresh the UI if necessary
                 if (liveFeed.isScanRunning() != scanRunning) {
@@ -280,7 +285,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                     onFinishScan(true, singleDirectory);
                 }
             } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
-                SwingUtilities.invokeLater(() -> screen.showError("An error occurred while retrieving the live feed: " + ex.getMessage()));
+                SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_LIVE_FEED_ERROR_PREFIX + ex.getMessage()));
                 scanStatusTimer.stop(); // Stop polling on error
                 onFinishScan(false, singleDirectory);
             }
