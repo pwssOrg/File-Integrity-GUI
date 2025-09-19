@@ -23,10 +23,14 @@ public class HomeScreen extends BaseScreen {
     private JButton newDirectoryButton;
     private JTable recentScanTable;
     private JTable monitoredDirectoriesTable;
-    private JButton scanSingleButton;
     private JProgressBar scanProgress;
     private JPanel scanProgressContainer;
     private JLabel scanProgressLabel;
+    private JTextPane liveFeedText;
+    private JLabel liveFeedTitle;
+    private JScrollPane liveFeedContainer;
+    private JLabel liveFeedDiffCount;
+    private JPanel settingsTab;
 
     @Override
     protected String getScreenName() {
@@ -54,10 +58,6 @@ public class HomeScreen extends BaseScreen {
         return quickScanButton;
     }
 
-    public JButton getScanSingleButton() {
-        return scanSingleButton;
-    }
-
     public JTable getRecentScanTable() {
         return recentScanTable;
     }
@@ -70,16 +70,28 @@ public class HomeScreen extends BaseScreen {
         return historyTable;
     }
 
-    public JProgressBar getScanProgress() {
-        return scanProgress;
-    }
-
     public JPanel getScanProgressContainer() {
         return scanProgressContainer;
     }
 
-    public JLabel getScanProgressLabel() {
-        return scanProgressLabel;
+    public JScrollPane getLiveFeedContainer() {
+        return liveFeedContainer;
+    }
+
+    public JTextPane getLiveFeedText() {
+        return liveFeedText;
+    }
+
+    public JLabel getLiveFeedTitle() {
+        return liveFeedTitle;
+    }
+
+    public JLabel getLiveFeedDiffCount() {
+        return liveFeedDiffCount;
+    }
+
+    public JTabbedPane getTabbedPane() {
+        return tabbedPane;
     }
 
     {
@@ -105,7 +117,7 @@ public class HomeScreen extends BaseScreen {
         rootPanel.add(tabbedPane, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         homeTab = new JPanel();
         homeTab.setLayout(new GridLayoutManager(3, 1, new Insets(10, 10, 10, 10), -1, -1));
-        tabbedPane.addTab("Home", homeTab);
+        tabbedPane.addTab("\uD83C\uDFE0 Home", homeTab);
         quickScanButton = new JButton();
         quickScanButton.setText("Quick scan");
         homeTab.add(quickScanButton, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -121,41 +133,56 @@ public class HomeScreen extends BaseScreen {
         recentScanTable.setShowHorizontalLines(true);
         scrollPane1.setViewportView(recentScanTable);
         scanTab = new JPanel();
-        scanTab.setLayout(new GridLayoutManager(3, 2, new Insets(10, 10, 10, 10), -1, -1));
-        tabbedPane.addTab("Scan", scanTab);
+        scanTab.setLayout(new GridLayoutManager(10, 2, new Insets(10, 10, 10, 10), -1, -1));
+        tabbedPane.addTab("\uD83D\uDD0E Scan", scanTab);
         final JLabel label2 = new JLabel();
         Font label2Font = this.$$$getFont$$$(null, Font.BOLD, 16, label2.getFont());
         if (label2Font != null) label2.setFont(label2Font);
         label2.setHorizontalAlignment(0);
         label2.setText("Monitored directories");
         scanTab.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(2, 2, new Insets(0, 0, 0, 0), -1, -1, true, false));
-        scanTab.add(panel1, new GridConstraints(2, 0, 1, 2, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        newDirectoryButton = new JButton();
-        newDirectoryButton.setText("New directory");
-        panel1.add(newDirectoryButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        scanButton = new JButton();
-        scanButton.setText("Full scan");
-        panel1.add(scanButton, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        editDirectoryButton = new JButton();
-        editDirectoryButton.setText("Edit directory");
-        panel1.add(editDirectoryButton, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        scanSingleButton = new JButton();
-        scanSingleButton.setText("Single scan");
-        panel1.add(scanSingleButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JScrollPane scrollPane2 = new JScrollPane();
-        scanTab.add(scrollPane2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        scanTab.add(scrollPane2, new GridConstraints(1, 0, 5, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         monitoredDirectoriesTable = new JTable();
         monitoredDirectoriesTable.setAutoResizeMode(2);
         scrollPane2.setViewportView(monitoredDirectoriesTable);
+        liveFeedContainer = new JScrollPane();
+        scanTab.add(liveFeedContainer, new GridConstraints(1, 1, 8, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, new Dimension(450, -1), new Dimension(450, -1), null, 0, false));
+        liveFeedText = new JTextPane();
+        liveFeedText.setEditable(false);
+        liveFeedText.setText("");
+        liveFeedContainer.setViewportView(liveFeedText);
+        liveFeedTitle = new JLabel();
+        Font liveFeedTitleFont = this.$$$getFont$$$(null, Font.BOLD, 16, liveFeedTitle.getFont());
+        if (liveFeedTitleFont != null) liveFeedTitle.setFont(liveFeedTitleFont);
+        liveFeedTitle.setHorizontalAlignment(0);
+        liveFeedTitle.setText("Scan logs");
+        scanTab.add(liveFeedTitle, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JPanel panel1 = new JPanel();
+        panel1.setLayout(new GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
+        scanTab.add(panel1, new GridConstraints(7, 0, 3, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        newDirectoryButton = new JButton();
+        newDirectoryButton.setText("New directory");
+        panel1.add(newDirectoryButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        editDirectoryButton = new JButton();
+        editDirectoryButton.setText("Edit directory");
+        panel1.add(editDirectoryButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        liveFeedDiffCount = new JLabel();
+        liveFeedDiffCount.setText("");
+        scanTab.add(liveFeedDiffCount, new GridConstraints(9, 1, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        scanButton = new JButton();
+        scanButton.setText("Full scan");
+        scanTab.add(scanButton, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         historyTab = new JPanel();
         historyTab.setLayout(new GridLayoutManager(1, 1, new Insets(10, 10, 10, 10), -1, -1, true, false));
-        tabbedPane.addTab("History", historyTab);
+        tabbedPane.addTab("\uD83D\uDCD6 History", historyTab);
         historyTable = new JTable();
         historyTable.setAutoResizeMode(4);
         historyTable.setFillsViewportHeight(true);
         historyTab.add(historyTable, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        settingsTab = new JPanel();
+        settingsTab.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        tabbedPane.addTab("⚙\uFE0F Settings", settingsTab);
         scanProgressContainer = new JPanel();
         scanProgressContainer.setLayout(new GridLayoutManager(1, 2, new Insets(10, 10, 10, 10), -1, -1));
         rootPanel.add(scanProgressContainer, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, true));

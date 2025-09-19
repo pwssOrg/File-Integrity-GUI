@@ -10,6 +10,7 @@ import org.pwss.model.service.network.PwssHttpClient;
 import org.pwss.model.service.request.scan.GetMostRecentScansRequest;
 import org.pwss.model.service.request.scan.GetScanDiffsRequest;
 import org.pwss.model.service.request.scan.StartSingleScanRequest;
+import org.pwss.model.service.response.LiveFeedResponse;
 
 import java.net.http.HttpResponse;
 import java.util.Collections;
@@ -99,6 +100,26 @@ public class ScanService {
             case 500 ->
                     throw new StopScanException("Stop scan failed: An error occurred on the server while attempting to stop the scan.");
             default -> false;
+        };
+    }
+
+    /**
+     * Retrieves the live feed of scan events by sending a request to the LIVE_FEED endpoint.
+     *
+     * @return A LiveFeedResponse object containing the live feed data if the request is successful.
+     * @throws LiveFeedException      If the attempt to retrieve the live feed fails due to various reasons such as invalid credentials or server error.
+     * @throws ExecutionException     If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException   If the thread executing the request is interrupted.
+     * @throws JsonProcessingException If an error occurs while processing JSON data.
+     */
+    public LiveFeedResponse getLiveFeed() throws LiveFeedException, ExecutionException, InterruptedException, JsonProcessingException {
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.LIVE_FEED, null);
+
+        return switch (response.statusCode()) {
+            case 200 -> objectMapper.readValue(response.body(), LiveFeedResponse.class);
+            case 401 -> throw new LiveFeedException("Failed to fetch live feed: User not authorized to perform this action.");
+            case 500 -> throw new LiveFeedException("Failed to fetch live feed: an error occurred on the server while attempting to fetch the live feed.");
+            default -> throw new LiveFeedException("Failed to fetch live feed: unexpected response.");
         };
     }
 

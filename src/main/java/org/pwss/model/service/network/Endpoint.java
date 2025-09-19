@@ -35,21 +35,25 @@ public enum Endpoint {
      */
     STOP_SCAN(HTTP_Method.GET, A.BASE_URL + A.SCAN + "stop"),
     /**
+     * Endpoint for retrieving the live feed of a file integrity scan.
+     */
+    LIVE_FEED(HTTP_Method.GET, A.BASE_URL + A.SCAN + "live-feed"),
+    /**
      * Endpoint for retrieving the status of a file integrity scan.
      */
     SCAN_STATUS(HTTP_Method.GET, A.BASE_URL + A.SCAN + "status"),
     /**
      * Endpoint most recent scans for given count of active monitored directories.
      */
-    MOST_RECENT_SCANS(HTTP_Method.POST, A.BASE_URL + A.SCAN + "scan/most-recent"),
+    MOST_RECENT_SCANS(HTTP_Method.POST, A.BASE_URL + A.SCAN + "most-recent"),
     /**
      * Endpoint most recent scans for all active monitored directories.
      */
     MOST_RECENT_SCANS_ALL(HTTP_Method.GET, A.BASE_URL + A.SCAN + "active-directory/most-recent"),
     /**
-     * Endpoint for retrieving all scans.
+     * Endpoint for retrieving diffs for a given scan.
      */
-    SCAN_DIFFS(HTTP_Method.POST, A.BASE_URL + A.SCAN + "diffs"),
+    SCAN_DIFFS(HTTP_Method.POST, A.BASE_URL + A.SCAN + "diff"),
 
 
     // Directory Endpoints

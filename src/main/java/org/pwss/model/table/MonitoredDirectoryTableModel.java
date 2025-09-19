@@ -4,6 +4,7 @@ import org.pwss.model.entity.MonitoredDirectory;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.List;
+import java.util.Optional;
 
 public class MonitoredDirectoryTableModel extends AbstractTableModel {
     private final List<MonitoredDirectory> directories;
@@ -33,7 +34,7 @@ public class MonitoredDirectoryTableModel extends AbstractTableModel {
     @Override
     public Class<?> getColumnClass(int columnIndex) {
         return switch (columnIndex) {
-            case 1, 3, 4 -> Boolean.class;
+            case 1, 4 -> Boolean.class;
             default -> super.getColumnClass(columnIndex);
         };
     }
@@ -46,23 +47,24 @@ public class MonitoredDirectoryTableModel extends AbstractTableModel {
             case 0 -> dir.path();
             case 1 -> dir.isActive();
             case 2 -> dir.lastScanned();
-            case 3 -> dir.baselineEstablished();
+            case 3 -> dir.baselineEstablished() ? "Yes" : "No";
             case 4 -> dir.includeSubdirectories();
             default -> null;
         };
     }
 
     /**
-     * Returns the MonitoredDirectory object at the specified row index.
+     * Get the MonitoredDirectory object at the specified row index.
      *
-     * @param rowIndex the index of the row
-     * @return the MonitoredDirectory object at the specified row, or null if the index is out of bounds
+     * @param rowIndex the index of the row in the table.
+     * @return an Optional containing the MonitoredDirectory object at the specified row index,
+     *         or an empty Optional if the index is out of bounds.
      */
-    public MonitoredDirectory getDirectoryAt(int rowIndex) {
+    public Optional<MonitoredDirectory> getDirectoryAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < directories.size()) {
-            return directories.get(rowIndex);
+            return Optional.of(directories.get(rowIndex));
         }
-        return null;
+        return Optional.empty();
     }
 }
 

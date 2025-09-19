@@ -3,6 +3,7 @@ package org.pwss.presenter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.*;
@@ -14,11 +15,14 @@ import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.service.MonitoredDirectoryService;
 import org.pwss.model.service.ScanService;
+import org.pwss.model.service.response.LiveFeedResponse;
 import org.pwss.model.table.MonitoredDirectoryTableModel;
 import org.pwss.model.table.ScanTableModel;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.presenter.util.NavigationContext;
+import org.pwss.utils.LiveFeedUtils;
+import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.HomeScreen;
 
 public class HomePresenter extends BasePresenter<HomeScreen> {
@@ -29,6 +33,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
     private List<Scan> recentScans;
 
     private boolean scanRunning;
+    private long totalDiffCount = 0;
     private Timer scanStatusTimer;
 
     public HomePresenter(HomeScreen view) {
@@ -53,8 +58,15 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             allMonitoredDirectories = monitoredDirectoryService.getAllDirectories();
             // Fetch recent scans for display in the scan table
             recentScans = scanService.getMostRecentScansAll();
+            // Check if a scan is currently running
+            boolean scanCurrentlyRunning = scanService.scanRunning();
+            // If a scan has started since the last check, initiate polling
+            if (scanCurrentlyRunning && !scanRunning) {
+                scanRunning = true;
+                startPollingScanLiveFeed(false);
+            }
         } catch (MonitoredDirectoryGetAllException | ExecutionException | InterruptedException |
-                 JsonProcessingException | GetAllMostRecentScansException e) {
+                 JsonProcessingException | GetAllMostRecentScansException | ScanStatusException e) {
             SwingUtilities.invokeLater(() -> screen.showError("Error getting data: " + e.getMessage()));
         }
         // Finally, refresh the view to reflect the updated data
@@ -71,7 +83,22 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         screen.getAddNewDirectoryButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.NEW_DIRECTORY, null));
         screen.getScanButton().addActionListener(e -> handleScanButtonClick(false));
         screen.getQuickScanButton().addActionListener(e -> handleScanButtonClick(false));
-        screen.getScanSingleButton().addActionListener(e -> handleScanButtonClick(true));
+        screen.getMonitoredDirectoriesTable().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && screen.getMonitoredDirectoriesTable().getSelectedRow() != -1) {
+                    int viewRow = screen.getMonitoredDirectoriesTable().getSelectedRow();
+                    int modelRow = screen.getMonitoredDirectoriesTable().convertRowIndexToModel(viewRow);
+
+                    MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) screen.getMonitoredDirectoriesTable().getModel();
+                    Optional<MonitoredDirectory> dir = model.getDirectoryAt(modelRow);
+
+                    if (dir.isPresent()) {
+                        handleScanButtonClick(true);
+                    }
+                }
+            }
+        });
         // Double-click listener for recent scans table to view scan details
         screen.getRecentScanTable().addMouseListener(new MouseAdapter() {
             @Override
@@ -81,11 +108,11 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                     int modelRow = screen.getRecentScanTable().convertRowIndexToModel(viewRow);
 
                     ScanTableModel model = (ScanTableModel) screen.getRecentScanTable().getModel();
-                    Scan scan = model.getScanAt(modelRow);
+                    Optional<Scan> scan = model.getScanAt(modelRow);
 
-                    if (scan != null) {
+                    if (scan.isPresent()) {
                         NavigationContext context = new NavigationContext();
-                        context.put("scanId", scan.id());
+                        context.put("scanId", scan.get().id());
                         NavigationEvents.navigateTo(Screen.SCAN_SUMMARY, context);
                     }
                 }
@@ -96,21 +123,20 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
     @Override
     protected void refreshView() {
         // Update UI components based on the current state
-        try {
-            boolean isScanRunning = scanService.scanRunning();
-            screen.getScanButton().setText(isScanRunning ? "Stop Scan" : "Full Scan");
-            screen.getScanSingleButton().setText(isScanRunning ? "Stop Scan" : "Scan Selected");
-            screen.getQuickScanButton().setText(isScanRunning ? "Stop Scan" : "Quick Scan");
-            screen.getScanProgressContainer().setVisible(scanRunning);
+        screen.getScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
+        screen.getQuickScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
 
-            ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans);
-            screen.getRecentScanTable().setModel(mostRecentScansListModel);
+        // Scan running views
+        screen.getScanProgressContainer().setVisible(scanRunning);
+        screen.getLiveFeedContainer().setVisible(scanRunning);
+        screen.getLiveFeedTitle().setVisible(scanRunning);
+        screen.getLiveFeedDiffCount().setVisible(scanRunning);
 
-            MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(allMonitoredDirectories);
-            screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
-        } catch (ScanStatusException | ExecutionException | InterruptedException e) {
-            SwingUtilities.invokeLater(() -> screen.showError("Error updating UI state: " + e.getMessage()));
-        }
+        ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans);
+        screen.getRecentScanTable().setModel(mostRecentScansListModel);
+
+        MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(allMonitoredDirectories);
+        screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
     }
 
     /**
@@ -127,7 +153,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                 performStartScan(singleDirectory);
             }
         } catch (ScanStatusException | ExecutionException | InterruptedException e) {
-            SwingUtilities.invokeLater(() -> screen.showError("Error starting scan: " + e.getMessage()));
+            SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_START_ERROR + e.getMessage()));
         }
     }
 
@@ -141,28 +167,33 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             boolean startScanSuccess;
             JTable table = screen.getMonitoredDirectoriesTable();
             MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) table.getModel();
-            if (singleDirectory){
+            if (singleDirectory) {
                 int viewRow = table.getSelectedRow();
                 if (viewRow == -1) {
                     startScanSuccess = false;
                 } else {
                     int modelRow = table.convertRowIndexToModel(viewRow);
-                    MonitoredDirectory dir = model.getDirectoryAt(modelRow);
-                    startScanSuccess = scanService.startScanById(dir.id());
+                    Optional<MonitoredDirectory> dir = model.getDirectoryAt(modelRow);
+                    if (dir.isPresent()) {
+                        startScanSuccess = scanService.startScanById(dir.get().id());
+                    } else {
+                        startScanSuccess = false;
+                    }
                 }
             } else {
                 startScanSuccess = scanService.startScan();
             }
             SwingUtilities.invokeLater(() -> {
                 if (startScanSuccess) {
-                    screen.showSuccess("Scan started successfully!");
-                    startScanStatusPolling(singleDirectory);
+                    screen.showSuccess(StringConstants.SCAN_STARTED_SUCCESS);
+                    startPollingScanLiveFeed(singleDirectory);
                 } else {
-                    screen.showError("Failed to start scan.");
+                    screen.showError(StringConstants.SCAN_STARTED_FAILURE);
                 }
             });
-        } catch (ExecutionException | InterruptedException | StartScanAllException | StartScanByIdException | JsonProcessingException e) {
-            SwingUtilities.invokeLater(() -> screen.showError("Error starting scan: " + e.getMessage()));
+        } catch (ExecutionException | InterruptedException | StartScanAllException | StartScanByIdException |
+                 JsonProcessingException e) {
+            SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_START_ERROR + e.getMessage()));
         }
     }
 
@@ -174,39 +205,89 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             boolean stopScanSuccess = scanService.stopScan();
             SwingUtilities.invokeLater(() -> {
                 if (stopScanSuccess) {
-                    screen.showSuccess("Scan stopped successfully!");
+                    screen.showSuccess(StringConstants.SCAN_STOPPED_SUCCESS);
                 } else {
-                    screen.showError("Failed to stop scan.");
+                    screen.showError(StringConstants.SCAN_STOPPED_FAILURE);
                 }
             });
         } catch (ExecutionException | InterruptedException | StopScanException e) {
-            SwingUtilities.invokeLater(() -> screen.showError("Error stopping scan: " + e.getMessage()));
+            SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_STOP_ERROR + e.getMessage()));
         }
     }
 
+    private void onFinishScan(boolean completed, boolean singleDirectory) {
+        // Refresh data to display the latest scan results
+        fetchDataAndRefreshView();
+        // Notify the user about the scan results
+        if (totalDiffCount > 0 && completed) {
+            int choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE, StringConstants.SCAN_COMPLETED_DIFFS, new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO}, StringConstants.GENERIC_YES);
+            if (choice == 0) {
+                if (singleDirectory) {
+                    // If single directory scan, navigate to the scan summary of the most recent scan.
+                    try {
+                        Scan latestScan = scanService.getMostRecentScans(1).getFirst();
+                        NavigationContext context = new NavigationContext();
+                        context.put("scanId", latestScan.id());
+                        NavigationEvents.navigateTo(Screen.SCAN_SUMMARY, context);
+                    } catch (GetMostRecentScansException | ExecutionException | InterruptedException | JsonProcessingException e) {
+                        screen.showError(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX + e.getMessage());
+                    }
+                } else {
+                    // If full scan, set current tab to home screen where scans are listed so user can select.
+                    screen.getTabbedPane().setSelectedIndex(0);
+                }
+            }
+        } else if (completed) {
+            // Scan completed with no differences
+            screen.showSuccess(StringConstants.SCAN_COMPLETED_NO_DIFFS);
+        } else {
+            // Scan did not complete successfully
+            screen.showError(StringConstants.SCAN_NOT_COMPLETED);
+        }
+        // Reset diff count for the next scan
+        totalDiffCount = 0;
+        // Clear the live feed text area in preparation for the next scan
+        screen.getLiveFeedText().setText("");
+    }
+
     /**
-     * Starts polling the scan status at regular intervals.
-     *
-     * @param singleDirectory if true, indicates that a single directory scan was initiated.
+     * Starts polling the live feed for scan updates.
+     * This method sets up a timer to periodically fetch live feed updates
+     * and update the UI accordingly.
+     * @param singleDirectory if true, indicates that the scan is for a single directory; otherwise, for all directories.
      */
-    private void startScanStatusPolling(boolean singleDirectory) {
+    private void startPollingScanLiveFeed(boolean singleDirectory) {
         if (scanStatusTimer != null && scanStatusTimer.isRunning()) {
-            return; // already polling
+            return; // Polling is already active
         }
 
-        scanStatusTimer = new Timer(1500, e -> {
+        scanStatusTimer = new Timer(1000, e -> {
             try {
-                boolean running = scanService.scanRunning();
-                if (running != scanRunning) {
-                    scanRunning = running;
-                    refreshView(); // update UI if state changed
+                // Retrieve live feed updates
+                LiveFeedResponse liveFeed = scanService.getLiveFeed();
+
+                String currentLiveFeedText = screen.getLiveFeedText().getText();
+                String newEntry = LiveFeedUtils.formatLiveFeedEntry(liveFeed.livefeed());
+                String updatedLiveFeedText = currentLiveFeedText + newEntry;
+                screen.getLiveFeedText().setText(updatedLiveFeedText);
+
+                // Update the total difference count based on new warnings
+                totalDiffCount += LiveFeedUtils.countWarnings(liveFeed.livefeed());
+                screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
+
+                // Update scanRunning state and refresh the UI if necessary
+                if (liveFeed.isScanRunning() != scanRunning) {
+                    scanRunning = liveFeed.isScanRunning();
+                    refreshView();
                 }
-                if (!running) {
-                    scanStatusTimer.stop(); // stop polling when scan ends
-                    fetchDataAndRefreshView(); // refresh data when scan ends to get latest scans
+                if (!liveFeed.isScanRunning()) {
+                    scanStatusTimer.stop(); // Terminate polling when the scan completes
+                    onFinishScan(true, singleDirectory);
                 }
-            } catch (ScanStatusException | ExecutionException | InterruptedException ex) {
-                SwingUtilities.invokeLater(() -> screen.showError("Error checking scan status: " + ex.getMessage()));
+            } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
+                SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_LIVE_FEED_ERROR_PREFIX + ex.getMessage()));
+                scanStatusTimer.stop(); // Stop polling on error
+                onFinishScan(false, singleDirectory);
             }
         });
         scanStatusTimer.start();
