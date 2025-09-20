@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public class ScanSummaryTableModel extends AbstractTableModel {
     private final List<ScanSummary> data;
-    private final String[] columns = {"File Name"};
+    private final String[] columns = {"\uD83D\uDEA6 File Name"};
 
     public ScanSummaryTableModel(List<ScanSummary> data) {
         this.data = data;

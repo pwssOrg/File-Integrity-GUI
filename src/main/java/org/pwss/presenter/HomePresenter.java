@@ -11,17 +11,20 @@ import javax.swing.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
 import org.pwss.exception.scan.*;
+import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.service.MonitoredDirectoryService;
 import org.pwss.model.service.ScanService;
 import org.pwss.model.service.response.LiveFeedResponse;
+import org.pwss.model.table.DiffTableModel;
 import org.pwss.model.table.MonitoredDirectoryTableModel;
 import org.pwss.model.table.ScanTableModel;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.presenter.util.NavigationContext;
 import org.pwss.utils.LiveFeedUtils;
+import org.pwss.utils.ReportUtils;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.HomeScreen;
 
@@ -31,6 +34,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
 
     private List<MonitoredDirectory> allMonitoredDirectories;
     private List<Scan> recentScans;
+    private List<Diff> recentDiffs;
 
     private boolean scanRunning;
     private long totalDiffCount = 0;
@@ -58,6 +62,14 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             allMonitoredDirectories = monitoredDirectoryService.getAllDirectories();
             // Fetch recent scans for display in the scan table
             recentScans = scanService.getMostRecentScansAll();
+            if (recentScans.isEmpty()) {
+                recentDiffs = List.of();
+            } else {
+                // Fetch diffs for the most recent scan to show in the diffs table
+                recentDiffs = recentScans.stream()
+                        .flatMap(scan -> safeGetDiffs(scan.id()).stream())
+                        .toList();
+            }
             // Check if a scan is currently running
             boolean scanCurrentlyRunning = scanService.scanRunning();
             // If a scan has started since the last check, initiate polling
@@ -71,6 +83,21 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         }
         // Finally, refresh the view to reflect the updated data
         refreshView();
+    }
+
+    /**
+     * Safely retrieves diffs for a given scan ID.
+     * This method handles exceptions and returns an empty list in case of errors.
+     *
+     * @param scanId the ID of the scan for which to retrieve diffs
+     * @return a list of diffs associated with the scan, or an empty list if an error occurs
+     */
+    private List<Diff> safeGetDiffs(long scanId) {
+        try {
+            return scanService.getDiffs(scanId, 1000, null, false);
+        } catch (GetScanDiffsException | ExecutionException | InterruptedException | JsonProcessingException e) {
+            return List.of();
+        }
     }
 
     @Override
@@ -118,6 +145,20 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                 }
             }
         });
+        // Selection listener for diffs table to show diff details
+        screen.getDiffTable().getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && screen.getDiffTable().getSelectedRow() != -1) {
+                int viewRow = screen.getDiffTable().getSelectedRow();
+                int modelRow = screen.getDiffTable().convertRowIndexToModel(viewRow);
+
+                DiffTableModel model = (DiffTableModel) screen.getDiffTable().getModel();
+                Optional<Diff> diff = model.getDiffAt(modelRow);
+
+                diff.ifPresent(d -> screen.getDiffDetails().setText(ReportUtils.formatDiff(d)));
+            } else {
+                screen.getDiffDetails().setText("");
+            }
+        });
     }
 
     @Override
@@ -137,6 +178,9 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
 
         MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(allMonitoredDirectories);
         screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
+
+        DiffTableModel diffTableModel = new DiffTableModel(recentDiffs);
+        screen.getDiffTable().setModel(diffTableModel);
     }
 
     /**
@@ -233,8 +277,8 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                         screen.showError(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX + e.getMessage());
                     }
                 } else {
-                    // If full scan, set current tab to home screen where scans are listed so user can select.
-                    screen.getTabbedPane().setSelectedIndex(0);
+                    // If full scan, navigate to the diffs tab to show all differences.
+                    screen.getTabbedPane().setSelectedIndex(2);
                 }
             }
         } else if (completed) {

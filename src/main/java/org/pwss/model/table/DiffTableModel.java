@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class DiffTableModel extends AbstractTableModel {
     private final List<Diff> data;
-    private final String[] columns = {"File Path", "Modified", "Detected"};
+    private final String[] columns = {"\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected"};
 
     public DiffTableModel(List<Diff> data) {
         this.data = data;
