@@ -15,11 +15,11 @@ public class HomeScreen extends BaseScreen {
     private JTabbedPane tabbedPane;
     private JPanel homeTab;
     private JPanel scanTab;
-    private JPanel historyTab;
+    private JPanel recentDiffsTab;
     private JButton quickScanButton;
     private JButton editDirectoryButton;
     private JButton scanButton;
-    private JTable historyTable;
+    private JTable diffTable;
     private JButton newDirectoryButton;
     private JTable recentScanTable;
     private JTable monitoredDirectoriesTable;
@@ -31,6 +31,7 @@ public class HomeScreen extends BaseScreen {
     private JScrollPane liveFeedContainer;
     private JLabel liveFeedDiffCount;
     private JPanel settingsTab;
+    private JTextPane diffDetails;
 
     @Override
     protected String getScreenName() {
@@ -66,8 +67,8 @@ public class HomeScreen extends BaseScreen {
         return monitoredDirectoriesTable;
     }
 
-    public JTable getHistoryTable() {
-        return historyTable;
+    public JTable getDiffTable() {
+        return diffTable;
     }
 
     public JPanel getScanProgressContainer() {
@@ -92,6 +93,10 @@ public class HomeScreen extends BaseScreen {
 
     public JTabbedPane getTabbedPane() {
         return tabbedPane;
+    }
+
+    public JTextPane getDiffDetails() {
+        return diffDetails;
     }
 
     {
@@ -173,13 +178,26 @@ public class HomeScreen extends BaseScreen {
         scanButton = new JButton();
         scanButton.setText("Full scan");
         scanTab.add(scanButton, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        historyTab = new JPanel();
-        historyTab.setLayout(new GridLayoutManager(1, 1, new Insets(10, 10, 10, 10), -1, -1, true, false));
-        tabbedPane.addTab("\uD83D\uDCD6 History", historyTab);
-        historyTable = new JTable();
-        historyTable.setAutoResizeMode(4);
-        historyTable.setFillsViewportHeight(true);
-        historyTab.add(historyTable, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
+        recentDiffsTab = new JPanel();
+        recentDiffsTab.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
+        tabbedPane.addTab("⚠\uFE0F Recent diffs", recentDiffsTab);
+        final JSplitPane splitPane1 = new JSplitPane();
+        recentDiffsTab.add(splitPane1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
+        final JScrollPane scrollPane3 = new JScrollPane();
+        splitPane1.setLeftComponent(scrollPane3);
+        diffTable = new JTable();
+        diffTable.setAutoResizeMode(4);
+        diffTable.setFillsViewportHeight(true);
+        scrollPane3.setViewportView(diffTable);
+        final JScrollPane scrollPane4 = new JScrollPane();
+        splitPane1.setRightComponent(scrollPane4);
+        diffDetails = new JTextPane();
+        scrollPane4.setViewportView(diffDetails);
+        final JLabel label3 = new JLabel();
+        Font label3Font = this.$$$getFont$$$(null, Font.BOLD, 16, label3.getFont());
+        if (label3Font != null) label3.setFont(label3Font);
+        label3.setText("Most recently detected diffs");
+        recentDiffsTab.add(label3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         settingsTab = new JPanel();
         settingsTab.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPane.addTab("⚙\uFE0F Settings", settingsTab);

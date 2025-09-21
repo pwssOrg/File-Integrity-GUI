@@ -9,7 +9,7 @@ import java.util.Optional;
 public class ScanTableModel extends AbstractTableModel {
     private final List<Scan> scans;
     private final String[] columnNames = {
-            "Directory", "Scan Time", "Status", "Notes"
+            "\uD83D\uDCC1 Directory", "\uD83D\uDD59 Scan Time", "\uD83D\uDEA6 Status", "\uD83D\uDEA6 Notes"
     };
 
     public ScanTableModel(List<Scan> scans) {
