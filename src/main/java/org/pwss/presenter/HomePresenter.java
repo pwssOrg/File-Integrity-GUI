@@ -159,6 +159,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                 screen.getDiffDetails().setText("");
             }
         });
+        screen.getClearFeedButton().addActionListener(e -> clearLiveFeed());
     }
 
     @Override
@@ -168,10 +169,13 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         screen.getQuickScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
 
         // Scan running views
+        boolean showLiveFeed = !screen.getLiveFeedText().getText().isEmpty() || scanRunning;
+        boolean showClearLiveFeed = !scanRunning && !screen.getLiveFeedText().getText().isEmpty();
         screen.getScanProgressContainer().setVisible(scanRunning);
-        screen.getLiveFeedContainer().setVisible(scanRunning);
-        screen.getLiveFeedTitle().setVisible(scanRunning);
-        screen.getLiveFeedDiffCount().setVisible(scanRunning);
+        screen.getLiveFeedContainer().setVisible(showLiveFeed);
+        screen.getLiveFeedTitle().setVisible(showLiveFeed);
+        screen.getLiveFeedDiffCount().setVisible(showLiveFeed);
+        screen.getClearFeedButton().setVisible(showClearLiveFeed);
 
         ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans);
         screen.getRecentScanTable().setModel(mostRecentScansListModel);
@@ -229,6 +233,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             }
             SwingUtilities.invokeLater(() -> {
                 if (startScanSuccess) {
+                    clearLiveFeed();
                     screen.showSuccess(StringConstants.SCAN_STARTED_SUCCESS);
                     startPollingScanLiveFeed(singleDirectory);
                 } else {
@@ -263,8 +268,15 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         // Refresh data to display the latest scan results
         fetchDataAndRefreshView();
         // Notify the user about the scan results
-        if (totalDiffCount > 0 && completed) {
-            int choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE, StringConstants.SCAN_COMPLETED_DIFFS, new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO}, StringConstants.GENERIC_YES);
+        if (completed) {
+            int choice;
+            // Prompt the user to view scan results based on whether differences were found
+            if (totalDiffCount > 0) {
+                choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE, StringConstants.SCAN_COMPLETED_DIFFS, new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO}, StringConstants.GENERIC_YES);
+            } else {
+                choice = screen.showOptionDialog(JOptionPane.INFORMATION_MESSAGE, StringConstants.SCAN_COMPLETED_NO_DIFFS, new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO}, StringConstants.GENERIC_YES);
+            }
+
             if (choice == 0) {
                 if (singleDirectory) {
                     // If single directory scan, navigate to the scan summary of the most recent scan.
@@ -277,21 +289,33 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                         screen.showError(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX + e.getMessage());
                     }
                 } else {
-                    // If full scan, navigate to the diffs tab to show all differences.
-                    screen.getTabbedPane().setSelectedIndex(2);
+                    if (totalDiffCount > 0) {
+                        // If full scan, and we have diffs, navigate to the diffs tab to show all differences.
+                        screen.getTabbedPane().setSelectedIndex(2);
+                    } else {
+                        // If no diffs, navigate to the recent scans tab to show the most recent scan.
+                        screen.getTabbedPane().setSelectedIndex(0);
+                    }
                 }
             }
-        } else if (completed) {
-            // Scan completed with no differences
-            screen.showSuccess(StringConstants.SCAN_COMPLETED_NO_DIFFS);
-        } else {
+        }  else {
             // Scan did not complete successfully
             screen.showError(StringConstants.SCAN_NOT_COMPLETED);
         }
+    }
+
+    /**
+     * Clears the live feed text area and resets the total difference count.
+     */
+    private void clearLiveFeed() {
+        // Clear the live feed text area
+        screen.getLiveFeedText().setText("");
         // Reset diff count for the next scan
         totalDiffCount = 0;
-        // Clear the live feed text area in preparation for the next scan
-        screen.getLiveFeedText().setText("");
+        // Update the live feed diff count in preparation for the next scan
+        screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
+        // Refresh the view to reflect the cleared live feed
+        refreshView();
     }
 
     /**
