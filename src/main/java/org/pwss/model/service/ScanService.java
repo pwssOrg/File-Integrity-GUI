@@ -161,7 +161,6 @@ public class ScanService {
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), Scan[].class));
             case 401 -> throw new GetMostRecentScansException("Failed to fetch most recent scans: User not authorized to perform this action.");
-            case 404 -> throw new GetMostRecentScansException("Failed to fetch most recent scans: No active monitored directories found.");
             case 500 -> throw new GetMostRecentScansException("Failed to fetch most recent scans: Server error");
             default -> Collections.emptyList();
         };
@@ -182,7 +181,6 @@ public class ScanService {
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), Scan[].class));
             case 401 -> throw new GetAllMostRecentScansException("Failed to fetch most recent scans: User not authorized to perform this action.");
-            case 404 -> throw new GetAllMostRecentScansException("Failed to fetch most recent scans: No active monitored directories found.");
             case 500 -> throw new GetAllMostRecentScansException("Failed to fetch most recent scans: Server error");
             default -> Collections.emptyList();
         };
@@ -195,7 +193,6 @@ public class ScanService {
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), Diff[].class));
             case 401 -> throw new GetScanDiffsException("Failed to fetch scan diffs: User not authorized to perform this action.");
-            case 404 -> throw new GetScanDiffsException("Failed to fetch scan diffs: Scan with the given ID not found.");
             case 500 -> throw new GetScanDiffsException("Failed to fetch scan diffs: Server error");
             default -> Collections.emptyList();
         };
