@@ -159,6 +159,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
                 screen.getDiffDetails().setText("");
             }
         });
+        screen.getClearFeedButton().addActionListener(e -> clearLiveFeed());
     }
 
     @Override
@@ -168,10 +169,13 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         screen.getQuickScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
 
         // Scan running views
+        boolean showLiveFeed = !screen.getLiveFeedText().getText().isEmpty() || scanRunning;
+        boolean showClearLiveFeed = !scanRunning && !screen.getLiveFeedText().getText().isEmpty();
         screen.getScanProgressContainer().setVisible(scanRunning);
-        screen.getLiveFeedContainer().setVisible(scanRunning);
-        screen.getLiveFeedTitle().setVisible(scanRunning);
-        screen.getLiveFeedDiffCount().setVisible(scanRunning);
+        screen.getLiveFeedContainer().setVisible(showLiveFeed);
+        screen.getLiveFeedTitle().setVisible(showLiveFeed);
+        screen.getLiveFeedDiffCount().setVisible(showLiveFeed);
+        screen.getClearFeedButton().setVisible(showClearLiveFeed);
 
         ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans);
         screen.getRecentScanTable().setModel(mostRecentScansListModel);
@@ -229,6 +233,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             }
             SwingUtilities.invokeLater(() -> {
                 if (startScanSuccess) {
+                    clearLiveFeed();
                     screen.showSuccess(StringConstants.SCAN_STARTED_SUCCESS);
                     startPollingScanLiveFeed(singleDirectory);
                 } else {
@@ -288,10 +293,20 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
             // Scan did not complete successfully
             screen.showError(StringConstants.SCAN_NOT_COMPLETED);
         }
+    }
+
+    /**
+     * Clears the live feed text area and resets the total difference count.
+     */
+    private void clearLiveFeed() {
+        // Clear the live feed text area
+        screen.getLiveFeedText().setText("");
         // Reset diff count for the next scan
         totalDiffCount = 0;
         // Clear the live feed text area in preparation for the next scan
-        screen.getLiveFeedText().setText("");
+        screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
+        // Refresh the view to reflect the cleared live feed
+        refreshView();
     }
 
     /**
