@@ -312,7 +312,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         screen.getLiveFeedText().setText("");
         // Reset diff count for the next scan
         totalDiffCount = 0;
-        // Clear the live feed text area in preparation for the next scan
+        // Update the live feed diff count in preparation for the next scan
         screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
         // Refresh the view to reflect the cleared live feed
         refreshView();
