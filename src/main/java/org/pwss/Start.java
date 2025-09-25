@@ -6,8 +6,8 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.NavigationHandler;
 import org.pwss.navigation.Screen;
-import org.pwss.presenter.factory.AppPresenterFactory;
-import org.pwss.presenter.factory.PresenterFactory;
+import org.pwss.controller.factory.AppControllerFactory;
+import org.pwss.controller.factory.ControllerFactory;
 
 public class Start {
     public static void main(String[] args) {
@@ -23,13 +23,13 @@ public class Start {
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setLocationRelativeTo(null); // center on screen
 
-                // Create presenter factory
-                PresenterFactory factory = new AppPresenterFactory();
+                // Create controller factory
+                ControllerFactory factory = new AppControllerFactory();
 
                 // Create navigation handler
                 NavigationHandler navigator = new NavigationHandler(frame, factory);
 
-                // Hook navigation listener so presenters can signal navigation
+                // Hook navigation listener so controller can signal navigation
                 NavigationEvents.setListener(navigator::navigateTo);
 
                 // Start with Login screen

@@ -131,14 +131,15 @@ public class MonitoredDirectoryService {
      * Creates a new baseline for a monitored directory by sending a request to the MONITORED_DIRECTORY_NEW_BASELINE endpoint.
      *
      * @param id The ID of the monitored directory for which to create a new baseline.
+     * @param endpointCode Code for verifying the action of creating a new baseline.
      * @return `true` if the baseline creation was successful, otherwise `false`.
      * @throws NewMonitoredDirectoryBaselineException If the baseline creation attempt fails due to unauthorized access, monitored directory not found, or server error.
      * @throws ExecutionException                    If an error occurs during the asynchronous execution of the request.
      * @throws InterruptedException                  If the thread executing the request is interrupted.
      * @throws JsonProcessingException               If an error occurs while serializing the request body.
      */
-    public boolean newMonitoredDirectoryBaseline(int id) throws NewMonitoredDirectoryBaselineException, ExecutionException, InterruptedException, JsonProcessingException {
-        String body = objectMapper.writeValueAsString(new NewBaselineRequest(id, PwssHttpClient.ENDPOINT_CODE));
+    public boolean newMonitoredDirectoryBaseline(long id, long endpointCode) throws NewMonitoredDirectoryBaselineException, ExecutionException, InterruptedException, JsonProcessingException {
+        String body = objectMapper.writeValueAsString(new NewBaselineRequest(id, endpointCode));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.MONITORED_DIRECTORY_NEW_BASELINE, body);
 
         return switch (response.statusCode()) {

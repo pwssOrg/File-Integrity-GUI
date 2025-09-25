@@ -1,4 +1,4 @@
-package org.pwss.presenter.util;
+package org.pwss.controller.util;
 
 import java.util.HashMap;
 import java.util.Map;

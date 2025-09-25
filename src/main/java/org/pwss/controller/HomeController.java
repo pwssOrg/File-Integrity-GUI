@@ -1,4 +1,4 @@
-package org.pwss.presenter;
+package org.pwss.controller;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -22,15 +22,18 @@ import org.pwss.model.table.MonitoredDirectoryTableModel;
 import org.pwss.model.table.ScanTableModel;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
-import org.pwss.presenter.util.NavigationContext;
+import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
+import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
+import org.pwss.controller.util.NavigationContext;
 import org.pwss.utils.LiveFeedUtils;
 import org.pwss.utils.ReportUtils;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.HomeScreen;
 
-public class HomePresenter extends BasePresenter<HomeScreen> {
+public class HomeController extends BaseController<HomeScreen> {
     private final ScanService scanService;
     private final MonitoredDirectoryService monitoredDirectoryService;
+    private final MonitoredDirectoryPopupFactory monitoredDirectoryPopupFactory;
 
     private List<MonitoredDirectory> allMonitoredDirectories;
     private List<Scan> recentScans;
@@ -40,10 +43,11 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
     private long totalDiffCount = 0;
     private Timer scanStatusTimer;
 
-    public HomePresenter(HomeScreen view) {
+    public HomeController(HomeScreen view) {
         super(view);
         this.scanService = new ScanService();
         this.monitoredDirectoryService = new MonitoredDirectoryService();
+        this.monitoredDirectoryPopupFactory = new MonitoredDirectoryPopupFactory(new MonitoredDirectoryPopupListenerImpl(this, monitoredDirectoryService));
     }
 
     @Override
@@ -112,17 +116,27 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
         screen.getQuickScanButton().addActionListener(e -> handleScanButtonClick(false));
         screen.getMonitoredDirectoriesTable().addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2 && screen.getMonitoredDirectoriesTable().getSelectedRow() != -1) {
+            public void mousePressed(MouseEvent e) {
+                showPopupIfTriggered(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                showPopupIfTriggered(e);
+            }
+
+            private void showPopupIfTriggered(MouseEvent e) {
+                if (e.isPopupTrigger() && screen.getMonitoredDirectoriesTable().getSelectedRow() != -1) {
                     int viewRow = screen.getMonitoredDirectoriesTable().getSelectedRow();
                     int modelRow = screen.getMonitoredDirectoriesTable().convertRowIndexToModel(viewRow);
 
                     MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) screen.getMonitoredDirectoriesTable().getModel();
                     Optional<MonitoredDirectory> dir = model.getDirectoryAt(modelRow);
 
-                    if (dir.isPresent()) {
-                        handleScanButtonClick(true);
-                    }
+                    dir.ifPresent(d -> {
+                        JPopupMenu popupMenu = monitoredDirectoryPopupFactory.create(screen.getMonitoredDirectoriesTable(), viewRow);
+                        popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    });
                 }
             }
         });
@@ -210,7 +224,7 @@ public class HomePresenter extends BasePresenter<HomeScreen> {
      *
      * @param singleDirectory if true, scans only the selected directory; if false, scans all directories.
      */
-    private void performStartScan(boolean singleDirectory) {
+    public void performStartScan(boolean singleDirectory) {
         try {
             boolean startScanSuccess;
             JTable table = screen.getMonitoredDirectoriesTable();
