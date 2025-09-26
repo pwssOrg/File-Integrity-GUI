@@ -24,10 +24,10 @@ public class Start {
                 frame.setLocationRelativeTo(null); // center on screen
 
                 // Create controller factory
-                ControllerFactory factory = new AppControllerFactory();
+                final ControllerFactory factory = new AppControllerFactory();
 
                 // Create navigation handler
-                NavigationHandler navigator = new NavigationHandler(frame, factory);
+                final NavigationHandler navigator = new NavigationHandler(frame, factory);
 
                 // Hook navigation listener so controller can signal navigation
                 NavigationEvents.setListener(navigator::navigateTo);
@@ -41,6 +41,5 @@ public class Start {
         } catch( Exception ex ) {
             System.err.println( "Failed to initialize LaF" );
         }
-
     }
 }
