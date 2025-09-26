@@ -23,4 +23,16 @@ public final class StringConstants {
     public static final String SCAN_DIFFS_PREFIX = "Diffs: ";
     public static final String SCAN_LIVE_FEED_ERROR_PREFIX = "An error occurred while retrieving the live feed: ";
     public static final String SCAN_SHOW_RESULTS_ERROR_PREFIX = "Error displaying scan results: ";
+
+    // Monitored directory popup related strings
+    public static final String MON_DIR_POPUP_START_SCAN = "Scan this directory";
+    public static final String MON_DIR_POPUP_RESET_BASELINE = "Reset baseline";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_POPUP_TITLE = "Confirm Reset Baseline";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_POPUP_MESSAGE = "Type the code to confirm baseline reset for:\n";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_SUCCESS = "Baseline reset successfully.";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR = "Failed to reset baseline.";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_EMPTY_INPUT = "Endpoint code is required. Baseline reset cancelled.";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_INVALID = "Invalid code. Baseline reset cancelled.";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_PREFIX = "Error resetting baseline: ";
+    public static final String MON_DIR_POPUP_EDIT_DIR = "Edit this directory";
 }

@@ -1,6 +1,6 @@
 package org.pwss.navigation;
 
-import org.pwss.presenter.util.NavigationContext;
+import org.pwss.controller.util.NavigationContext;
 
 /**
  * Handles navigation events within the application.

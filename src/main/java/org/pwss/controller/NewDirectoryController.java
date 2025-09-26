@@ -1,4 +1,4 @@
-package org.pwss.presenter;
+package org.pwss.controller;
 
 import org.pwss.model.service.MonitoredDirectoryService;
 import org.pwss.navigation.NavigationEvents;
@@ -7,11 +7,11 @@ import org.pwss.view.screen.NewDirectoryScreen;
 
 import javax.swing.*;
 
-public class NewDirectoryPresenter extends BasePresenter<NewDirectoryScreen> {
+public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
     private final MonitoredDirectoryService monitoredDirectoryService;
     private String selectedPath = null;
 
-    public NewDirectoryPresenter(NewDirectoryScreen screen) {
+    public NewDirectoryController(NewDirectoryScreen screen) {
         super(screen);
         this.monitoredDirectoryService = new MonitoredDirectoryService();
     }

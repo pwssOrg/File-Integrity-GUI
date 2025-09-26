@@ -1,0 +1,78 @@
+package org.pwss.view.popup_menu;
+
+import org.pwss.model.entity.MonitoredDirectory;
+import org.pwss.model.table.MonitoredDirectoryTableModel;
+import org.pwss.utils.StringConstants;
+import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListener;
+
+import javax.swing.*;
+import java.util.Optional;
+
+/**
+ * Factory class for creating context menus for monitored directories in a JTable.
+ */
+public class MonitoredDirectoryPopupFactory {
+    private final MonitoredDirectoryPopupListener listener;
+
+    public MonitoredDirectoryPopupFactory(MonitoredDirectoryPopupListener listener) {
+        this.listener = listener;
+    }
+
+    public JPopupMenu create(JTable table, int viewRow) {
+        JPopupMenu menu = new JPopupMenu();
+
+        int modelRow = table.convertRowIndexToModel(viewRow);
+        MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) table.getModel();
+        Optional<MonitoredDirectory> dirOpt = model.getDirectoryAt(modelRow);
+
+        if (dirOpt.isEmpty()) return menu;
+        MonitoredDirectory dir = dirOpt.get();
+
+        // Scan this directory
+        JMenuItem scanItem = new JMenuItem(StringConstants.MON_DIR_POPUP_START_SCAN);
+        scanItem.addActionListener(e -> listener.onStartScan());
+
+        // Reset baseline
+        JMenuItem resetBaselineItem = getResetBaselineItem(dir);
+
+        // Edit directory
+        JMenuItem editDirectory = getEditDirectoryItem(dir);
+
+        menu.add(scanItem);
+        menu.add(editDirectory);
+        menu.addSeparator();
+        menu.add(resetBaselineItem);
+
+        return menu;
+    }
+
+    private JMenuItem getResetBaselineItem(MonitoredDirectory dir) {
+        JMenuItem resetBaselineItem = new JMenuItem(StringConstants.MON_DIR_POPUP_RESET_BASELINE);
+        resetBaselineItem.addActionListener(e -> {
+            String input = JOptionPane.showInputDialog(
+                    listener.getParentComponent(),
+                    StringConstants.MON_DIR_POPUP_RESET_BASELINE_POPUP_MESSAGE + dir.path(),
+                    StringConstants.MON_DIR_POPUP_RESET_BASELINE_POPUP_TITLE,
+                    JOptionPane.WARNING_MESSAGE
+            );
+
+            try {
+                if (input == null || input.isBlank()) {
+                    listener.showError(StringConstants.MON_DIR_POPUP_RESET_BASELINE_ERROR_EMPTY_INPUT);
+                    return;
+                }
+                listener.onResetBaseline(dir, Long.parseLong(input));
+            } catch (NumberFormatException ex) {
+                listener.showError(StringConstants.MON_DIR_POPUP_RESET_BASELINE_ERROR_INVALID);
+            }
+        });
+        return resetBaselineItem;
+    }
+
+    private JMenuItem getEditDirectoryItem(MonitoredDirectory dir) {
+        JMenuItem editItem = new JMenuItem(StringConstants.MON_DIR_POPUP_EDIT_DIR);
+        editItem.addActionListener(e -> listener.onEditDirectory(dir));
+        return editItem;
+    }
+}
+

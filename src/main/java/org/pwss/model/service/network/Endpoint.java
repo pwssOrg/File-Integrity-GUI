@@ -72,7 +72,7 @@ public enum Endpoint {
     /**
      * Endpoint for creating a new baseline for a monitored directory.
      */
-    MONITORED_DIRECTORY_NEW_BASELINE(HTTP_Method.POST, A.BASE_URL + A.DIRECTORY + "new-baseline"),
+    MONITORED_DIRECTORY_NEW_BASELINE(HTTP_Method.PUT, A.BASE_URL + A.DIRECTORY + "new-baseline"),
     /**
      * Endpoint for updating an existing monitored directory.
      */
