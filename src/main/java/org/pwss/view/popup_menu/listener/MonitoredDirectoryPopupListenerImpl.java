@@ -37,7 +37,7 @@ public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPo
 
     @Override
     public void onEditDirectory(MonitoredDirectory dir) {
-
+        // TODO: Implement edit directory functionality
     }
 
     @Override
