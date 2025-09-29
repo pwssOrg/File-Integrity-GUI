@@ -7,6 +7,8 @@ public final class StringConstants {
     // General purpose strings
     public static final String GENERIC_YES = "Yes";
     public static final String GENERIC_NO = "No";
+    public static final String GENERIC_SUCCESS = "Success";
+    public static final String GENERIC_ERROR = "Error";
 
     // Scan related strings
     public static final String SCAN_FULL = "Full scan";
@@ -35,4 +37,9 @@ public final class StringConstants {
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_INVALID = "Invalid code. Baseline reset cancelled.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_PREFIX = "Error resetting baseline: ";
     public static final String MON_DIR_POPUP_EDIT_DIR = "Edit this directory";
+
+    // New directory screen related strings
+    public static final String NEW_DIR_SUCCESS_TEXT = "Directory added successfully!";
+    public static final String NEW_DIR_ERROR_PREFIX = "Failed to add directory: ";
+    public static final String NEW_DIR_NO_PATH_SELECTED = "No directory selected.";
 }
