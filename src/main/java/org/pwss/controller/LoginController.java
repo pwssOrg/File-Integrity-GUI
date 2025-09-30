@@ -39,7 +39,8 @@ public class LoginController extends BaseController<LoginScreen> {
 
     @Override
     protected void initListeners() {
-        getScreen().getProceedButton().addActionListener(e -> onProceedButtonClick());
+        getScreen().getPasswordField().addActionListener(e -> proceedAndValidate());
+        getScreen().getProceedButton().addActionListener(e -> proceedAndValidate());
         getScreen().getCancelButton().addActionListener(e -> System.exit(0));
     }
 
@@ -88,7 +89,7 @@ public class LoginController extends BaseController<LoginScreen> {
      * Handles the proceed button click event.
      * Validates input and either creates a new user or performs login based on the mode.
      */
-    private void onProceedButtonClick() {
+    private void proceedAndValidate() {
         if (!validateInput()) {
             return; // Input validation failed, do not proceed
         }

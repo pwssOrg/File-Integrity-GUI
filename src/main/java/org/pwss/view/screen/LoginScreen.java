@@ -45,6 +45,10 @@ public class LoginScreen extends BaseScreen {
         return cancelButton;
     }
 
+    public JPasswordField getPasswordField() {
+        return passwordField;
+    }
+
     public void setMessage(String message) {
         this.messageLabel.setText(message);
     }
