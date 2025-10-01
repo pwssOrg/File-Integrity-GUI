@@ -88,6 +88,10 @@ public enum Endpoint {
      */
     SUMMARY_FILE(HTTP_Method.POST, A.BASE_URL + A.SCAN_SUMMARY + "file"),
     /**
+     * Endpoint for searching files based on a query string.
+     */
+    SUMMARY_FILE_SEARCH(HTTP_Method.POST, A.BASE_URL + A.SCAN_SUMMARY + "file/search"),
+    /**
      * Endpoint for retrieving the most recent scan summary.
      */
     SUMMARY_MOST_RECENT_SCAN(HTTP_Method.POST, A.BASE_URL + A.SCAN_SUMMARY + "most-recent");
@@ -155,4 +159,8 @@ final class A {
      * Path segment for user-related endpoints.
      */
     static final String USER = "user/";
+    /**
+     * Path segment for note-related endpoints.
+     */
+    static final String NOTE = "note/";
 }

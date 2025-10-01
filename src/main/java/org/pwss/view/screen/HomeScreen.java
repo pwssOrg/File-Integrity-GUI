@@ -33,6 +33,12 @@ public class HomeScreen extends BaseScreen {
     private JPanel settingsTab;
     private JTextPane diffDetails;
     private JButton clearFeedButton;
+    private JPanel filesTab;
+    private JTable filesTable;
+    private JTextPane fileDetails;
+    private JTextField fileSearchField;
+    private JCheckBox searchContainingCheckBox;
+    private JCheckBox descendingCheckBox;
 
     @Override
     protected String getScreenName() {
@@ -46,10 +52,6 @@ public class HomeScreen extends BaseScreen {
 
     public JButton getAddNewDirectoryButton() {
         return newDirectoryButton;
-    }
-
-    public JButton getEditDirectoryButton() {
-        return editDirectoryButton;
     }
 
     public JButton getScanButton() {
@@ -102,6 +104,30 @@ public class HomeScreen extends BaseScreen {
 
     public JButton getClearFeedButton() {
         return clearFeedButton;
+    }
+
+    public JPanel getFilesTab() {
+        return filesTab;
+    }
+
+    public JTextField getFileSearchField() {
+        return fileSearchField;
+    }
+
+    public JTextPane getFileDetails() {
+        return fileDetails;
+    }
+
+    public JCheckBox getDescendingCheckBox() {
+        return descendingCheckBox;
+    }
+
+    public JTable getFilesTable() {
+        return filesTable;
+    }
+
+    public JCheckBox getSearchContainingCheckBox() {
+        return searchContainingCheckBox;
     }
 
     {
@@ -183,26 +209,53 @@ public class HomeScreen extends BaseScreen {
         clearFeedButton = new JButton();
         clearFeedButton.setText("Clear feed");
         scanTab.add(clearFeedButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        filesTab = new JPanel();
+        filesTab.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
+        tabbedPane.addTab("\uD83D\uDDC4\uFE0F Files", filesTab);
+        final JSplitPane splitPane1 = new JSplitPane();
+        filesTab.add(splitPane1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
+        final JScrollPane scrollPane3 = new JScrollPane();
+        splitPane1.setLeftComponent(scrollPane3);
+        filesTable = new JTable();
+        scrollPane3.setViewportView(filesTable);
+        final JScrollPane scrollPane4 = new JScrollPane();
+        splitPane1.setRightComponent(scrollPane4);
+        fileDetails = new JTextPane();
+        scrollPane4.setViewportView(fileDetails);
+        final JPanel panel2 = new JPanel();
+        panel2.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 10, 0), -1, -1));
+        filesTab.add(panel2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, true));
+        fileSearchField = new JTextField();
+        panel2.add(fileSearchField, new GridConstraints(1, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        final JLabel label3 = new JLabel();
+        label3.setText("Search for file");
+        panel2.add(label3, new GridConstraints(0, 0, 1, 2, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        searchContainingCheckBox = new JCheckBox();
+        searchContainingCheckBox.setText("File name contains");
+        panel2.add(searchContainingCheckBox, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        descendingCheckBox = new JCheckBox();
+        descendingCheckBox.setText("Descending");
+        panel2.add(descendingCheckBox, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         recentDiffsTab = new JPanel();
         recentDiffsTab.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
         tabbedPane.addTab("⚠\uFE0F Recent diffs", recentDiffsTab);
-        final JSplitPane splitPane1 = new JSplitPane();
-        recentDiffsTab.add(splitPane1, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
-        final JScrollPane scrollPane3 = new JScrollPane();
-        splitPane1.setLeftComponent(scrollPane3);
+        final JSplitPane splitPane2 = new JSplitPane();
+        recentDiffsTab.add(splitPane2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
+        final JScrollPane scrollPane5 = new JScrollPane();
+        splitPane2.setLeftComponent(scrollPane5);
         diffTable = new JTable();
         diffTable.setAutoResizeMode(4);
         diffTable.setFillsViewportHeight(true);
-        scrollPane3.setViewportView(diffTable);
-        final JScrollPane scrollPane4 = new JScrollPane();
-        splitPane1.setRightComponent(scrollPane4);
+        scrollPane5.setViewportView(diffTable);
+        final JScrollPane scrollPane6 = new JScrollPane();
+        splitPane2.setRightComponent(scrollPane6);
         diffDetails = new JTextPane();
-        scrollPane4.setViewportView(diffDetails);
-        final JLabel label3 = new JLabel();
-        Font label3Font = this.$$$getFont$$$(null, Font.BOLD, 16, label3.getFont());
-        if (label3Font != null) label3.setFont(label3Font);
-        label3.setText("Most recently detected diffs");
-        recentDiffsTab.add(label3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        scrollPane6.setViewportView(diffDetails);
+        final JLabel label4 = new JLabel();
+        Font label4Font = this.$$$getFont$$$(null, Font.BOLD, 16, label4.getFont());
+        if (label4Font != null) label4.setFont(label4Font);
+        label4.setText("Most recently detected diffs");
+        recentDiffsTab.add(label4, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         settingsTab = new JPanel();
         settingsTab.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         tabbedPane.addTab("⚙\uFE0F Settings", settingsTab);

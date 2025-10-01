@@ -1,43 +1,48 @@
 package org.pwss.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.pwss.controller.util.NavigationContext;
+import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
+import org.pwss.exception.scan.*;
+import org.pwss.exception.scan_summary.GetSearchFilesException;
+import org.pwss.model.entity.Diff;
+import org.pwss.model.entity.File;
+import org.pwss.model.entity.MonitoredDirectory;
+import org.pwss.model.entity.Scan;
+import org.pwss.model.service.MonitoredDirectoryService;
+import org.pwss.model.service.ScanService;
+import org.pwss.model.service.ScanSummaryService;
+import org.pwss.model.service.response.LiveFeedResponse;
+import org.pwss.model.table.DiffTableModel;
+import org.pwss.model.table.FileTableModel;
+import org.pwss.model.table.MonitoredDirectoryTableModel;
+import org.pwss.model.table.ScanTableModel;
+import org.pwss.navigation.NavigationEvents;
+import org.pwss.navigation.Screen;
+import org.pwss.utils.LiveFeedUtils;
+import org.pwss.utils.ReportUtils;
+import org.pwss.utils.StringConstants;
+import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
+import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
+import org.pwss.view.screen.HomeScreen;
+
+import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import javax.swing.*;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
-import org.pwss.exception.scan.*;
-import org.pwss.model.entity.Diff;
-import org.pwss.model.entity.MonitoredDirectory;
-import org.pwss.model.entity.Scan;
-import org.pwss.model.service.MonitoredDirectoryService;
-import org.pwss.model.service.ScanService;
-import org.pwss.model.service.response.LiveFeedResponse;
-import org.pwss.model.table.DiffTableModel;
-import org.pwss.model.table.MonitoredDirectoryTableModel;
-import org.pwss.model.table.ScanTableModel;
-import org.pwss.navigation.NavigationEvents;
-import org.pwss.navigation.Screen;
-import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
-import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
-import org.pwss.controller.util.NavigationContext;
-import org.pwss.utils.LiveFeedUtils;
-import org.pwss.utils.ReportUtils;
-import org.pwss.utils.StringConstants;
-import org.pwss.view.screen.HomeScreen;
-
 public class HomeController extends BaseController<HomeScreen> {
     private final ScanService scanService;
     private final MonitoredDirectoryService monitoredDirectoryService;
+    private final ScanSummaryService scanSummaryService;
     private final MonitoredDirectoryPopupFactory monitoredDirectoryPopupFactory;
 
     private List<MonitoredDirectory> allMonitoredDirectories;
     private List<Scan> recentScans;
     private List<Diff> recentDiffs;
+    private List<File> fileResults;
 
     private boolean scanRunning;
     private long totalDiffCount = 0;
@@ -47,6 +52,7 @@ public class HomeController extends BaseController<HomeScreen> {
         super(view);
         this.scanService = new ScanService();
         this.monitoredDirectoryService = new MonitoredDirectoryService();
+        scanSummaryService = new ScanSummaryService();
         this.monitoredDirectoryPopupFactory = new MonitoredDirectoryPopupFactory(new MonitoredDirectoryPopupListenerImpl(this, monitoredDirectoryService));
     }
 
@@ -174,6 +180,7 @@ public class HomeController extends BaseController<HomeScreen> {
             }
         });
         screen.getClearFeedButton().addActionListener(e -> clearLiveFeed());
+        screen.getFileSearchField().addActionListener(e -> searchForFiles());
     }
 
     @Override
@@ -191,14 +198,17 @@ public class HomeController extends BaseController<HomeScreen> {
         screen.getLiveFeedDiffCount().setVisible(showLiveFeed);
         screen.getClearFeedButton().setVisible(showClearLiveFeed);
 
-        ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans);
+        ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans != null ? recentScans : List.of());
         screen.getRecentScanTable().setModel(mostRecentScansListModel);
 
-        MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(allMonitoredDirectories);
+        MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(allMonitoredDirectories != null ? allMonitoredDirectories : List.of());
         screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
 
-        DiffTableModel diffTableModel = new DiffTableModel(recentDiffs);
+        DiffTableModel diffTableModel = new DiffTableModel(recentDiffs != null ? recentDiffs : List.of());
         screen.getDiffTable().setModel(diffTableModel);
+
+        FileTableModel fileTableModel = new FileTableModel(fileResults != null ? fileResults : List.of());
+        screen.getFilesTable().setModel(fileTableModel);
     }
 
     /**
@@ -373,5 +383,23 @@ public class HomeController extends BaseController<HomeScreen> {
             }
         });
         scanStatusTimer.start();
+    }
+
+    private void searchForFiles() {
+        String query = screen.getFileSearchField().getText().trim();
+        boolean searchContainingInput = screen.getSearchContainingCheckBox().isSelected();
+        boolean descendingOrder = screen.getDescendingCheckBox().isSelected();
+        if (query.isEmpty()) {
+            screen.showError("Please enter a search query.");
+            return;
+        }
+
+        try {
+            String searchQuery = searchContainingInput ? "%" + query + "%" : query;
+            fileResults = scanSummaryService.searchFiles(searchQuery, !descendingOrder);
+            refreshView();
+        } catch (GetSearchFilesException | ExecutionException | InterruptedException | JsonProcessingException e) {
+            SwingUtilities.invokeLater(() -> screen.showError(e.getMessage()));
+        }
     }
 }
