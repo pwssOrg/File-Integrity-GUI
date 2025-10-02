@@ -5,7 +5,7 @@ import org.pwss.model.entity.ScanSummary;
 import org.pwss.model.service.ScanService;
 import org.pwss.model.service.ScanSummaryService;
 import org.pwss.model.table.DiffTableModel;
-import org.pwss.model.table.ScanSummaryTableModel;
+import org.pwss.model.table.SimpleSummaryTableModel;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.utils.ReportUtils;
@@ -90,8 +90,8 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
     @Override
     void refreshView() {
         // Populate scan summary table
-        ScanSummaryTableModel scanSummaryTableModel = new ScanSummaryTableModel(scanSummaries);
-        screen.getScanSummaryTable().setModel(scanSummaryTableModel);
+        SimpleSummaryTableModel simpleSummaryTableModel = new SimpleSummaryTableModel(scanSummaries);
+        screen.getScanSummaryTable().setModel(simpleSummaryTableModel);
 
         // Populate diffs table
         DiffTableModel diffTableModel = new DiffTableModel(diffs);

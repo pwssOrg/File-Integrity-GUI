@@ -1,18 +1,16 @@
 package org.pwss.model.table;
 
-import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.ScanSummary;
 
 import javax.swing.table.AbstractTableModel;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-public class DiffTableModel extends AbstractTableModel {
-    private final List<Diff> data;
-    private final String[] columns = {"\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected"};
+public class SimpleSummaryTableModel extends AbstractTableModel {
+    private final List<ScanSummary> data;
+    private final String[] columns = {"\uD83D\uDEA6 File Name"};
 
-    public DiffTableModel(List<Diff> data) {
+    public SimpleSummaryTableModel(List<ScanSummary> data) {
         this.data = data;
     }
 
@@ -32,32 +30,22 @@ public class DiffTableModel extends AbstractTableModel {
     }
 
     @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        return switch (columnIndex) {
-            case 1, 2 -> Date.class;
-            default -> super.getColumnClass(columnIndex);
-        };
-    }
-
-    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Diff diff = data.get(rowIndex);
+        ScanSummary summary = data.get(rowIndex);
         return switch (columnIndex) {
-            case 0 -> diff.baseline().file().path();
-            case 1 -> diff.integrityFail().file().mtime();
-            case 2 -> diff.time().created();
+            case 0 -> summary.file().basename();
             default -> null;
         };
     }
 
     /**
-     * Get the Diff object at the specified row index.
+     * Get the ScanSummary object at the specified row index.
      *
      * @param rowIndex the index of the row in the table.
-     * @return an Optional containing the Diff object at the specified row index,
+     * @return an Optional containing the ScanSummary object at the specified row index,
      *         or an empty Optional if the index is out of bounds.
      */
-    public Optional<Diff> getDiffAt(int rowIndex) {
+    public Optional<ScanSummary> getSummaryAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < data.size()) {
             return Optional.of(data.get(rowIndex));
         }

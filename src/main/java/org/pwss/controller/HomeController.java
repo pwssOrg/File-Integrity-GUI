@@ -5,18 +5,13 @@ import org.pwss.controller.util.NavigationContext;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
 import org.pwss.exception.scan.*;
 import org.pwss.exception.scan_summary.GetSearchFilesException;
-import org.pwss.model.entity.Diff;
-import org.pwss.model.entity.File;
-import org.pwss.model.entity.MonitoredDirectory;
-import org.pwss.model.entity.Scan;
+import org.pwss.exception.scan_summary.GetSummaryForFileException;
+import org.pwss.model.entity.*;
 import org.pwss.model.service.MonitoredDirectoryService;
 import org.pwss.model.service.ScanService;
 import org.pwss.model.service.ScanSummaryService;
 import org.pwss.model.service.response.LiveFeedResponse;
-import org.pwss.model.table.DiffTableModel;
-import org.pwss.model.table.FileTableModel;
-import org.pwss.model.table.MonitoredDirectoryTableModel;
-import org.pwss.model.table.ScanTableModel;
+import org.pwss.model.table.*;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.utils.LiveFeedUtils;
@@ -43,6 +38,7 @@ public class HomeController extends BaseController<HomeScreen> {
     private List<Scan> recentScans;
     private List<Diff> recentDiffs;
     private List<File> fileResults;
+    private List<ScanSummary> fileSummaries;
 
     private boolean scanRunning;
     private long totalDiffCount = 0;
@@ -181,6 +177,19 @@ public class HomeController extends BaseController<HomeScreen> {
         });
         screen.getClearFeedButton().addActionListener(e -> clearLiveFeed());
         screen.getFileSearchField().addActionListener(e -> searchForFiles());
+        screen.getSearchContainingCheckBox().addActionListener(e -> searchForFiles());
+        screen.getDescendingCheckBox().addActionListener(e -> searchForFiles());
+        screen.getFilesTable().getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && screen.getFilesTable().getSelectedRow() != -1) {
+                int viewRow = screen.getFilesTable().getSelectedRow();
+                int modelRow = screen.getFilesTable().convertRowIndexToModel(viewRow);
+
+                FileTableModel model = (FileTableModel) screen.getFilesTable().getModel();
+                Optional<File> file = model.getFileAt(modelRow);
+
+                file.ifPresent(this::getSummaryForFile);
+            }
+        });
     }
 
     @Override
@@ -209,6 +218,9 @@ public class HomeController extends BaseController<HomeScreen> {
 
         FileTableModel fileTableModel = new FileTableModel(fileResults != null ? fileResults : List.of());
         screen.getFilesTable().setModel(fileTableModel);
+
+        ScanSummaryTableModel fileSummaryTableModel = new ScanSummaryTableModel(fileSummaries != null ? fileSummaries : List.of());
+        screen.getFileScanSummaryTable().setModel(fileSummaryTableModel);
     }
 
     /**
@@ -387,18 +399,27 @@ public class HomeController extends BaseController<HomeScreen> {
 
     private void searchForFiles() {
         String query = screen.getFileSearchField().getText().trim();
-        boolean searchContainingInput = screen.getSearchContainingCheckBox().isSelected();
-        boolean descendingOrder = screen.getDescendingCheckBox().isSelected();
         if (query.isEmpty()) {
-            screen.showError("Please enter a search query.");
             return;
         }
+
+        boolean searchContainingInput = screen.getSearchContainingCheckBox().isSelected();
+        boolean descendingOrder = screen.getDescendingCheckBox().isSelected();
 
         try {
             String searchQuery = searchContainingInput ? "%" + query + "%" : query;
             fileResults = scanSummaryService.searchFiles(searchQuery, !descendingOrder);
             refreshView();
         } catch (GetSearchFilesException | ExecutionException | InterruptedException | JsonProcessingException e) {
+            SwingUtilities.invokeLater(() -> screen.showError(e.getMessage()));
+        }
+    }
+
+    private void getSummaryForFile(File file) {
+        try {
+            fileSummaries = scanSummaryService.getSummaryForFile(file.id());
+            refreshView();
+        } catch (GetSummaryForFileException | ExecutionException | InterruptedException | JsonProcessingException e) {
             SwingUtilities.invokeLater(() -> screen.showError(e.getMessage()));
         }
     }

@@ -204,7 +204,7 @@
                     <properties/>
                     <border type="none"/>
                     <children>
-                      <component id="a6b54" class="javax.swing.JTextPane" binding="fileDetails">
+                      <component id="b8db8" class="javax.swing.JTable" binding="fileSummaryTable">
                         <constraints/>
                         <properties/>
                       </component>

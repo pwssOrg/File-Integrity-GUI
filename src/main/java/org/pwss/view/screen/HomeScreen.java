@@ -35,10 +35,10 @@ public class HomeScreen extends BaseScreen {
     private JButton clearFeedButton;
     private JPanel filesTab;
     private JTable filesTable;
-    private JTextPane fileDetails;
     private JTextField fileSearchField;
     private JCheckBox searchContainingCheckBox;
     private JCheckBox descendingCheckBox;
+    private JTable fileSummaryTable;
 
     @Override
     protected String getScreenName() {
@@ -114,8 +114,8 @@ public class HomeScreen extends BaseScreen {
         return fileSearchField;
     }
 
-    public JTextPane getFileDetails() {
-        return fileDetails;
+    public JTable getFileScanSummaryTable() {
+        return fileSummaryTable;
     }
 
     public JCheckBox getDescendingCheckBox() {
@@ -220,8 +220,8 @@ public class HomeScreen extends BaseScreen {
         scrollPane3.setViewportView(filesTable);
         final JScrollPane scrollPane4 = new JScrollPane();
         splitPane1.setRightComponent(scrollPane4);
-        fileDetails = new JTextPane();
-        scrollPane4.setViewportView(fileDetails);
+        fileSummaryTable = new JTable();
+        scrollPane4.setViewportView(fileSummaryTable);
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridLayoutManager(4, 2, new Insets(0, 0, 10, 0), -1, -1));
         filesTab.add(panel2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_NORTH, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, true));

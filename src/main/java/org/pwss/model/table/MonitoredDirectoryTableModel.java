@@ -3,6 +3,7 @@ package org.pwss.model.table;
 import org.pwss.model.entity.MonitoredDirectory;
 
 import javax.swing.table.AbstractTableModel;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,10 +36,10 @@ public class MonitoredDirectoryTableModel extends AbstractTableModel {
     public Class<?> getColumnClass(int columnIndex) {
         return switch (columnIndex) {
             case 1, 4 -> Boolean.class;
+            case 2 -> Date.class;
             default -> super.getColumnClass(columnIndex);
         };
     }
-
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
