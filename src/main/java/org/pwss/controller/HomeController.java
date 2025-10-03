@@ -190,6 +190,15 @@ public class HomeController extends BaseController<HomeScreen> {
                 file.ifPresent(this::getSummaryForFile);
             }
         });
+        screen.getFileScanSummaryTable().getSelectionModel().addListSelectionListener(e -> {
+            int selectedRow = screen.getFileScanSummaryTable().getSelectedRow();
+            if (selectedRow >= 0 && selectedRow < fileSummaries.size()) {
+                ScanSummary selectedSummary = fileSummaries.get(selectedRow);
+                screen.getScanSummaryDetails().setText(ReportUtils.formatSummary(selectedSummary));
+            } else {
+                screen.getScanSummaryDetails().setText("");
+            }
+        });
     }
 
     @Override
@@ -206,6 +215,9 @@ public class HomeController extends BaseController<HomeScreen> {
         screen.getLiveFeedTitle().setVisible(showLiveFeed);
         screen.getLiveFeedDiffCount().setVisible(showLiveFeed);
         screen.getClearFeedButton().setVisible(showClearLiveFeed);
+
+        // File search views
+        screen.getSearchResultCount().setText(StringConstants.FILE_SEARCH_RESULTS_PREFIX + (fileResults != null ? fileResults.size() : 0));
 
         ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans != null ? recentScans : List.of());
         screen.getRecentScanTable().setModel(mostRecentScansListModel);

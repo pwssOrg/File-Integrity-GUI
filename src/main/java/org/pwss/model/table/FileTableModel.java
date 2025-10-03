@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public class FileTableModel extends AbstractTableModel {
     private final List<File> data;
-    private final String[] columns = {"\uD83D\uDEA6 Basename", "Directory", "Size (bytes)"};
+    private final String[] columns = {"\uD83D\uDEA6 Basename", "Directory"};
 
     public FileTableModel(List<File> data) {
         this.data = data;
@@ -35,7 +35,6 @@ public class FileTableModel extends AbstractTableModel {
         return switch (columnIndex) {
             case 0 -> file.basename();
             case 1 -> file.directory();
-            case 2 -> file.size();
             default -> null;
         };
     }

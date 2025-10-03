@@ -42,4 +42,7 @@ public final class StringConstants {
     public static final String NEW_DIR_SUCCESS_TEXT = "Directory added successfully!";
     public static final String NEW_DIR_ERROR_PREFIX = "Failed to add directory: ";
     public static final String NEW_DIR_NO_PATH_SELECTED = "No directory selected.";
+
+    // File search related strings
+    public static final String FILE_SEARCH_RESULTS_PREFIX = "Results: ";
 }
