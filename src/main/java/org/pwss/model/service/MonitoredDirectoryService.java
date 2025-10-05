@@ -95,11 +95,11 @@ public class MonitoredDirectoryService {
         return switch (response.statusCode()) {
             case 200 -> objectMapper.readValue(response.body(), MonitoredDirectory.class);
             case 400 ->
-                    throw new NewMonitoredDirectoryException("Create monitored directory failed: Invalid directory path or request body.");
+                    throw new NewMonitoredDirectoryException("Create monitored directory failed: Invalid directory path or request body.", body);
             case 401 ->
                     throw new NewMonitoredDirectoryException("Create monitored directory failed: User not authorized to perform this action.");
             case 500 ->
-                    throw new NewMonitoredDirectoryException("Create monitored directory failed: An error occurred on the server while attempting to create the monitored directory.");
+                    throw new NewMonitoredDirectoryException("Create monitored directory failed: An error occurred on the server while attempting to create the monitored directory.", body);
             default -> null;
         };
     }
