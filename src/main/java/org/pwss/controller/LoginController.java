@@ -1,4 +1,4 @@
-package org.pwss.presenter;
+package org.pwss.controller;
 
 import javax.swing.SwingUtilities;
 
@@ -13,7 +13,7 @@ import org.pwss.view.screen.LoginScreen;
 
 import java.util.concurrent.ExecutionException;
 
-public class LoginPresenter extends BasePresenter<LoginScreen> {
+public class LoginController extends BaseController<LoginScreen> {
     /**
      * Indicates whether the application is in create user mode (i.e., no users exist yet).
      */
@@ -22,11 +22,11 @@ public class LoginPresenter extends BasePresenter<LoginScreen> {
     private final AuthService authService;
 
     /**
-     * Constructs a LoginPresenter with the specified view and authentication service.
+     * Constructs a LoginController with the specified view and authentication service.
      *
-     * @param view        The LoginView instance to be managed by this presenter.
+     * @param view        The LoginView instance to be managed by this Controller.
      */
-    public LoginPresenter(LoginScreen view) {
+    public LoginController(LoginScreen view) {
         super(view);
         this.authService = new AuthService();
         this.createUserMode = !checkUserExists();

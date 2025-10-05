@@ -7,6 +7,8 @@ public final class StringConstants {
     // General purpose strings
     public static final String GENERIC_YES = "Yes";
     public static final String GENERIC_NO = "No";
+    public static final String GENERIC_SUCCESS = "Success";
+    public static final String GENERIC_ERROR = "Error";
 
     // Scan related strings
     public static final String SCAN_FULL = "Full scan";
@@ -23,4 +25,21 @@ public final class StringConstants {
     public static final String SCAN_DIFFS_PREFIX = "Diffs: ";
     public static final String SCAN_LIVE_FEED_ERROR_PREFIX = "An error occurred while retrieving the live feed: ";
     public static final String SCAN_SHOW_RESULTS_ERROR_PREFIX = "Error displaying scan results: ";
+
+    // Monitored directory popup related strings
+    public static final String MON_DIR_POPUP_START_SCAN = "Scan this directory";
+    public static final String MON_DIR_POPUP_RESET_BASELINE = "Reset baseline";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_POPUP_TITLE = "Confirm Reset Baseline";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_POPUP_MESSAGE = "Type the code to confirm baseline reset for:\n";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_SUCCESS = "Baseline reset successfully.";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR = "Failed to reset baseline.";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_EMPTY_INPUT = "Endpoint code is required. Baseline reset cancelled.";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_INVALID = "Invalid code. Baseline reset cancelled.";
+    public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_PREFIX = "Error resetting baseline: ";
+    public static final String MON_DIR_POPUP_EDIT_DIR = "Edit this directory";
+
+    // New directory screen related strings
+    public static final String NEW_DIR_SUCCESS_TEXT = "Directory added successfully!";
+    public static final String NEW_DIR_ERROR_PREFIX = "Failed to add directory: ";
+    public static final String NEW_DIR_NO_PATH_SELECTED = "No directory selected.";
 }

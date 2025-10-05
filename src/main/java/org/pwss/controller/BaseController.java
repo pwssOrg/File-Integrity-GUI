@@ -1,17 +1,17 @@
-package org.pwss.presenter;
+package org.pwss.controller;
 
-import org.pwss.presenter.util.NavigationContext;
+import org.pwss.controller.util.NavigationContext;
 import org.pwss.view.screen.BaseScreen;
 
 
 /**
- * An abstract base class for presenters in the application.
+ * An abstract base class for controllers in the application.
  * Provides a common structure for managing a `BaseScreen` view and initializing event listeners.
  */
-public abstract class BasePresenter<Screen extends BaseScreen> {
+public abstract class BaseController<Screen extends BaseScreen> {
     /**
-     * The view instance managed by this presenter.
-     * Represents the UI component associated with this presenter.
+     * The view instance managed by this controller.
+     * Represents the UI component associated with this controller.
      */
     protected Screen screen;
 
@@ -23,14 +23,14 @@ public abstract class BasePresenter<Screen extends BaseScreen> {
     /**
      * Retrieves the current navigation context.
      *
-     * @return The `NavigationContext` instance associated with this presenter.
+     * @return The `NavigationContext` instance associated with this controller.
      */
     protected NavigationContext getContext() {
         return context;
     }
 
     /**
-     * Sets the navigation context for the presenter.
+     * Sets the navigation context for the controller.
      *
      * @param context
      */
@@ -39,12 +39,12 @@ public abstract class BasePresenter<Screen extends BaseScreen> {
     }
 
     /**
-     * Constructs a `BasePresenter` with the specified view.
+     * Constructs a `BaseController` with the specified view.
      * Initializes the view and sets up event listeners.
      *
-     * @param screen The `Screen` instance to be managed by this presenter.
+     * @param screen The `Screen` instance to be managed by this controller.
      */
-    public BasePresenter(Screen screen) {
+    public BaseController(Screen screen) {
         this.screen = screen;
         // Initialize event listeners
         initListeners();
@@ -72,7 +72,7 @@ public abstract class BasePresenter<Screen extends BaseScreen> {
     }
 
     /**
-     * Retrieves the view managed by this presenter.
+     * Retrieves the view managed by this controller.
      *
      * @return The `Screen` instance representing the managed view.
      */

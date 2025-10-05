@@ -1,4 +1,4 @@
-package org.pwss.presenter;
+package org.pwss.controller;
 
 import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.ScanSummary;
@@ -13,13 +13,13 @@ import org.pwss.view.screen.ScanDetailsScreen;
 
 import java.util.List;
 
-public class ScanDetailsPresenter extends BasePresenter<ScanDetailsScreen> {
+public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
     private final ScanSummaryService scanSummaryService;
     private final ScanService scanService;
     private List<ScanSummary> scanSummaries;
     private List<Diff> diffs;
 
-    public ScanDetailsPresenter(ScanDetailsScreen screen) {
+    public ScanDetailsController(ScanDetailsScreen screen) {
         super(screen);
         this.scanSummaryService = new ScanSummaryService();
         this.scanService = new ScanService();

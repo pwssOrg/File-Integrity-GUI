@@ -1,17 +1,18 @@
-package org.pwss.presenter;
+package org.pwss.controller;
 
 import org.pwss.model.service.MonitoredDirectoryService;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
+import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.NewDirectoryScreen;
 
 import javax.swing.*;
 
-public class NewDirectoryPresenter extends BasePresenter<NewDirectoryScreen> {
+public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
     private final MonitoredDirectoryService monitoredDirectoryService;
     private String selectedPath = null;
 
-    public NewDirectoryPresenter(NewDirectoryScreen screen) {
+    public NewDirectoryController(NewDirectoryScreen screen) {
         super(screen);
         this.monitoredDirectoryService = new MonitoredDirectoryService();
     }
@@ -30,7 +31,7 @@ public class NewDirectoryPresenter extends BasePresenter<NewDirectoryScreen> {
 
     @Override
     void refreshView() {
-        getScreen().getPathLabel().setText(selectedPath != null ? selectedPath : "No folder selected");
+        getScreen().getPathLabel().setText(selectedPath != null ? selectedPath : StringConstants.NEW_DIR_NO_PATH_SELECTED);
         getScreen().getCreateButton().setEnabled(selectedPath != null && !selectedPath.isEmpty());
     }
 
@@ -59,10 +60,10 @@ public class NewDirectoryPresenter extends BasePresenter<NewDirectoryScreen> {
         if (selectedPath != null && !selectedPath.isEmpty()) {
             try {
                 monitoredDirectoryService.createNewMonitoredDirectory(selectedPath, includeSubdirectories, makeActive);
-                JOptionPane.showMessageDialog(getScreen().getRootPanel(), "Directory added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(getScreen().getRootPanel(), StringConstants.NEW_DIR_SUCCESS_TEXT, StringConstants.GENERIC_SUCCESS, JOptionPane.INFORMATION_MESSAGE);
                 NavigationEvents.navigateTo(Screen.HOME, null);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(getScreen().getRootPanel(), "Failed to add directory: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(getScreen().getRootPanel(), StringConstants.NEW_DIR_ERROR_PREFIX + e.getMessage(), StringConstants.GENERIC_ERROR, JOptionPane.ERROR_MESSAGE);
             }
         }
     }
