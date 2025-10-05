@@ -46,21 +46,12 @@ public final class GetSearchFilesException extends Exception {
      * Constructs a `GetSearchFilesException` with the specified detail message
      * and file search text string. The message is appended with " \nPWSS-FE @Exception".
      *
-     * @param message       The detail message to be included in the exception.
+     * @param message        The detail message to be included in the exception.
      * @param fileSearchText The file search text to be included in the exception.
      */
     public GetSearchFilesException(String message, String fileSearchText) {
         super(formatMessage(message, fileSearchText));
         this.fileSearchText = fileSearchText;
-    }
-
-    /**
-     * Returns the file search text associated with this exception, if any.
-     *
-     * @return The file search text string, or null if not set.
-     */
-    public String getFileSearchText() {
-        return fileSearchText;
     }
 
     private static String formatMessage(String message, String fileSearchText) {
@@ -75,6 +66,15 @@ public final class GetSearchFilesException extends Exception {
         sb.append("\nPWSS-FE @Exception");
 
         return sb.toString();
+    }
+
+    /**
+     * Returns the file search text associated with this exception, if any.
+     *
+     * @return The file search text string, or null if not set.
+     */
+    public String getFileSearchText() {
+        return fileSearchText;
     }
 
 }

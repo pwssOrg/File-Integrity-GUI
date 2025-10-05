@@ -1,12 +1,14 @@
 package org.pwss.view.popup_menu;
 
+import java.util.Optional;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.table.MonitoredDirectoryTableModel;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListener;
-
-import javax.swing.*;
-import java.util.Optional;
 
 /**
  * Factory class to create a context menu (popup menu) for monitored directories in a JTable.

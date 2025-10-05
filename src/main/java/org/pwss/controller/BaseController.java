@@ -7,6 +7,7 @@ import org.pwss.view.screen.BaseScreen;
 /**
  * An abstract base class for controllers in the application.
  * Provides a common structure for managing a `BaseScreen` view and initializing event listeners.
+ *
  * @author PWSS ORG
  */
 public abstract class BaseController<Screen extends BaseScreen> {
@@ -20,6 +21,18 @@ public abstract class BaseController<Screen extends BaseScreen> {
      * The navigation context for passing data between different parts of the application during navigation.
      */
     private NavigationContext context;
+
+    /**
+     * Constructs a `BaseController` with the specified view.
+     * Initializes the view and sets up event listeners.
+     *
+     * @param screen The `Screen` instance to be managed by this controller.
+     */
+    public BaseController(Screen screen) {
+        this.screen = screen;
+        // Initialize event listeners
+        initListeners();
+    }
 
     /**
      * Retrieves the current navigation context.
@@ -37,18 +50,6 @@ public abstract class BaseController<Screen extends BaseScreen> {
      */
     public void setContext(NavigationContext context) {
         this.context = context;
-    }
-
-    /**
-     * Constructs a `BaseController` with the specified view.
-     * Initializes the view and sets up event listeners.
-     *
-     * @param screen The `Screen` instance to be managed by this controller.
-     */
-    public BaseController(Screen screen) {
-        this.screen = screen;
-        // Initialize event listeners
-        initListeners();
     }
 
     /**

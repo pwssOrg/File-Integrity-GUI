@@ -2,10 +2,7 @@ package org.pwss.navigation;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.swing.JFrame;
-
-
 import org.pwss.controller.BaseController;
 import org.pwss.controller.factory.ControllerFactory;
 import org.pwss.controller.util.NavigationContext;

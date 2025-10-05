@@ -1,18 +1,18 @@
 package org.pwss;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-
 import com.formdev.flatlaf.FlatDarculaLaf;
+import java.awt.Image;
+import java.io.IOException;
+import java.util.Objects;
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import org.pwss.controller.factory.AppControllerFactory;
+import org.pwss.controller.factory.ControllerFactory;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.NavigationHandler;
 import org.pwss.navigation.Screen;
-import org.pwss.controller.factory.AppControllerFactory;
-import org.pwss.controller.factory.ControllerFactory;
-
-import java.awt.*;
-import java.io.IOException;
-import java.util.Objects;
 
 public class Start {
     public static void main(String[] args) {
@@ -51,8 +51,8 @@ public class Start {
                 // Finally, show the main frame hosting the screens :)
                 frame.setVisible(true);
             });
-        } catch( Exception ex ) {
-            System.err.println( "Failed to initialize LaF" );
+        } catch (Exception ex) {
+            System.err.println("Failed to initialize LaF");
         }
     }
 }

@@ -1,17 +1,42 @@
 package org.pwss.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import org.pwss.controller.util.NavigationContext;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
-import org.pwss.exception.scan.*;
+import org.pwss.exception.scan.GetAllMostRecentScansException;
+import org.pwss.exception.scan.GetMostRecentScansException;
+import org.pwss.exception.scan.GetScanDiffsException;
+import org.pwss.exception.scan.LiveFeedException;
+import org.pwss.exception.scan.ScanStatusException;
+import org.pwss.exception.scan.StartScanAllException;
+import org.pwss.exception.scan.StartScanByIdException;
+import org.pwss.exception.scan.StopScanException;
 import org.pwss.exception.scan_summary.GetSearchFilesException;
 import org.pwss.exception.scan_summary.GetSummaryForFileException;
-import org.pwss.model.entity.*;
+import org.pwss.model.entity.Diff;
+import org.pwss.model.entity.File;
+import org.pwss.model.entity.MonitoredDirectory;
+import org.pwss.model.entity.Scan;
+import org.pwss.model.entity.ScanSummary;
 import org.pwss.model.service.MonitoredDirectoryService;
 import org.pwss.model.service.ScanService;
 import org.pwss.model.service.ScanSummaryService;
 import org.pwss.model.service.response.LiveFeedResponse;
-import org.pwss.model.table.*;
+import org.pwss.model.table.DiffTableModel;
+import org.pwss.model.table.FileTableModel;
+import org.pwss.model.table.MonitoredDirectoryTableModel;
+import org.pwss.model.table.ScanSummaryTableModel;
+import org.pwss.model.table.ScanTableModel;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.utils.LiveFeedUtils;
@@ -20,13 +45,6 @@ import org.pwss.utils.StringConstants;
 import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
-
-import javax.swing.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 public class HomeController extends BaseController<HomeScreen> {
     private final ScanService scanService;
@@ -333,7 +351,8 @@ public class HomeController extends BaseController<HomeScreen> {
                         NavigationContext context = new NavigationContext();
                         context.put("scanId", latestScan.id());
                         NavigationEvents.navigateTo(Screen.SCAN_SUMMARY, context);
-                    } catch (GetMostRecentScansException | ExecutionException | InterruptedException | JsonProcessingException e) {
+                    } catch (GetMostRecentScansException | ExecutionException | InterruptedException |
+                             JsonProcessingException e) {
                         screen.showError(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX + e.getMessage());
                     }
                 } else {
@@ -346,7 +365,7 @@ public class HomeController extends BaseController<HomeScreen> {
                     }
                 }
             }
-        }  else {
+        } else {
             // Scan did not complete successfully
             screen.showError(StringConstants.SCAN_NOT_COMPLETED);
         }
@@ -370,6 +389,7 @@ public class HomeController extends BaseController<HomeScreen> {
      * Starts polling the live feed for scan updates.
      * This method sets up a timer to periodically fetch live feed updates
      * and update the UI accordingly.
+     *
      * @param singleDirectory if true, indicates that the scan is for a single directory; otherwise, for all directories.
      */
     private void startPollingScanLiveFeed(boolean singleDirectory) {

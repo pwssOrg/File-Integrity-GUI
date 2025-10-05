@@ -2,6 +2,8 @@ package org.pwss.model.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.http.HttpResponse;
+import java.util.concurrent.ExecutionException;
 import org.pwss.exception.user.CreateUserException;
 import org.pwss.exception.user.LoginException;
 import org.pwss.exception.user.UserExistsLookupException;
@@ -10,9 +12,6 @@ import org.pwss.model.service.network.PwssHttpClient;
 import org.pwss.model.service.request.user.CreateUserRequest;
 import org.pwss.model.service.request.user.LoginUserRequest;
 import org.pwss.model.service.response.LoginResponse;
-
-import java.net.http.HttpResponse;
-import java.util.concurrent.ExecutionException;
 
 /**
  * The `AuthService` class provides methods for user authentication, specifically for logging in.
@@ -32,8 +31,8 @@ public class AuthService {
      *
      * @return `true` if the user exists, otherwise `false`.
      * @throws UserExistsLookupException If an error occurs while checking for user existence.
-     * @throws ExecutionException If an error occurs during the asynchronous execution of the request.
-     * @throws InterruptedException If the thread executing the request is interrupted.
+     * @throws ExecutionException        If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException      If the thread executing the request is interrupted.
      */
     public boolean userExists() throws UserExistsLookupException, ExecutionException, InterruptedException {
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.USER_EXISTS, null);
@@ -54,9 +53,9 @@ public class AuthService {
      * @param password The password of the user attempting to log in.
      * @return `true` if the login is successful, otherwise `false`.
      * @throws JsonProcessingException If an error occurs while serializing the login request to JSON.
-     * @throws LoginException If the login attempt fails due to invalid credentials or server error.
-     * @throws ExecutionException If an error occurs during the asynchronous execution of the request.
-     * @throws InterruptedException If the thread executing the request is interrupted.
+     * @throws LoginException          If the login attempt fails due to invalid credentials or server error.
+     * @throws ExecutionException      If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException    If the thread executing the request is interrupted.
      */
     public boolean login(String username, String password) throws LoginException, JsonProcessingException, ExecutionException, InterruptedException {
         final String body = objectMapper.writeValueAsString(new LoginUserRequest(username, password));
@@ -77,11 +76,11 @@ public class AuthService {
      * @param password The password of the user to be created.
      * @return `true` if the user creation request is successful (HTTP status indicates success), otherwise `false`.
      * @throws JsonProcessingException If an error occurs while serializing the user creation request to JSON.
-     * @throws ExecutionException If an error occurs during the asynchronous execution of the request.
-     * @throws InterruptedException If the thread executing the request is interrupted.
+     * @throws ExecutionException      If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException    If the thread executing the request is interrupted.
      */
     public boolean createUser(String username, String password) throws CreateUserException, JsonProcessingException, ExecutionException, InterruptedException {
-            final String body = objectMapper.writeValueAsString(new CreateUserRequest(username, password));
+        final String body = objectMapper.writeValueAsString(new CreateUserRequest(username, password));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.CREATE_USER, body);
 
         return switch (response.statusCode()) {

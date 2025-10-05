@@ -1,5 +1,6 @@
 package org.pwss.controller;
 
+import java.util.List;
 import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.ScanSummary;
 import org.pwss.model.service.ScanService;
@@ -10,8 +11,6 @@ import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.utils.ReportUtils;
 import org.pwss.view.screen.ScanDetailsScreen;
-
-import java.util.List;
 
 public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
     private final ScanSummaryService scanSummaryService;
@@ -43,7 +42,9 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
         fetchData();
     }
 
-    /** Fetches scan summaries and diffs from the service based on the scan ID in the context. */
+    /**
+     * Fetches scan summaries and diffs from the service based on the scan ID in the context.
+     */
     private void fetchData() {
         try {
             Long scanId = getContext().get("scanId", Long.class);

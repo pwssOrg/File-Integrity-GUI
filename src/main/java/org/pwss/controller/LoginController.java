@@ -1,17 +1,14 @@
 package org.pwss.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.concurrent.ExecutionException;
 import javax.swing.SwingUtilities;
-
 import org.pwss.exception.user.LoginException;
 import org.pwss.exception.user.UserExistsLookupException;
 import org.pwss.model.service.AuthService;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.pwss.view.screen.LoginScreen;
-
-import java.util.concurrent.ExecutionException;
 
 public class LoginController extends BaseController<LoginScreen> {
     /**
@@ -24,7 +21,7 @@ public class LoginController extends BaseController<LoginScreen> {
     /**
      * Constructs a LoginController with the specified view and authentication service.
      *
-     * @param view        The LoginView instance to be managed by this Controller.
+     * @param view The LoginView instance to be managed by this Controller.
      */
     public LoginController(LoginScreen view) {
         super(view);

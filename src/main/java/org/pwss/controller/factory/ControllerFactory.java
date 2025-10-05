@@ -1,10 +1,11 @@
 package org.pwss.controller.factory;
 
-import org.pwss.navigation.Screen;
 import org.pwss.controller.BaseController;
+import org.pwss.navigation.Screen;
 
 /**
  * A factory interface for creating controllers for different screens in the application.
+ *
  * @author PWSS ORG
  */
 public interface ControllerFactory {

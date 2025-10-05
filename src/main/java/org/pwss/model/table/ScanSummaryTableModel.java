@@ -1,11 +1,10 @@
 package org.pwss.model.table;
 
-import org.pwss.model.entity.ScanSummary;
-
-import javax.swing.table.AbstractTableModel;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.table.AbstractTableModel;
+import org.pwss.model.entity.ScanSummary;
 
 public class ScanSummaryTableModel extends AbstractTableModel {
     private final List<ScanSummary> data;
@@ -57,7 +56,7 @@ public class ScanSummaryTableModel extends AbstractTableModel {
      *
      * @param rowIndex the index of the row in the table.
      * @return an Optional containing the ScanSummary object at the specified row index,
-     *         or an empty Optional if the index is out of bounds.
+     * or an empty Optional if the index is out of bounds.
      */
     public Optional<ScanSummary> getSummaryAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < data.size()) {

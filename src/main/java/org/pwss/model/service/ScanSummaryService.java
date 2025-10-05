@@ -2,6 +2,9 @@ package org.pwss.model.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.pwss.exception.scan_summary.GetMostRecentSummaryException;
 import org.pwss.exception.scan_summary.GetSearchFilesException;
 import org.pwss.exception.scan_summary.GetSummaryForFileException;
@@ -13,10 +16,6 @@ import org.pwss.model.service.network.PwssHttpClient;
 import org.pwss.model.service.request.scan_summary.GetFilesSearchRequest;
 import org.pwss.model.service.request.scan_summary.GetSummaryForFileRequest;
 import org.pwss.model.service.request.scan_summary.GetSummaryForScanRequest;
-
-import java.net.http.HttpResponse;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class ScanSummaryService {
     /**
@@ -33,18 +32,21 @@ public class ScanSummaryService {
      *
      * @return The most recent ScanSummary object if the request is successful.
      * @throws GetMostRecentSummaryException If the attempt to retrieve the most recent scan summary fails due to various reasons such as invalid credentials, no scan summaries found, or server error.
-     * @throws ExecutionException         If an error occurs during the asynchronous execution of the request.
-     * @throws InterruptedException       If the thread executing the request is interrupted.
-     * @throws JsonProcessingException    If an error occurs while processing JSON data.
+     * @throws ExecutionException            If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException          If the thread executing the request is interrupted.
+     * @throws JsonProcessingException       If an error occurs while processing JSON data.
      */
     public List<ScanSummary> getMostRecentSummary() throws GetMostRecentSummaryException, ExecutionException, InterruptedException, JsonProcessingException {
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.SUMMARY_MOST_RECENT_SCAN, null);
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), ScanSummary[].class));
-            case 401 -> throw new GetMostRecentSummaryException("Get most recent scan summary failed: User not authorized to perform this action.");
-            case 404 -> throw new GetMostRecentSummaryException("Get most recent scan summary failed: No scan summaries found.");
-            case 500 -> throw new GetMostRecentSummaryException("Get most recent scan summary failed: An error occurred on the server while attempting to retrieve the scan summary.");
+            case 401 ->
+                    throw new GetMostRecentSummaryException("Get most recent scan summary failed: User not authorized to perform this action.");
+            case 404 ->
+                    throw new GetMostRecentSummaryException("Get most recent scan summary failed: No scan summaries found.");
+            case 500 ->
+                    throw new GetMostRecentSummaryException("Get most recent scan summary failed: An error occurred on the server while attempting to retrieve the scan summary.");
             default -> null;
         };
     }
@@ -65,10 +67,14 @@ public class ScanSummaryService {
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), ScanSummary[].class));
-            case 401 -> throw new GetSummaryForFileException("Get summaries for file failed: User not authorized to perform this action.");
-            case 404 -> throw new GetSummaryForFileException("Get summaries for file failed: No scan summaries found for the specified file.");
-            case 422 -> throw new GetSummaryForFileException("Get summaries for file failed: The provided file ID is invalid.");
-            case 500 -> throw new GetSummaryForFileException("Get summaries for file failed: An error occurred on the server while attempting to retrieve the scan summaries.");
+            case 401 ->
+                    throw new GetSummaryForFileException("Get summaries for file failed: User not authorized to perform this action.");
+            case 404 ->
+                    throw new GetSummaryForFileException("Get summaries for file failed: No scan summaries found for the specified file.");
+            case 422 ->
+                    throw new GetSummaryForFileException("Get summaries for file failed: The provided file ID is invalid.");
+            case 500 ->
+                    throw new GetSummaryForFileException("Get summaries for file failed: An error occurred on the server while attempting to retrieve the scan summaries.");
             default -> null;
         };
     }
@@ -107,10 +113,14 @@ public class ScanSummaryService {
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), ScanSummary[].class));
-            case 401 -> throw new GetSummaryForScanException("Get summaries for scan failed: User not authorized to perform this action.");
-            case 404 -> throw new GetSummaryForScanException("Get summaries for scan failed: No scan summaries found for the specified file.");
-            case 422 -> throw new GetSummaryForScanException("Get summaries for scan failed: The provided scan ID is invalid.");
-            case 500 -> throw new GetSummaryForScanException("Get summaries for scan failed: An error occurred on the server while attempting to retrieve the scan summaries.");
+            case 401 ->
+                    throw new GetSummaryForScanException("Get summaries for scan failed: User not authorized to perform this action.");
+            case 404 ->
+                    throw new GetSummaryForScanException("Get summaries for scan failed: No scan summaries found for the specified file.");
+            case 422 ->
+                    throw new GetSummaryForScanException("Get summaries for scan failed: The provided scan ID is invalid.");
+            case 500 ->
+                    throw new GetSummaryForScanException("Get summaries for scan failed: An error occurred on the server while attempting to retrieve the scan summaries.");
             default -> null;
         };
     }

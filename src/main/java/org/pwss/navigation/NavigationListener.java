@@ -9,7 +9,7 @@ public interface NavigationListener {
     /**
      * Called when a navigation event occurs.
      *
-     * @param screen The `Screen` to navigate to.
+     * @param screen  The `Screen` to navigate to.
      * @param context The `NavigationContext` containing data for the new screen.
      */
     void onNavigate(Screen screen, NavigationContext context);

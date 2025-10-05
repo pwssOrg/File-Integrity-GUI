@@ -1,10 +1,9 @@
 package org.pwss.model.table;
 
-import org.pwss.model.entity.Scan;
-
-import javax.swing.table.AbstractTableModel;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.table.AbstractTableModel;
+import org.pwss.model.entity.Scan;
 
 public class ScanTableModel extends AbstractTableModel {
     private final List<Scan> scans;
