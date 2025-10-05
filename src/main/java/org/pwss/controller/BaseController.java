@@ -7,6 +7,7 @@ import org.pwss.view.screen.BaseScreen;
 /**
  * An abstract base class for controllers in the application.
  * Provides a common structure for managing a `BaseScreen` view and initializing event listeners.
+ * @author PWSS ORG
  */
 public abstract class BaseController<Screen extends BaseScreen> {
     /**

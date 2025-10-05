@@ -10,6 +10,7 @@ import org.pwss.view.screen.ScanDetailsScreen;
 
 /**
  * A factory class responsible for creating controllers for different screens in the application.
+ * @author PWSS ORG
  */
 public class AppControllerFactory implements ControllerFactory {
 

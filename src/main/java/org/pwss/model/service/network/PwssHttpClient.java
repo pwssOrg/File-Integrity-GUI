@@ -12,6 +12,12 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A singleton HTTP client for making requests to the API server.
+ * This class provides methods for sending asynchronous and synchronous HTTP requests,
+ * handling JSON serialization/deserialization, and managing session cookies.
+ * @author PWSS ORG
+ */
 public class PwssHttpClient {
     /**
      * A singleton instance of the `PwssHttpClient` class.

@@ -5,6 +5,7 @@ import org.pwss.controller.BaseController;
 
 /**
  * A factory interface for creating controllers for different screens in the application.
+ * @author PWSS ORG
  */
 public interface ControllerFactory {
     /**

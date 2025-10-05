@@ -2,6 +2,11 @@ package org.pwss.view.screen;
 
 import javax.swing.*;
 
+/**
+ * Base class for all screens in the application.
+ * Provides common functionality such as displaying message dialogs.
+ * @author PWSS ORG
+ */
 public abstract class BaseScreen extends JPanel {
 
     /**
