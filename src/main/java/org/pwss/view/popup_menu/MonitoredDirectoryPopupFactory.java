@@ -9,7 +9,8 @@ import javax.swing.*;
 import java.util.Optional;
 
 /**
- * Factory class for creating context menus for monitored directories in a JTable.
+ * Factory class to create a context menu (popup menu) for monitored directories in a JTable.
+ * The menu provides options to scan the directory, reset its baseline, and edit its details.
  */
 public class MonitoredDirectoryPopupFactory {
     private final MonitoredDirectoryPopupListener listener;
