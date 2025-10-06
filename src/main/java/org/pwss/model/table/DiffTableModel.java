@@ -1,12 +1,10 @@
 package org.pwss.model.table;
 
-import org.pwss.model.entity.Diff;
-import org.pwss.model.entity.ScanSummary;
-
-import javax.swing.table.AbstractTableModel;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.table.AbstractTableModel;
+import org.pwss.model.entity.Diff;
 
 public class DiffTableModel extends AbstractTableModel {
     private final List<Diff> data;
@@ -32,6 +30,14 @@ public class DiffTableModel extends AbstractTableModel {
     }
 
     @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        return switch (columnIndex) {
+            case 1, 2 -> Date.class;
+            default -> super.getColumnClass(columnIndex);
+        };
+    }
+
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Diff diff = data.get(rowIndex);
         return switch (columnIndex) {
@@ -47,7 +53,7 @@ public class DiffTableModel extends AbstractTableModel {
      *
      * @param rowIndex the index of the row in the table.
      * @return an Optional containing the Diff object at the specified row index,
-     *         or an empty Optional if the index is out of bounds.
+     * or an empty Optional if the index is out of bounds.
      */
     public Optional<Diff> getDiffAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < data.size()) {

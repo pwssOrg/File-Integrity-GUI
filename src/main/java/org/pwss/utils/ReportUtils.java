@@ -1,9 +1,12 @@
 package org.pwss.utils;
 
-import org.pwss.model.entity.*;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import org.pwss.model.entity.Checksum;
+import org.pwss.model.entity.Diff;
+import org.pwss.model.entity.File;
+import org.pwss.model.entity.Scan;
+import org.pwss.model.entity.ScanSummary;
 
 public class ReportUtils {
 

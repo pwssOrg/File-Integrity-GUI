@@ -2,7 +2,18 @@ package org.pwss.model.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pwss.exception.scan.*;
+import java.net.http.HttpResponse;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import org.pwss.exception.scan.GetAllMostRecentScansException;
+import org.pwss.exception.scan.GetMostRecentScansException;
+import org.pwss.exception.scan.GetScanDiffsException;
+import org.pwss.exception.scan.LiveFeedException;
+import org.pwss.exception.scan.ScanStatusException;
+import org.pwss.exception.scan.StartScanAllException;
+import org.pwss.exception.scan.StartScanByIdException;
+import org.pwss.exception.scan.StopScanException;
 import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.service.network.Endpoint;
@@ -11,11 +22,6 @@ import org.pwss.model.service.request.scan.GetMostRecentScansRequest;
 import org.pwss.model.service.request.scan.GetScanDiffsRequest;
 import org.pwss.model.service.request.scan.StartSingleScanRequest;
 import org.pwss.model.service.response.LiveFeedResponse;
-
-import java.net.http.HttpResponse;
-import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * The `ScanService` class provides methods to manage scans, specifically starting and stopping scans.
@@ -35,8 +41,8 @@ public class ScanService {
      *
      * @return `true` if the scan start request is successful, otherwise `false`.
      * @throws StartScanAllException If the scan start attempt fails due to various reasons such as invalid credentials, no active monitored directories, scan already running, or server error.
-     * @throws ExecutionException If an error occurs during the asynchronous execution of the request.
-     * @throws InterruptedException If the thread executing the request is interrupted.
+     * @throws ExecutionException    If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException  If the thread executing the request is interrupted.
      */
     public boolean startScan() throws StartScanAllException, ExecutionException, InterruptedException {
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN, null);
@@ -107,9 +113,9 @@ public class ScanService {
      * Retrieves the live feed of scan events by sending a request to the LIVE_FEED endpoint.
      *
      * @return A LiveFeedResponse object containing the live feed data if the request is successful.
-     * @throws LiveFeedException      If the attempt to retrieve the live feed fails due to various reasons such as invalid credentials or server error.
-     * @throws ExecutionException     If an error occurs during the asynchronous execution of the request.
-     * @throws InterruptedException   If the thread executing the request is interrupted.
+     * @throws LiveFeedException       If the attempt to retrieve the live feed fails due to various reasons such as invalid credentials or server error.
+     * @throws ExecutionException      If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException    If the thread executing the request is interrupted.
      * @throws JsonProcessingException If an error occurs while processing JSON data.
      */
     public LiveFeedResponse getLiveFeed() throws LiveFeedException, ExecutionException, InterruptedException, JsonProcessingException {
@@ -117,8 +123,10 @@ public class ScanService {
 
         return switch (response.statusCode()) {
             case 200 -> objectMapper.readValue(response.body(), LiveFeedResponse.class);
-            case 401 -> throw new LiveFeedException("Failed to fetch live feed: User not authorized to perform this action.");
-            case 500 -> throw new LiveFeedException("Failed to fetch live feed: an error occurred on the server while attempting to fetch the live feed.");
+            case 401 ->
+                    throw new LiveFeedException("Failed to fetch live feed: User not authorized to perform this action.");
+            case 500 ->
+                    throw new LiveFeedException("Failed to fetch live feed: an error occurred on the server while attempting to fetch the live feed.");
             default -> throw new LiveFeedException("Failed to fetch live feed: unexpected response.");
         };
     }
@@ -150,9 +158,9 @@ public class ScanService {
      * @param nrOfScans The number of most recent scans to retrieve.
      * @return A list of the most recent Scan objects if the request is successful.
      * @throws GetMostRecentScansException If the attempt to retrieve the most recent scans fails due to various reasons such as invalid credentials, no active monitored directories, or server error.
-     * @throws ExecutionException         If an error occurs during the asynchronous execution of the request.
-     * @throws InterruptedException       If the thread executing the request is interrupted.
-     * @throws JsonProcessingException    If an error occurs while processing JSON data.
+     * @throws ExecutionException          If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException        If the thread executing the request is interrupted.
+     * @throws JsonProcessingException     If an error occurs while processing JSON data.
      */
     public List<Scan> getMostRecentScans(long nrOfScans) throws GetMostRecentScansException, ExecutionException, InterruptedException, JsonProcessingException {
         String body = objectMapper.writeValueAsString(new GetMostRecentScansRequest(nrOfScans));
@@ -160,7 +168,8 @@ public class ScanService {
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), Scan[].class));
-            case 401 -> throw new GetMostRecentScansException("Failed to fetch most recent scans: User not authorized to perform this action.");
+            case 401 ->
+                    throw new GetMostRecentScansException("Failed to fetch most recent scans: User not authorized to perform this action.");
             case 500 -> throw new GetMostRecentScansException("Failed to fetch most recent scans: Server error");
             default -> Collections.emptyList();
         };
@@ -171,16 +180,17 @@ public class ScanService {
      *
      * @return A list of the most recent Scan objects if the request is successful.
      * @throws GetAllMostRecentScansException If the attempt to retrieve the most recent scans fails due to various reasons such as invalid credentials, no active monitored directories, or server error.
-     * @throws ExecutionException         If an error occurs during the asynchronous execution of the request.
-     * @throws InterruptedException       If the thread executing the request is interrupted.
-     * @throws JsonProcessingException    If an error occurs while processing JSON data.
+     * @throws ExecutionException             If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException           If the thread executing the request is interrupted.
+     * @throws JsonProcessingException        If an error occurs while processing JSON data.
      */
     public List<Scan> getMostRecentScansAll() throws GetAllMostRecentScansException, ExecutionException, InterruptedException, JsonProcessingException {
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.MOST_RECENT_SCANS_ALL, null);
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), Scan[].class));
-            case 401 -> throw new GetAllMostRecentScansException("Failed to fetch most recent scans: User not authorized to perform this action.");
+            case 401 ->
+                    throw new GetAllMostRecentScansException("Failed to fetch most recent scans: User not authorized to perform this action.");
             case 500 -> throw new GetAllMostRecentScansException("Failed to fetch most recent scans: Server error");
             default -> Collections.emptyList();
         };
@@ -192,7 +202,8 @@ public class ScanService {
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), Diff[].class));
-            case 401 -> throw new GetScanDiffsException("Failed to fetch scan diffs: User not authorized to perform this action.");
+            case 401 ->
+                    throw new GetScanDiffsException("Failed to fetch scan diffs: User not authorized to perform this action.");
             case 500 -> throw new GetScanDiffsException("Failed to fetch scan diffs: Server error");
             default -> Collections.emptyList();
         };

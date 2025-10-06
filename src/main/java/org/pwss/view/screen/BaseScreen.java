@@ -1,7 +1,14 @@
 package org.pwss.view.screen;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
+/**
+ * Base class for all screens in the application.
+ * Provides common functionality such as displaying message dialogs.
+ *
+ * @author PWSS ORG
+ */
 public abstract class BaseScreen extends JPanel {
 
     /**
@@ -57,6 +64,7 @@ public abstract class BaseScreen extends JPanel {
 
     /**
      * Show an option dialog with custom buttons.
+     *
      * @param dialogType    The type of dialog (e.g., JOptionPane.WARNING_MESSAGE).
      * @param message       The message to display.
      * @param options       The button labels.

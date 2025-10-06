@@ -21,18 +21,6 @@ public final class Session {
         this.sessionCookie = sessionCookie;
     }
 
-    public Map<String, List<String>> getHeaderFields() {
-        return headerFields;
-    }
-
-    public List<String> getCookies() {
-        return cookies;
-    }
-
-    public Optional<String> getSessionCookie() {
-        return Optional.ofNullable(sessionCookie);
-    }
-
     /**
      * Factory method that builds a Session from HttpHeaders.
      */
@@ -50,5 +38,17 @@ public final class Session {
                 .filter(s -> s.startsWith("JSESSIONID="))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("JSESSIONID not found in Set-Cookie"));
+    }
+
+    public Map<String, List<String>> getHeaderFields() {
+        return headerFields;
+    }
+
+    public List<String> getCookies() {
+        return cookies;
+    }
+
+    public Optional<String> getSessionCookie() {
+        return Optional.ofNullable(sessionCookie);
     }
 }
