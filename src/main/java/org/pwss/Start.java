@@ -13,10 +13,13 @@ import org.pwss.controller.factory.ControllerFactory;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.NavigationHandler;
 import org.pwss.navigation.Screen;
+import org.pwss.view.screen.splash_screen.FileIntegrityScannerSplashScreen;
 
 public class Start {
     public static void main(String[] args) {
         try {
+            FileIntegrityScannerSplashScreen.showSplash();
+            Thread.sleep(4000);
             // Set FlatLaf Look and Feel
             UIManager.setLookAndFeel(new FlatDarculaLaf());
 

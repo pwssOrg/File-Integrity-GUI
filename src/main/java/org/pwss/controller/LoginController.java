@@ -67,8 +67,8 @@ public class LoginController extends BaseController<LoginScreen> {
         try {
             return authService.userExists();
         } catch (UserExistsLookupException | ExecutionException e) {
-            SwingUtilities.invokeLater(() ->
-                    screen.showError("Error checking user existence: " + e.getMessage()));
+                    // TODO: Add Logger
+                    //screen.showError("Error checking user existence: " + e.getMessage()));
             return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
