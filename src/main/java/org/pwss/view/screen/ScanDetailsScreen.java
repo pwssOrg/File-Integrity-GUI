@@ -19,7 +19,6 @@ public class ScanDetailsScreen extends BaseScreen {
     private JPanel rootPanel;
     private JTable diffTable;
     private JTextPane scanSummaryDetails;
-    private JPanel rootpanel;
     private JTextPane diffDetails;
 
     {

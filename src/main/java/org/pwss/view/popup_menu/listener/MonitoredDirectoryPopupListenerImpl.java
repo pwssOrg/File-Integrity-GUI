@@ -37,6 +37,8 @@ public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPo
     @Override
     public void onEditDirectory(MonitoredDirectory dir) {
         // TODO: Implement edit directory functionality
+        
+        // We need to be able to update and save notes. Maybe here? :) / Pwgit-Create 
     }
 
     @Override

@@ -29,7 +29,6 @@ public class HomeScreen extends BaseScreen {
     private JPanel scanTab;
     private JPanel recentDiffsTab;
     private JButton quickScanButton;
-    private JButton editDirectoryButton;
     private JButton scanButton;
     private JTable diffTable;
     private JButton newDirectoryButton;
