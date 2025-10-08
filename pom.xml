@@ -8,7 +8,7 @@
     <groupId>org.pwss</groupId>
     <artifactId>file_integrity_gui</artifactId>
     <packaging>jar</packaging>
-    <version>0.4</version>
+    <version>0.5</version>
     <description>A GUI application for file integrity checking</description>
     
     <!-- Licenses -->
@@ -66,6 +66,14 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.20.0</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.5.19</version>
+        </dependency>
+
 
 
    

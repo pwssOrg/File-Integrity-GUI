@@ -1,13 +1,12 @@
 package org.pwss.view.popup_menu.listener;
 
+import java.awt.Component;
+import org.pwss.controller.HomeController;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.service.MonitoredDirectoryService;
-import org.pwss.controller.HomeController;
 import org.pwss.utils.StringConstants;
 
-import java.awt.Component;
-
-public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPopupListener{
+public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPopupListener {
     private final HomeController controller;
     private final MonitoredDirectoryService directoryService;
 
@@ -30,7 +29,7 @@ public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPo
             } else {
                 showError(StringConstants.MON_DIR_POPUP_RESET_BASELINE_ERROR);
             }
-        } catch (Exception  e) {
+        } catch (Exception e) {
             showError(StringConstants.MON_DIR_POPUP_RESET_BASELINE_ERROR_PREFIX + e.getMessage());
         }
     }
@@ -38,6 +37,8 @@ public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPo
     @Override
     public void onEditDirectory(MonitoredDirectory dir) {
         // TODO: Implement edit directory functionality
+        
+        // We need to be able to update and save notes. Maybe here? :) / Pwgit-Create 
     }
 
     @Override

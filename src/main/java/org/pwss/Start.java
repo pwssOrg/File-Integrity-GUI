@@ -1,17 +1,28 @@
 package org.pwss;
 
-import javax.swing.*;
-
 import com.formdev.flatlaf.FlatDarculaLaf;
+import java.awt.Image;
+import java.io.IOException;
+import java.util.Objects;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import org.pwss.controller.factory.AppControllerFactory;
+import org.pwss.controller.factory.ControllerFactory;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.NavigationHandler;
 import org.pwss.navigation.Screen;
-import org.pwss.controller.factory.AppControllerFactory;
-import org.pwss.controller.factory.ControllerFactory;
+import org.pwss.view.screen.splash_screen.FileIntegrityScannerSplashScreen;
+import org.slf4j.LoggerFactory;
 
 public class Start {
     public static void main(String[] args) {
+        final org.slf4j.Logger log = LoggerFactory.getLogger(Start.class);
         try {
+            FileIntegrityScannerSplashScreen.showSplash();
+            Thread.sleep(4000);
             // Set FlatLaf Look and Feel
             UIManager.setLookAndFeel(new FlatDarculaLaf());
 
@@ -22,6 +33,15 @@ public class Start {
                 frame.setResizable(true);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setLocationRelativeTo(null); // center on screen
+
+                // Application icon
+                try {
+                    Image icon = ImageIO.read(Objects.requireNonNull(Start.class.getResource("/app-icon.png")));
+                    frame.setIconImage(icon);
+                } catch (IOException e) {
+                    log.debug("Failed to load application icon",e);
+                    log.error("Failed to load application icon: {}", e.getMessage());
+                }
 
                 // Create controller factory
                 final ControllerFactory factory = new AppControllerFactory();
@@ -38,8 +58,9 @@ public class Start {
                 // Finally, show the main frame hosting the screens :)
                 frame.setVisible(true);
             });
-        } catch( Exception ex ) {
-            System.err.println( "Failed to initialize LaF" );
+        } catch (Exception ex) {
+            log.debug("Failed to initialize LaF", ex);
+            log.error("Failed to initialize LaF", ex.getMessage());
         }
     }
 }

@@ -1,16 +1,15 @@
 package org.pwss.model.table;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.table.AbstractTableModel;
 import org.pwss.model.entity.ScanSummary;
 
-public class ScanSummaryTableModel extends AbstractTableModel {
+public class SimpleSummaryTableModel extends AbstractTableModel {
     private final List<ScanSummary> data;
-    private final String[] columns = {"Scan id", "Scan time", "Notes", "Scan completed"};
+    private final String[] columns = {"\uD83D\uDEA6 File Name"};
 
-    public ScanSummaryTableModel(List<ScanSummary> data) {
+    public SimpleSummaryTableModel(List<ScanSummary> data) {
         this.data = data;
     }
 
@@ -30,23 +29,10 @@ public class ScanSummaryTableModel extends AbstractTableModel {
     }
 
     @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        return switch (columnIndex) {
-            case 1 -> Date.class;
-            case 2 -> String.class;
-            case 3 -> Boolean.class;
-            default -> super.getColumnClass(columnIndex);
-        };
-    }
-
-    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         ScanSummary summary = data.get(rowIndex);
         return switch (columnIndex) {
-            case 0 -> summary.scan().id();
-            case 1 -> summary.scan().scanTime().created();
-            case 2 -> summary.scan().notes().notes();
-            case 3 -> summary.scan().status().equals("COMPLETED");
+            case 0 -> summary.file().basename();
             default -> null;
         };
     }

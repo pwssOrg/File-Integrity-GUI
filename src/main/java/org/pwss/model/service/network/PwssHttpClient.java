@@ -1,7 +1,6 @@
 package org.pwss.model.service.network;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -12,19 +11,25 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
+/**
+ * A singleton HTTP client for making requests to the API server.
+ * This class provides methods for sending asynchronous and synchronous HTTP requests,
+ * handling JSON serialization/deserialization, and managing session cookies.
+ *
+ * @author PWSS ORG
+ */
 public class PwssHttpClient {
+    public final static long ENDPOINT_CODE = 4350345983458934L;
     /**
      * A singleton instance of the `PwssHttpClient` class.
      * Ensures that only one instance of the client is created and shared across the application.
      */
     private static PwssHttpClient instance;
-
     /**
      * The ObjectMapper instance used for JSON serialization and deserialization.
      * This is typically used to convert Java objects to JSON and vice versa.
      */
     private final ObjectMapper objectMapper;
-
     /**
      * The HttpClient instance used to send HTTP requests.
      */
@@ -44,19 +49,15 @@ public class PwssHttpClient {
      * This is used to set the connection timeout for the HttpClient.
      */
     private final long TIMEOUT_SECONDS = 10L;
-
-    public final static long ENDPOINT_CODE = 4350345983458934L;
-
-    /**
-     * Session variables like header fields and Session Cookie(s)
-     */
-    private Session session;
-
     /**
      * Default headers to be included in every request.
      * This can be used to set common headers like Content-Type, User-Agent, etc.
      */
     private final Map<String, String> defaultHeaders;
+    /**
+     * Session variables like header fields and Session Cookie(s)
+     */
+    private Session session;
 
     private PwssHttpClient() {
         this.objectMapper = new ObjectMapper();
@@ -120,7 +121,7 @@ public class PwssHttpClient {
                     // Session management: update session if headers contain Set-Cookie
                     Session.from(response.headers()).ifPresent(newSession -> {
                         this.session = newSession;
-                       
+
                     });
                     // Return the full response
                     return response;

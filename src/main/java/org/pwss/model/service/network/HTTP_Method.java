@@ -2,7 +2,7 @@ package org.pwss.model.service.network;
 
 /**
  * Enum representing HTTP methods used in RESTful web services.
- * 
+ * <p>
  * For more information, see {@link <a href=
  * "https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods">developer.mozilla.org</a>}.
  */

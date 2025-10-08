@@ -2,7 +2,14 @@ package org.pwss.model.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.pwss.exception.monitored_directory.*;
+import java.net.http.HttpResponse;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import org.pwss.exception.monitored_directory.MonitoredDirectoryByIdException;
+import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
+import org.pwss.exception.monitored_directory.NewMonitoredDirectoryBaselineException;
+import org.pwss.exception.monitored_directory.NewMonitoredDirectoryException;
+import org.pwss.exception.monitored_directory.UpdateMonitoredDirectoryException;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.service.network.Endpoint;
 import org.pwss.model.service.network.PwssHttpClient;
@@ -10,10 +17,6 @@ import org.pwss.model.service.request.monitored_directory.GetDirectoryByIdReques
 import org.pwss.model.service.request.monitored_directory.NewBaselineRequest;
 import org.pwss.model.service.request.monitored_directory.NewDirectoryRequest;
 import org.pwss.model.service.request.monitored_directory.UpdateDirectoryRequest;
-
-import java.net.http.HttpResponse;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class MonitoredDirectoryService {
     /**
@@ -76,9 +79,9 @@ public class MonitoredDirectoryService {
     /**
      * Creates a new monitored directory by sending a request to the MONITORED_DIRECTORY_CREATE endpoint.
      *
-     * @param path                 The path of the directory to be monitored.
+     * @param path                  The path of the directory to be monitored.
      * @param includeSubdirectories A boolean indicating whether subdirectories should be included.
-     * @param isActive             A boolean indicating whether the monitored directory should be active.
+     * @param isActive              A boolean indicating whether the monitored directory should be active.
      * @return A `MonitoredDirectory` object representing the newly created monitored directory.
      * @throws NewMonitoredDirectoryException If the creation attempt fails due to invalid input, unauthorized access, or server error.
      * @throws ExecutionException             If an error occurs during the asynchronous execution of the request.
@@ -92,11 +95,11 @@ public class MonitoredDirectoryService {
         return switch (response.statusCode()) {
             case 200 -> objectMapper.readValue(response.body(), MonitoredDirectory.class);
             case 400 ->
-                    throw new NewMonitoredDirectoryException("Create monitored directory failed: Invalid directory path or request body.");
+                    throw new NewMonitoredDirectoryException("Create monitored directory failed: Invalid directory path or request body.", body);
             case 401 ->
                     throw new NewMonitoredDirectoryException("Create monitored directory failed: User not authorized to perform this action.");
             case 500 ->
-                    throw new NewMonitoredDirectoryException("Create monitored directory failed: An error occurred on the server while attempting to create the monitored directory.");
+                    throw new NewMonitoredDirectoryException("Create monitored directory failed: An error occurred on the server while attempting to create the monitored directory.", body);
             default -> null;
         };
     }
@@ -120,9 +123,12 @@ public class MonitoredDirectoryService {
 
         return switch (response.statusCode()) {
             case 200 -> true;
-            case 401 -> throw new UpdateMonitoredDirectoryException("Update monitored directory failed: User not authorized to perform this action.");
-            case 422 -> throw new UpdateMonitoredDirectoryException("Update monitored directory failed: Unprocessable entity - invalid input data.");
-            case 500 -> throw new UpdateMonitoredDirectoryException("Update monitored directory failed: An error occurred on the server while attempting to update the monitored directory.");
+            case 401 ->
+                    throw new UpdateMonitoredDirectoryException("Update monitored directory failed: User not authorized to perform this action.");
+            case 422 ->
+                    throw new UpdateMonitoredDirectoryException("Update monitored directory failed: Unprocessable entity - invalid input data.");
+            case 500 ->
+                    throw new UpdateMonitoredDirectoryException("Update monitored directory failed: An error occurred on the server while attempting to update the monitored directory.");
             default -> false;
         };
     }
@@ -130,13 +136,13 @@ public class MonitoredDirectoryService {
     /**
      * Creates a new baseline for a monitored directory by sending a request to the MONITORED_DIRECTORY_NEW_BASELINE endpoint.
      *
-     * @param id The ID of the monitored directory for which to create a new baseline.
+     * @param id           The ID of the monitored directory for which to create a new baseline.
      * @param endpointCode Code for verifying the action of creating a new baseline.
      * @return `true` if the baseline creation was successful, otherwise `false`.
      * @throws NewMonitoredDirectoryBaselineException If the baseline creation attempt fails due to unauthorized access, monitored directory not found, or server error.
-     * @throws ExecutionException                    If an error occurs during the asynchronous execution of the request.
-     * @throws InterruptedException                  If the thread executing the request is interrupted.
-     * @throws JsonProcessingException               If an error occurs while serializing the request body.
+     * @throws ExecutionException                     If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException                   If the thread executing the request is interrupted.
+     * @throws JsonProcessingException                If an error occurs while serializing the request body.
      */
     public boolean newMonitoredDirectoryBaseline(long id, long endpointCode) throws NewMonitoredDirectoryBaselineException, ExecutionException, InterruptedException, JsonProcessingException {
         String body = objectMapper.writeValueAsString(new NewBaselineRequest(id, endpointCode));
@@ -144,9 +150,12 @@ public class MonitoredDirectoryService {
 
         return switch (response.statusCode()) {
             case 200 -> true;
-            case 401 -> throw new NewMonitoredDirectoryBaselineException("Create new baseline failed: User not authorized to perform this action.");
-            case 404 -> throw new NewMonitoredDirectoryBaselineException("Create new baseline failed: Monitored directory not found.");
-            case 500 -> throw new NewMonitoredDirectoryBaselineException("Create new baseline failed: An error occurred on the server while attempting to create the new baseline.");
+            case 401 ->
+                    throw new NewMonitoredDirectoryBaselineException("Create new baseline failed: User not authorized to perform this action.");
+            case 404 ->
+                    throw new NewMonitoredDirectoryBaselineException("Create new baseline failed: Monitored directory not found.");
+            case 500 ->
+                    throw new NewMonitoredDirectoryBaselineException("Create new baseline failed: An error occurred on the server while attempting to create the new baseline.");
             default -> false;
         };
     }

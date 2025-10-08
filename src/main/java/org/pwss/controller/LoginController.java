@@ -1,30 +1,40 @@
 package org.pwss.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import java.util.concurrent.ExecutionException;
 import javax.swing.SwingUtilities;
-
 import org.pwss.exception.user.LoginException;
 import org.pwss.exception.user.UserExistsLookupException;
 import org.pwss.model.service.AuthService;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.pwss.view.screen.LoginScreen;
+import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutionException;
-
+/**
+ * The LoginController class manages user login operations and interacts with
+ * the LoginScreen.
+ */
 public class LoginController extends BaseController<LoginScreen> {
+
     /**
-     * Indicates whether the application is in create user mode (i.e., no users exist yet).
+     * Logger for logging messages within this controller.
+     */
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(LoginController.class);
+
+    /**
+     * Indicates whether the application is in create user mode (i.e., no users
+     * exist yet).
      */
     private final boolean createUserMode;
 
     private final AuthService authService;
 
     /**
-     * Constructs a LoginController with the specified view and authentication service.
+     * Constructs a LoginController with the specified view and authentication
+     * service.
      *
-     * @param view        The LoginView instance to be managed by this Controller.
+     * @param view The LoginView instance to be managed by this Controller.
      */
     public LoginController(LoginScreen view) {
         super(view);
@@ -39,7 +49,8 @@ public class LoginController extends BaseController<LoginScreen> {
 
     @Override
     protected void initListeners() {
-        getScreen().getProceedButton().addActionListener(e -> onProceedButtonClick());
+        getScreen().getPasswordField().addActionListener(e -> proceedAndValidate());
+        getScreen().getProceedButton().addActionListener(e -> proceedAndValidate());
         getScreen().getCancelButton().addActionListener(e -> System.exit(0));
     }
 
@@ -69,26 +80,32 @@ public class LoginController extends BaseController<LoginScreen> {
         try {
             return authService.userExists();
         } catch (UserExistsLookupException | ExecutionException e) {
-            SwingUtilities.invokeLater(() ->
-                    screen.showError("Error checking user existence: " + e.getMessage()));
+            /**
+             * This will happen from time to time with the Auto Start Script. 
+             * That is why debug log is used here!
+             */
+            log.debug("Error checking user existence: {}", e.getMessage()); 
             return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            SwingUtilities.invokeLater(() ->
-                    screen.showError("Operation interrupted: " + e.getMessage()));
+            log.debug("Operation interrupted", e);
+            log.error("Operation interrupted", e.getMessage());
+            SwingUtilities.invokeLater(() -> screen.showError("Operation interrupted"));
             return true;
         } catch (Exception e) {
-            SwingUtilities.invokeLater(() ->
-                    screen.showError("An unexpected error occurred: " + e.getMessage()));
+            log.error("An unexpected error occurred {}", e.getMessage());
+            log.debug("Debug An unexpected error occurred", e);
+            SwingUtilities.invokeLater(() -> screen.showError("An unexpected error occurred"));
             return true;
         }
     }
 
     /**
      * Handles the proceed button click event.
-     * Validates input and either creates a new user or performs login based on the mode.
+     * Validates input and either creates a new user or performs login based on the
+     * mode.
      */
-    private void onProceedButtonClick() {
+    private void proceedAndValidate() {
         if (!validateInput()) {
             return; // Input validation failed, do not proceed
         }
@@ -145,12 +162,15 @@ public class LoginController extends BaseController<LoginScreen> {
         try {
             return authService.createUser(username, password);
         } catch (JsonProcessingException e) {
-            SwingUtilities.invokeLater(() ->
-                    screen.showError("Error preparing user creation request: " + e.getMessage()));
+            log.debug("Error preparing user creation request", e);
+            log.error("Error preparing user creation request", e.getMessage());
+            SwingUtilities
+                    .invokeLater(() -> screen.showError("Error preparing user creation request"));
             return false;
         } catch (Exception e) {
-            SwingUtilities.invokeLater(() ->
-                    screen.showError("An unexpected error occurred: " + e.getMessage()));
+            log.debug("An unexpected error occurred", e);
+            log.error("An unexpected error occurred {}", e.getMessage());
+            SwingUtilities.invokeLater(() -> screen.showError("An unexpected error occurred"));
             return false;
         }
     }
@@ -180,14 +200,17 @@ public class LoginController extends BaseController<LoginScreen> {
             });
 
         } catch (JsonProcessingException e) {
-            SwingUtilities.invokeLater(() ->
-                    screen.showError("Error preparing login request: " + e.getMessage()));
+            log.debug("Error preparing login request", e);
+            log.error("Error preparing login request", e.getMessage());
+            SwingUtilities.invokeLater(() -> screen.showError("Error preparing login request"));
         } catch (LoginException e) {
-            SwingUtilities.invokeLater(() ->
-                    screen.showError("Login request failed: " + e.getMessage()));
+            log.debug("Login request failed", e);
+            log.error("Login request failed",e.getMessage());
+            SwingUtilities.invokeLater(() -> screen.showError("Login request failed"));
         } catch (Exception e) {
-            SwingUtilities.invokeLater(() ->
-                    screen.showError("An unexpected error occurred: " + e.getMessage()));
+            log.debug("An unexpected error occurred", e);
+            log.error("An unexpected error occurred {}", e.getMessage());
+            SwingUtilities.invokeLater(() -> screen.showError("An unexpected error occurred"));
         }
     }
 }
