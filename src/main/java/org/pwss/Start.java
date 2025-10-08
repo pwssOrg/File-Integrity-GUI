@@ -39,6 +39,7 @@ public class Start {
                     Image icon = ImageIO.read(Objects.requireNonNull(Start.class.getResource("/app-icon.png")));
                     frame.setIconImage(icon);
                 } catch (IOException e) {
+                    log.debug("Failed to load application icon",e);
                     log.error("Failed to load application icon: {}", e.getMessage());
                 }
 
@@ -58,7 +59,8 @@ public class Start {
                 frame.setVisible(true);
             });
         } catch (Exception ex) {
-            log.error("Failed to initialize LaF", ex);
+            log.debug("Failed to initialize LaF", ex);
+            log.error("Failed to initialize LaF", ex.getMessage());
         }
     }
 }
