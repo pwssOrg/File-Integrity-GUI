@@ -88,7 +88,7 @@ class FileIntegrityScannerFrontend {
         } catch (Exception ex) {
             log.debug("Failed to initialize LaF", ex);
             log.error("Failed to initialize LaF", ex.getMessage());
-            throw new FailedToLaunchAppException();
+            throw new FailedToLaunchAppException(ex);
         }
 
     }
