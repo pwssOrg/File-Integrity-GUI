@@ -3,7 +3,7 @@ package org.pwss.app_settings;
 /**
  * The AppConfig class provides access to the application configuration
  * settings.
- * It uses a ConfigLoader instance to load and manage configuration values.´
+ * It uses a ConfigLoader instance to load and manage configuration values.
  * 
  * @author PWSS ORG
  */
