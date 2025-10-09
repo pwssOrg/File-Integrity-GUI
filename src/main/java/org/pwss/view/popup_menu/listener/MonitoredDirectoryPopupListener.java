@@ -29,6 +29,14 @@ public interface MonitoredDirectoryPopupListener {
     void onEditDirectory(MonitoredDirectory dir);
 
     /**
+     * Triggered when the notes for a monitored directory are updated.
+     *
+     * @param dir      The monitored directory whose notes are being updated.
+     * @param newNotes The new notes to be set.
+     */
+    void onUpdateNote(MonitoredDirectory dir, String newNotes);
+
+    /**
      * Displays a success message to the user.
      *
      * @param message The success message to be displayed.

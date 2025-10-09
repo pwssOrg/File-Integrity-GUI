@@ -41,8 +41,12 @@ public class MonitoredDirectoryPopupFactory {
         // Edit directory
         JMenuItem editDirectory = getEditDirectoryItem(dir);
 
+        // Update note
+        JMenuItem updateNoteItem = getUpdateNoteItem(dir);
+
         menu.add(scanItem);
         menu.add(editDirectory);
+        menu.add(updateNoteItem);
         menu.addSeparator();
         menu.add(resetBaselineItem);
 
@@ -76,6 +80,20 @@ public class MonitoredDirectoryPopupFactory {
         JMenuItem editItem = new JMenuItem(StringConstants.MON_DIR_POPUP_EDIT_DIR);
         editItem.addActionListener(e -> listener.onEditDirectory(dir));
         return editItem;
+    }
+
+    private JMenuItem getUpdateNoteItem(MonitoredDirectory dir) {
+        JMenuItem updateNoteItem = new JMenuItem(StringConstants.MON_DIR_POPUP_UPDATE_NOTE);
+        updateNoteItem.addActionListener(e -> {
+            String newNote = JOptionPane.showInputDialog(
+                listener.getParentComponent(),
+                StringConstants.MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX + dir.path(),
+                    StringConstants.MON_DIR_POPUP_UPDATE_NOTE,
+                JOptionPane.PLAIN_MESSAGE
+            );
+            listener.onUpdateNote(dir, newNote);
+        });
+        return updateNoteItem;
     }
 }
 

@@ -37,6 +37,10 @@ public final class StringConstants {
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_INVALID = "Invalid code. Baseline reset cancelled.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_PREFIX = "Error resetting baseline: ";
     public static final String MON_DIR_POPUP_EDIT_DIR = "Edit this directory";
+    public static final String MON_DIR_POPUP_UPDATE_NOTE = "Update note";
+    public static final String MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX = "Update note for:\n";
+    public static final String MON_DIR_POPUP_UPDATE_NOTE_SUCCESS = "Note updated successfully.";
+    public static final String MON_DIR_POPUP_UPDATE_NOTE_ERROR = "Failed to update note.";
 
     // New directory screen related strings
     public static final String NEW_DIR_SUCCESS_TEXT = "Directory added successfully!";

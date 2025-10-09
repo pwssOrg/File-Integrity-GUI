@@ -4,15 +4,23 @@ import java.awt.Component;
 import org.pwss.controller.HomeController;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.service.MonitoredDirectoryService;
+import org.pwss.model.service.NoteService;
 import org.pwss.utils.StringConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPopupListener {
+    private final org.slf4j.Logger log;
+
     private final HomeController controller;
     private final MonitoredDirectoryService directoryService;
+    private final NoteService noteService;
 
-    public MonitoredDirectoryPopupListenerImpl(HomeController controller, MonitoredDirectoryService directoryService) {
+    public MonitoredDirectoryPopupListenerImpl(HomeController controller, MonitoredDirectoryService directoryService, NoteService noteService) {
+        this.log = LoggerFactory.getLogger(MonitoredDirectoryPopupListenerImpl.class);
         this.controller = controller;
         this.directoryService = directoryService;
+        this.noteService = noteService;
     }
 
     @Override
@@ -30,6 +38,7 @@ public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPo
                 showError(StringConstants.MON_DIR_POPUP_RESET_BASELINE_ERROR);
             }
         } catch (Exception e) {
+            log.error("Error resetting baseline for directory {}: {}", dir.path(), e.getMessage());
             showError(StringConstants.MON_DIR_POPUP_RESET_BASELINE_ERROR_PREFIX + e.getMessage());
         }
     }
@@ -39,6 +48,21 @@ public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPo
         // TODO: Implement edit directory functionality
         
         // We need to be able to update and save notes. Maybe here? :) / Pwgit-Create 
+    }
+
+    @Override
+    public void onUpdateNote(MonitoredDirectory dir, String newNotes) {
+        try {
+            if (noteService.updateNotes(dir.notes().id(), newNotes)) {
+                showSuccess(StringConstants.MON_DIR_POPUP_UPDATE_NOTE_SUCCESS);
+                controller.reloadData();
+            } else {
+                showError(StringConstants.MON_DIR_POPUP_UPDATE_NOTE_ERROR);
+            }
+        } catch (Exception e) {
+            log.error("Error updating notes for directory {}: {}", dir.path(), e.getMessage());
+            showError(e.getMessage());
+        }
     }
 
     @Override

@@ -94,7 +94,18 @@ public enum Endpoint {
     /**
      * Endpoint for retrieving the most recent scan summary.
      */
-    SUMMARY_MOST_RECENT_SCAN(HTTP_Method.POST, A.BASE_URL + A.SCAN_SUMMARY + "most-recent");
+    SUMMARY_MOST_RECENT_SCAN(HTTP_Method.POST, A.BASE_URL + A.SCAN_SUMMARY + "most-recent"),
+
+    // Note Endpoints
+    /**
+     * Endpoint for updating a note.
+     */
+    NOTE_UPDATE(HTTP_Method.POST, A.BASE_URL + A.NOTE + "update"),
+    /**
+     * Endpoint for restoring a note.
+     */
+    NOTE_RESTORE(HTTP_Method.POST, A.BASE_URL + A.NOTE + "restore");
+
 
     /**
      * The URL path associated with the endpoint.

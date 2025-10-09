@@ -29,6 +29,7 @@ import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.entity.ScanSummary;
 import org.pwss.model.service.MonitoredDirectoryService;
+import org.pwss.model.service.NoteService;
 import org.pwss.model.service.ScanService;
 import org.pwss.model.service.ScanSummaryService;
 import org.pwss.model.service.response.LiveFeedResponse;
@@ -71,6 +72,11 @@ public class HomeController extends BaseController<HomeScreen> {
      * Service for retrieving and managing scan summaries.
      */
     private final ScanSummaryService scanSummaryService;
+
+    /**
+     * Service for managing notes.
+     */
+    private final NoteService noteService;
 
     /**
      * Factory for creating popup menus related to monitored directories.
@@ -126,9 +132,10 @@ public class HomeController extends BaseController<HomeScreen> {
         super(view);
         this.scanService = new ScanService();
         this.monitoredDirectoryService = new MonitoredDirectoryService();
-        scanSummaryService = new ScanSummaryService();
+        this.scanSummaryService = new ScanSummaryService();
+        this.noteService = new NoteService();
         this.monitoredDirectoryPopupFactory = new MonitoredDirectoryPopupFactory(
-                new MonitoredDirectoryPopupListenerImpl(this, monitoredDirectoryService));
+                new MonitoredDirectoryPopupListenerImpl(this, monitoredDirectoryService, noteService));
     }
 
     @Override
@@ -519,6 +526,12 @@ public class HomeController extends BaseController<HomeScreen> {
         scanStatusTimer.start();
     }
 
+    /**
+     * Searches for files based on user input and updates the view with the results.
+     * This method retrieves the search query and options from the UI, performs
+     * the search using the ScanSummaryService, and refreshes the view to display
+     * the search results.
+     */
     private void searchForFiles() {
         String query = screen.getFileSearchField().getText().trim();
         if (query.isEmpty()) {
@@ -539,6 +552,13 @@ public class HomeController extends BaseController<HomeScreen> {
         }
     }
 
+    /**
+     * Retrieves scan summaries for a specific file and updates the view.
+     * This method fetches the scan summaries associated with the given file
+     * using the ScanSummaryService and refreshes the view to display the summaries.
+     *
+     * @param file the file for which to retrieve scan summaries
+     */
     private void getSummaryForFile(File file) {
         try {
             fileSummaries = scanSummaryService.getSummaryForFile(file.id());
@@ -546,7 +566,7 @@ public class HomeController extends BaseController<HomeScreen> {
         } catch (GetSummaryForFileException | ExecutionException | InterruptedException | JsonProcessingException e) {
             log.error("Error when getting summaries for a file: {}", e.getMessage());
             log.debug("Debug Getting Summaries for a file Exception", e);
-            SwingUtilities.invokeLater(() -> screen.showError("Error wgetting summaries for a file"));
+            SwingUtilities.invokeLater(() -> screen.showError("Error getting summaries for a file"));
         }
     }
 }
