@@ -125,7 +125,7 @@ public final class MetadataManager {
      *                                           retrieval process, such as invalid
      *                                           format or parsing errors.
      */
-    public final List<Long> getFileIdsOfAllQurantinedFiles() throws MetadataKeyNameRetrievalException {
+    public final List<Long> getFileIdsOfAllQuarantinedFiles() throws MetadataKeyNameRetrievalException {
 
         List<Long> fileIdList = new LinkedList<>();
         try {
