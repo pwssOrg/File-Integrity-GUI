@@ -2,6 +2,7 @@ package org.pwss.view.popup_menu.listener;
 
 import java.awt.Component;
 import org.pwss.model.entity.MonitoredDirectory;
+import org.pwss.model.request.notes.RestoreNoteType;
 
 /**
  * Listener interface for handling actions from the monitored directory popup menu.
@@ -27,6 +28,22 @@ public interface MonitoredDirectoryPopupListener {
      * @param dir The monitored directory to be edited.
      */
     void onEditDirectory(MonitoredDirectory dir);
+
+    /**
+     * Triggered when the notes for a monitored directory are updated.
+     *
+     * @param dir      The monitored directory whose notes are being updated.
+     * @param newNotes The new notes to be set.
+     */
+    void onUpdateNote(MonitoredDirectory dir, String newNotes);
+
+    /**
+     * Triggered when the notes for a monitored directory are restored to a previous state.
+     *
+     * @param dir         The monitored directory whose notes are being restored.
+     * @param restoreType The type of restoration to be performed. (PREV_NOTE or PREV_PREV_NOTE)
+     */
+    void onRestoreNote(MonitoredDirectory dir, RestoreNoteType restoreType);
 
     /**
      * Displays a success message to the user.

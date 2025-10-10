@@ -9,6 +9,8 @@ public final class StringConstants {
     public static final String GENERIC_NO = "No";
     public static final String GENERIC_SUCCESS = "Success";
     public static final String GENERIC_ERROR = "Error";
+    public static final String GENERIC_OK = "OK";
+    public static final String GENERIC_CANCEL = "Cancel";
 
     // Scan related strings
     public static final String SCAN_FULL = "Full scan";
@@ -33,10 +35,30 @@ public final class StringConstants {
     public static final String MON_DIR_POPUP_RESET_BASELINE_POPUP_MESSAGE = "Type the code to confirm baseline reset for:\n";
     public static final String MON_DIR_POPUP_RESET_BASELINE_SUCCESS = "Baseline reset successfully.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR = "Failed to reset baseline.";
-    public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_EMPTY_INPUT = "Endpoint code is required. Baseline reset cancelled.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_INVALID = "Invalid code. Baseline reset cancelled.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_PREFIX = "Error resetting baseline: ";
     public static final String MON_DIR_POPUP_EDIT_DIR = "Edit this directory";
+
+    // Show note related strings
+    public static final String MON_DIR_POPUP_SHOW_NOTE = "Show note";
+    public static final String MON_DIR_POPUP_NO_NOTE = "No note available for this directory.";
+
+    // Update note related strings
+    public static final String MON_DIR_POPUP_UPDATE_NOTE = "Update note";
+    public static final String MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX = "Update note for:\n";
+    public static final String MON_DIR_POPUP_UPDATE_NOTE_SUCCESS = "Note updated successfully.";
+    public static final String MON_DIR_POPUP_UPDATE_NOTE_ERROR = "Failed to update note.";
+
+    // Restore note related strings
+    public static final String MON_DIR_POPUP_RESTORE_NOTE = "Restore Note";
+    public static final String MON_DIR_POPUP_RESTORE_NOTE_POPUP_PREFIX = "Select which previous note to restore for directory:\n";
+    public static final String MON_DIR_POPUP_RESTORE_NO_NOTE_FALLBACK = "No previous notes available to restore for directory:\n";
+    public static final String MON_DIR_POPUP_RESTORE_NOTE_PREV = "Restore previous note";
+    public static final String MON_DIR_POPUP_INFO_PREV_NOTE = "Previous note: ";
+    public static final String MON_DIR_POPUP_INFO_PREV_PREV_NOTE = "Before previous note: ";
+    public static final String MON_DIR_POPUP_RESTORE_NOTE_PREV_PREV = "Restore note before previous";
+    public static final String MON_DIR_POPUP_RESTORE_NOTE_SUCCESS = "Note restored successfully.";
+    public static final String MON_DIR_POPUP_RESTORE_NOTE_ERROR = "Failed to restore note.";
 
     // New directory screen related strings
     public static final String NEW_DIR_SUCCESS_TEXT = "Directory added successfully!";

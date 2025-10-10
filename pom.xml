@@ -82,8 +82,6 @@
             <scope>test</scope>
         </dependency>
    
-
-
         <!-- IntelliJ GUI Designer runtime -->
         <dependency>
             <groupId>com.intellij</groupId>
