@@ -30,7 +30,7 @@ public class MetadataManagerTest {
 
     @Order(2)
     @Test
-    void retreiveKeyNameTest() throws MetadataKeyNameRetrievalException {
+    void retrieveKeyNameTest() throws MetadataKeyNameRetrievalException {
 
         final String EXPECTED = "C_drive__.server_test.hej.txt";
         final String ACTUAL = metadataManager.retrieveKeyNameOfQuarantinedFile(mockFileId);
