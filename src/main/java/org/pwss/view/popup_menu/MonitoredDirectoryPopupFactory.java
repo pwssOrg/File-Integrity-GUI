@@ -52,6 +52,9 @@ public class MonitoredDirectoryPopupFactory {
         // Edit directory
         JMenuItem editDirectory = getEditDirectoryItem(dir);
 
+        // Show note
+        JMenuItem showNoteItem = getShowNoteItem(dir);
+
         // Update note
         JMenuItem updateNoteItem = getUpdateNoteItem(dir);
 
@@ -62,6 +65,7 @@ public class MonitoredDirectoryPopupFactory {
         menu.add(scanItem);
         menu.add(editDirectory);
         menu.addSeparator();
+        menu.add(showNoteItem);
         menu.add(updateNoteItem);
         menu.add(restoreNoteItem);
         menu.addSeparator();
@@ -80,6 +84,29 @@ public class MonitoredDirectoryPopupFactory {
         JMenuItem editItem = new JMenuItem(StringConstants.MON_DIR_POPUP_EDIT_DIR);
         editItem.addActionListener(e -> listener.onEditDirectory(dir));
         return editItem;
+    }
+
+    /**
+     * Creates a menu item for showing the note of a monitored directory.
+     *
+     * @param dir the monitored directory for which to create the menu item
+     * @return the JMenuItem for showing the note
+     */
+    private JMenuItem getShowNoteItem(MonitoredDirectory dir) {
+        JMenuItem showNoteItem = new JMenuItem(StringConstants.MON_DIR_POPUP_SHOW_NOTE);
+        showNoteItem.addActionListener(e -> {
+            String note = dir.notes().notes();
+            if (note == null || note.isBlank()) {
+                note = StringConstants.MON_DIR_POPUP_NO_NOTE;
+            }
+            JOptionPane.showMessageDialog(
+                    listener.getParentComponent(),
+                    note,
+                    StringConstants.MON_DIR_POPUP_SHOW_NOTE,
+                    JOptionPane.INFORMATION_MESSAGE
+            );
+        });
+        return showNoteItem;
     }
 
     /**

@@ -35,10 +35,13 @@ public final class StringConstants {
     public static final String MON_DIR_POPUP_RESET_BASELINE_POPUP_MESSAGE = "Type the code to confirm baseline reset for:\n";
     public static final String MON_DIR_POPUP_RESET_BASELINE_SUCCESS = "Baseline reset successfully.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR = "Failed to reset baseline.";
-    public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_EMPTY_INPUT = "Endpoint code is required. Baseline reset cancelled.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_INVALID = "Invalid code. Baseline reset cancelled.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_PREFIX = "Error resetting baseline: ";
     public static final String MON_DIR_POPUP_EDIT_DIR = "Edit this directory";
+
+    // Show note related strings
+    public static final String MON_DIR_POPUP_SHOW_NOTE = "Show note";
+    public static final String MON_DIR_POPUP_NO_NOTE = "No note available for this directory.";
 
     // Update note related strings
     public static final String MON_DIR_POPUP_UPDATE_NOTE = "Update note";
