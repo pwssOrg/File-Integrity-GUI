@@ -5,6 +5,7 @@ import org.pwss.controller.HomeController;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.service.MonitoredDirectoryService;
 import org.pwss.model.service.NoteService;
+import org.pwss.model.service.request.notes.RestoreNoteType;
 import org.pwss.utils.StringConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,21 @@ public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPo
             }
         } catch (Exception e) {
             log.error("Error updating notes for directory {}: {}", dir.path(), e.getMessage());
+            showError(e.getMessage());
+        }
+    }
+
+    @Override
+    public void onRestoreNote(MonitoredDirectory dir, RestoreNoteType restoreType) {
+        try {
+            if (noteService.restoreNotes(dir.notes().id(), restoreType)) {
+                showSuccess(StringConstants.MON_DIR_POPUP_RESTORE_NOTE_SUCCESS);
+                controller.reloadData();
+            } else {
+                showError(StringConstants.MON_DIR_POPUP_RESTORE_NOTE_ERROR);
+            }
+        } catch (Exception e) {
+            log.error("Error restoring notes for directory {}: {}", dir.path(), e.getMessage());
             showError(e.getMessage());
         }
     }
