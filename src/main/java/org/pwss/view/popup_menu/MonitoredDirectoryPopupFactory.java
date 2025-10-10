@@ -243,10 +243,10 @@ public class MonitoredDirectoryPopupFactory {
     }
 
     /**
-     * Creates a menu item for restoring the note of a monitored directory.
+     * Creates a menu item for resetting the baseline of a monitored directory.
      *
      * @param dir the monitored directory for which to create the menu item
-     * @return the JMenuItem for restoring the note
+     * @return the JMenuItem for resetting the baseline
      */
     private JMenuItem getResetBaselineItem(MonitoredDirectory dir) {
         JMenuItem resetBaselineItem = new JMenuItem(StringConstants.MON_DIR_POPUP_RESET_BASELINE);
