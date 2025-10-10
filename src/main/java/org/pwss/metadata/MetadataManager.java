@@ -138,7 +138,7 @@ public final class MetadataManager {
             }
 
         } catch (Exception e) {
-            log.debug("Failed to retrieve key name when getting all qurantined files", e);
+            log.debug("Failed to retrieve key name when getting all quarantined files", e);
             throw new MetadataKeyNameRetrievalException(e.getMessage(), e);
         }
 
