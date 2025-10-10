@@ -223,7 +223,7 @@ public class MonitoredDirectoryPopupFactory {
                     JOptionPane.PLAIN_MESSAGE,
                     null,
                     options.toArray(),
-                    options.getFirst()
+                    options.get(0)
             );
 
             // Handle result
