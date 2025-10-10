@@ -203,7 +203,7 @@ public class HomeController extends BaseController<HomeScreen> {
     @Override
     protected void initListeners() {
         screen.getAddNewDirectoryButton()
-                .addActionListener(e -> NavigationEvents.navigateTo(Screen.NEW_DIRECTORY, null));
+                .addActionListener(e -> NavigationEvents.navigateTo(Screen.NEW_DIRECTORY));
         screen.getScanButton().addActionListener(e -> handleScanButtonClick(false));
         screen.getQuickScanButton().addActionListener(e -> handleScanButtonClick(false));
         screen.getMonitoredDirectoriesTable().addMouseListener(new MouseAdapter() {

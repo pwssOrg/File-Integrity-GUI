@@ -31,4 +31,13 @@ public class NavigationEvents {
             listener.onNavigate(screen, context);
         }
     }
+
+    /**
+     * Navigates to the specified screen without a navigation context.
+     *
+     * @param screen The `Screen` to navigate to.
+     */
+    public static void navigateTo(Screen screen) {
+        navigateTo(screen, null);
+    }
 }

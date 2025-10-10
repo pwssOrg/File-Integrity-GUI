@@ -193,7 +193,7 @@ public class LoginController extends BaseController<LoginScreen> {
                     } else {
                         screen.showInfo("Logged in successfully!");
                     }
-                    NavigationEvents.navigateTo(Screen.HOME, null);
+                    NavigationEvents.navigateTo(Screen.HOME);
                 } else {
                     screen.showError("Invalid username or password.");
                 }

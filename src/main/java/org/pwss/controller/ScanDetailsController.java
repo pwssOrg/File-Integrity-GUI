@@ -85,7 +85,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
             }
         });
         // Back button listener
-        screen.getBackButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.HOME, null));
+        screen.getBackButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.HOME));
     }
 
     @Override

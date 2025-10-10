@@ -25,7 +25,7 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
     @Override
     void initListeners() {
         getScreen().getSelectPathButton().addActionListener(e -> openFolderPicker());
-        getScreen().getCancelButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.HOME, null));
+        getScreen().getCancelButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.HOME));
         getScreen().getCreateButton().addActionListener(e -> createNewDirectory());
     }
 
@@ -61,7 +61,7 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
             try {
                 monitoredDirectoryService.createNewMonitoredDirectory(selectedPath, includeSubdirectories, makeActive);
                 JOptionPane.showMessageDialog(getScreen().getRootPanel(), StringConstants.NEW_DIR_SUCCESS_TEXT, StringConstants.GENERIC_SUCCESS, JOptionPane.INFORMATION_MESSAGE);
-                NavigationEvents.navigateTo(Screen.HOME, null);
+                NavigationEvents.navigateTo(Screen.HOME);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(getScreen().getRootPanel(), StringConstants.NEW_DIR_ERROR_PREFIX + e.getMessage(), StringConstants.GENERIC_ERROR, JOptionPane.ERROR_MESSAGE);
             }

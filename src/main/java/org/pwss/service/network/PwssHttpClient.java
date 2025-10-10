@@ -10,6 +10,8 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import org.pwss.navigation.NavigationEvents;
+import org.pwss.navigation.Screen;
 
 /**
  * A singleton HTTP client for making requests to the API server.
@@ -161,6 +163,11 @@ public class PwssHttpClient {
                         // JSON parsing / mapping issue
                         return CompletableFuture.failedFuture(e);
                     } catch (Exception e) {
+                        if (response.statusCode() == 401) {
+                            // If we get a 401 Unauthorized, log the user out
+                            NavigationEvents.navigateTo(Screen.LOGIN);
+                            this.session = null; // Clear session
+                        }
                         // Any other unexpected error
                         return CompletableFuture.failedFuture(e);
                     }
