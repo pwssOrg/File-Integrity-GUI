@@ -75,10 +75,10 @@ public class MonitoredDirectoryPopupFactory {
     }
 
     /**
-     * Creates a menu item for restoring the note of a monitored directory.
+     * Creates a menu item for editing the details of a monitored directory.
      *
      * @param dir the monitored directory for which to create the menu item
-     * @return the JMenuItem for restoring the note
+     * @return the JMenuItem for editing the directory
      */
     private JMenuItem getEditDirectoryItem(MonitoredDirectory dir) {
         JMenuItem editItem = new JMenuItem(StringConstants.MON_DIR_POPUP_EDIT_DIR);
