@@ -39,7 +39,7 @@ public class MetadataManagerTest {
 
     @Order(3)
     @Test
-    void retreiveFileIdsFromAllMetadataKeysTest() throws MetadataKeyNameRetrievalException {
+    void retrieveFileIdsFromAllMetadataKeysTest() throws MetadataKeyNameRetrievalException {
 
         final Long EXPECTED = mockFileId;
         final Long ACTUAL = metadataManager.getFileIdsOfAllQurantinedFiles().get(0);
