@@ -3,12 +3,12 @@ package org.pwss.controller;
 import java.util.List;
 import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.ScanSummary;
-import org.pwss.model.service.ScanService;
-import org.pwss.model.service.ScanSummaryService;
 import org.pwss.model.table.DiffTableModel;
 import org.pwss.model.table.SimpleSummaryTableModel;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
+import org.pwss.service.ScanService;
+import org.pwss.service.ScanSummaryService;
 import org.pwss.utils.ReportUtils;
 import org.pwss.view.screen.ScanDetailsScreen;
 

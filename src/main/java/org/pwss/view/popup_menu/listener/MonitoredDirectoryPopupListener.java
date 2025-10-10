@@ -2,7 +2,7 @@ package org.pwss.view.popup_menu.listener;
 
 import java.awt.Component;
 import org.pwss.model.entity.MonitoredDirectory;
-import org.pwss.model.service.request.notes.RestoreNoteType;
+import org.pwss.model.request.notes.RestoreNoteType;
 
 /**
  * Listener interface for handling actions from the monitored directory popup menu.

@@ -2,9 +2,9 @@ package org.pwss.controller;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import org.pwss.model.service.MonitoredDirectoryService;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
+import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.NewDirectoryScreen;
 

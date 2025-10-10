@@ -8,7 +8,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import org.pwss.model.entity.MonitoredDirectory;
-import org.pwss.model.service.request.notes.RestoreNoteType;
+import org.pwss.model.request.notes.RestoreNoteType;
 import org.pwss.model.table.MonitoredDirectoryTableModel;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListener;

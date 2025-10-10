@@ -5,9 +5,9 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingUtilities;
 import org.pwss.exception.user.LoginException;
 import org.pwss.exception.user.UserExistsLookupException;
-import org.pwss.model.service.AuthService;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
+import org.pwss.service.AuthService;
 import org.pwss.view.screen.LoginScreen;
 import org.slf4j.LoggerFactory;
 

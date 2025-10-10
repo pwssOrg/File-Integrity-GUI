@@ -3,11 +3,10 @@ package org.pwss.view.popup_menu.listener;
 import java.awt.Component;
 import org.pwss.controller.HomeController;
 import org.pwss.model.entity.MonitoredDirectory;
-import org.pwss.model.service.MonitoredDirectoryService;
-import org.pwss.model.service.NoteService;
-import org.pwss.model.service.request.notes.RestoreNoteType;
+import org.pwss.model.request.notes.RestoreNoteType;
+import org.pwss.service.MonitoredDirectoryService;
+import org.pwss.service.NoteService;
 import org.pwss.utils.StringConstants;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPopupListener {
