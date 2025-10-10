@@ -1,5 +1,7 @@
 package org.pwss.exception.metadata;
 
+import java.io.Serial;
+
 /**
  * Exception thrown when there is a failure in retrieving the key name from a quarantined metadata file.
  *
@@ -8,6 +10,15 @@ process,
  * allowing developers to handle such errors appropriately within their applications.
  */
 public final class MetadataKeyNameRetrievalException extends Exception {
+
+     /**
+     * The serial version UID for object serialization. It ensures compatibility
+     * between different versions
+     * of this exception class when deserializing objects.
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Constructs a new MetadataKeyNameRetrievalException with the specified detail message.

@@ -1,5 +1,7 @@
 package org.pwss.exception.metadata;
 
+import java.io.Serial;
+
 /**
  * Exception thrown when there is a failure in removing metadata for a
  * quarantined file.
@@ -10,6 +12,15 @@ package org.pwss.exception.metadata;
  * applications.
  */
 public final class MetadataRemoveException extends Exception {
+
+     /**
+     * The serial version UID for object serialization. It ensures compatibility
+     * between different versions
+     * of this exception class when deserializing objects.
+     */
+    @Serial
+    private static final long serialVersionUID = 1L;
+
 
     /**
      * Constructs a new MetadataRemoveException with the specified detail message.
