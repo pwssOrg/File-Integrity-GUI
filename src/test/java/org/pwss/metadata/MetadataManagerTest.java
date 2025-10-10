@@ -42,7 +42,7 @@ public class MetadataManagerTest {
     void retrieveFileIdsFromAllMetadataKeysTest() throws MetadataKeyNameRetrievalException {
 
         final Long EXPECTED = mockFileId;
-        final Long ACTUAL = metadataManager.getFileIdsOfAllQurantinedFiles().get(0);
+        final Long ACTUAL = metadataManager.getFileIdsOfAllQuarantinedFiles().get(0);
         Assertions.assertEquals(EXPECTED, ACTUAL);
 
     }
