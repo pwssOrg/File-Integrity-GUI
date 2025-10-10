@@ -1,12 +1,20 @@
 package org.pwss.view.popup_menu;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.request.notes.RestoreNoteType;
 import org.pwss.model.table.MonitoredDirectoryTableModel;
@@ -83,16 +91,42 @@ public class MonitoredDirectoryPopupFactory {
     private JMenuItem getUpdateNoteItem(MonitoredDirectory dir) {
         JMenuItem updateNoteItem = new JMenuItem(StringConstants.MON_DIR_POPUP_UPDATE_NOTE);
         updateNoteItem.addActionListener(e -> {
-            String newNote = JOptionPane.showInputDialog(
+            // Label for directory path
+            JLabel label = new JLabel(StringConstants.MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX + dir.path());
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            // Text area for note input
+            JTextArea textArea = new JTextArea(10, 30);
+            textArea.setLineWrap(true);
+            textArea.setWrapStyleWord(true);
+
+            // Scroll pane with only vertical scrolling
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setAlignmentX(Component.LEFT_ALIGNMENT);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+            panel.add(label);
+            panel.add(Box.createVerticalStrut(5));
+            panel.add(scrollPane);
+
+            // Show confirm dialog
+            int result = JOptionPane.showConfirmDialog(
                     listener.getParentComponent(),
-                    StringConstants.MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX + dir.path(),
+                    panel,
                     StringConstants.MON_DIR_POPUP_UPDATE_NOTE,
+                    JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.PLAIN_MESSAGE
             );
+
             // User cancelled
-            if (newNote == null)
+            if (result != JOptionPane.OK_OPTION)
                 return;
 
+            String newNote = textArea.getText();
             // Handle note update
             listener.onUpdateNote(dir, newNote);
         });
