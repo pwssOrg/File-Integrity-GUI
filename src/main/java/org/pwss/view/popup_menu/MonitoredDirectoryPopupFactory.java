@@ -43,7 +43,7 @@ public class MonitoredDirectoryPopupFactory {
         MonitoredDirectory dir = dirOpt.get();
 
         // Scan this directory
-        JMenuItem scanItem = new JMenuItem(StringConstants.MON_DIR_POPUP_START_SCAN);
+        JMenuItem scanItem = new JMenuItem(dir.baselineEstablished() ? StringConstants.MON_DIR_POPUP_START_SCAN : StringConstants.MON_DIR_POPUP_ESTABLISH_BASELINE);
         scanItem.addActionListener(e -> listener.onStartScan());
 
         // Reset baseline

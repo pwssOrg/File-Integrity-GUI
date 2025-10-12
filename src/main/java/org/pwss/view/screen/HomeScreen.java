@@ -28,7 +28,6 @@ public class HomeScreen extends BaseScreen {
     private JPanel homeTab;
     private JPanel scanTab;
     private JPanel recentDiffsTab;
-    private JButton quickScanButton;
     private JButton scanButton;
     private JTable diffTable;
     private JButton newDirectoryButton;
@@ -52,6 +51,7 @@ public class HomeScreen extends BaseScreen {
     private JTable fileSummaryTable;
     private JTextPane scanSummaryDetails;
     private JLabel searchResultCount;
+    private JButton newDirectoryButton2;
 
     @Override
     protected String getScreenName() {
@@ -67,12 +67,12 @@ public class HomeScreen extends BaseScreen {
         return newDirectoryButton;
     }
 
-    public JButton getScanButton() {
-        return scanButton;
+    public JButton getAddNewDirectoryButton2() {
+        return newDirectoryButton2;
     }
 
-    public JButton getQuickScanButton() {
-        return quickScanButton;
+    public JButton getScanButton() {
+        return scanButton;
     }
 
     public JTable getRecentScanTable() {
@@ -173,9 +173,6 @@ public class HomeScreen extends BaseScreen {
         homeTab = new JPanel();
         homeTab.setLayout(new GridLayoutManager(3, 1, new Insets(10, 10, 10, 10), -1, -1));
         tabbedPane.addTab("\uD83C\uDFE0 Home", homeTab);
-        quickScanButton = new JButton();
-        quickScanButton.setText("Quick scan");
-        homeTab.add(quickScanButton, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label1 = new JLabel();
         Font label1Font = this.$$$getFont$$$(null, Font.BOLD, 16, label1.getFont());
         if (label1Font != null) label1.setFont(label1Font);
@@ -187,6 +184,9 @@ public class HomeScreen extends BaseScreen {
         recentScanTable.setAutoResizeMode(2);
         recentScanTable.setShowHorizontalLines(true);
         scrollPane1.setViewportView(recentScanTable);
+        newDirectoryButton2 = new JButton();
+        newDirectoryButton2.setText("New directory");
+        homeTab.add(newDirectoryButton2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         scanTab = new JPanel();
         scanTab.setLayout(new GridLayoutManager(10, 4, new Insets(10, 10, 10, 10), -1, -1));
         tabbedPane.addTab("\uD83D\uDD0E Scan", scanTab);

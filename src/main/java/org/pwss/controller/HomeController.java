@@ -3,6 +3,8 @@ package org.pwss.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
@@ -153,22 +155,26 @@ public class HomeController extends BaseController<HomeScreen> {
             // Fetch all monitored directories for display in the monitored directories
             // table
             allMonitoredDirectories = monitoredDirectoryService.getAllDirectories();
-            // Fetch recent scans for display in the scan table
-            recentScans = scanService.getMostRecentScansAll();
-            if (recentScans.isEmpty()) {
-                recentDiffs = List.of();
-            } else {
-                // Fetch diffs for the most recent scan to show in the diffs table
-                recentDiffs = recentScans.stream()
-                        .flatMap(scan -> safeGetDiffs(scan.id()).stream())
-                        .toList();
+
+            // Only fetch diffs if there are monitored directories present
+            if (!allMonitoredDirectories.isEmpty()) {
+                // Fetch recent scans for display in the scan table
+                recentScans = scanService.getMostRecentScansAll();
+                if (recentScans.isEmpty()) {
+                    recentDiffs = List.of();
+                } else {
+                    // Fetch diffs for the most recent scan to show in the diffs table
+                    recentDiffs = recentScans.stream()
+                            .flatMap(scan -> safeGetDiffs(scan.id()).stream())
+                            .toList();
+                }
             }
             // Check if a scan is currently running
             boolean scanCurrentlyRunning = scanService.scanRunning();
             // If a scan has started since the last check, initiate polling
             if (scanCurrentlyRunning && !scanRunning) {
                 scanRunning = true;
-                startPollingScanLiveFeed(false);
+                startPollingScanLiveFeed(false, Collections.emptyList());
             }
         } catch (MonitoredDirectoryGetAllException | ExecutionException | InterruptedException | JsonProcessingException
                 | GetAllMostRecentScansException | ScanStatusException e) {
@@ -204,8 +210,9 @@ public class HomeController extends BaseController<HomeScreen> {
     protected void initListeners() {
         screen.getAddNewDirectoryButton()
                 .addActionListener(e -> NavigationEvents.navigateTo(Screen.NEW_DIRECTORY));
+        screen.getAddNewDirectoryButton2()
+                .addActionListener(e -> NavigationEvents.navigateTo(Screen.NEW_DIRECTORY));
         screen.getScanButton().addActionListener(e -> handleScanButtonClick(false));
-        screen.getQuickScanButton().addActionListener(e -> handleScanButtonClick(false));
         screen.getMonitoredDirectoriesTable().addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -297,7 +304,6 @@ public class HomeController extends BaseController<HomeScreen> {
     protected void refreshView() {
         // Update UI components based on the current state
         screen.getScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
-        screen.getQuickScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
 
         // Scan running views
         boolean showLiveFeed = !screen.getLiveFeedText().getText().isEmpty() || scanRunning;
@@ -362,6 +368,7 @@ public class HomeController extends BaseController<HomeScreen> {
             boolean startScanSuccess;
             JTable table = screen.getMonitoredDirectoriesTable();
             MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) table.getModel();
+            ArrayList<MonitoredDirectory> scanningDirs = new ArrayList<>();
             if (singleDirectory) {
                 int viewRow = table.getSelectedRow();
                 if (viewRow == -1) {
@@ -371,18 +378,20 @@ public class HomeController extends BaseController<HomeScreen> {
                     Optional<MonitoredDirectory> dir = model.getDirectoryAt(modelRow);
                     if (dir.isPresent()) {
                         startScanSuccess = scanService.startScanById(dir.get().id());
+                        scanningDirs.add(dir.get());
                     } else {
                         startScanSuccess = false;
                     }
                 }
             } else {
                 startScanSuccess = scanService.startScan();
+                scanningDirs.addAll(allMonitoredDirectories);
             }
             SwingUtilities.invokeLater(() -> {
                 if (startScanSuccess) {
                     clearLiveFeed();
                     screen.showSuccess(StringConstants.SCAN_STARTED_SUCCESS);
-                    startPollingScanLiveFeed(singleDirectory);
+                    startPollingScanLiveFeed(singleDirectory, scanningDirs);
                 } else {
                     screen.showError(StringConstants.SCAN_STARTED_FAILURE);
                 }
@@ -427,8 +436,28 @@ public class HomeController extends BaseController<HomeScreen> {
                         new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                         StringConstants.GENERIC_YES);
             } else {
+                String message;
+                if (singleDirectory) {
+                    try {
+                        // If single directory scan, check if it was a baseline scan
+                        Scan latestScan = scanService.getMostRecentScans(1).getFirst();
+                        if (latestScan.isBaselineScan()) {
+                            message = StringConstants.SCAN_BASELINE_COMPLETED;
+                        } else {
+                            message = StringConstants.SCAN_COMPLETED_NO_DIFFS;
+                        }
+                    } catch (GetMostRecentScansException | ExecutionException | InterruptedException
+                             | JsonProcessingException e) {
+                        log.error(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX, e.getMessage());
+                        log.debug(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX, e);
+                        screen.showError(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX);
+                        return;
+                    }
+                } else {
+                    message = StringConstants.SCAN_COMPLETED_NO_DIFFS;
+                }
                 choice = screen.showOptionDialog(JOptionPane.INFORMATION_MESSAGE,
-                        StringConstants.SCAN_COMPLETED_NO_DIFFS,
+                        message,
                         new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                         StringConstants.GENERIC_YES);
             }
@@ -486,10 +515,22 @@ public class HomeController extends BaseController<HomeScreen> {
      *
      * @param singleDirectory if true, indicates that the scan is for a single
      *                        directory; otherwise, for all directories.
+     * @param scanningDirs    the list of directories being scanned
      */
-    private void startPollingScanLiveFeed(boolean singleDirectory) {
+    private void startPollingScanLiveFeed(boolean singleDirectory, List<MonitoredDirectory> scanningDirs) {
         if (scanStatusTimer != null && scanStatusTimer.isRunning()) {
             return; // Polling is already active
+        }
+
+        // Log directories that are establishing their baseline
+        for (MonitoredDirectory dir : scanningDirs) {
+            if (!dir.baselineEstablished()) {
+                log.debug("Establishing baseline for {}", dir.path());
+                String currentLiveFeedText = screen.getLiveFeedText().getText();
+                String newEntry = StringConstants.SCAN_ESTABLISHING_BASELINE + dir.path() + "\n";
+                String updatedLiveFeedText = currentLiveFeedText + newEntry;
+                screen.getLiveFeedText().setText(updatedLiveFeedText);
+            }
         }
 
         scanStatusTimer = new Timer(1000, e -> {

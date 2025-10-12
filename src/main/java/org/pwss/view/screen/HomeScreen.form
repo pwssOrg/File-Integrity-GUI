@@ -27,14 +27,6 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="92748" class="javax.swing.JButton" binding="quickScanButton" default-binding="true">
-                <constraints>
-                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="Quick scan"/>
-                </properties>
-              </component>
               <component id="af58d" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -60,6 +52,14 @@
                   </component>
                 </children>
               </scrollpane>
+              <component id="d54e" class="javax.swing.JButton" binding="newDirectoryButton2">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="New directory"/>
+                </properties>
+              </component>
             </children>
           </grid>
           <grid id="13250" binding="scanTab" layout-manager="GridLayoutManager" row-count="10" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
