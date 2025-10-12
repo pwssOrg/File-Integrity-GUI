@@ -5,6 +5,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -14,11 +15,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
 import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -54,6 +57,7 @@ import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
 import org.pwss.utils.AppTheme;
 import org.pwss.utils.LiveFeedUtils;
+import org.pwss.utils.MonitoredDirectoryUtils;
 import org.pwss.utils.ReportUtils;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
@@ -341,6 +345,9 @@ public class HomeController extends BaseController<HomeScreen> {
         // Update UI components based on the current state
         screen.getScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
 
+        String notifications = MonitoredDirectoryUtils.getMonitoredDirectoryNotificationMessage(allMonitoredDirectories);
+        boolean hasNotifications = !notifications.isEmpty();
+
         // Scan running views
         boolean showLiveFeed = !screen.getLiveFeedText().getText().isEmpty() || scanRunning;
         boolean showClearLiveFeed = !scanRunning && !screen.getLiveFeedText().getText().isEmpty();
@@ -349,6 +356,10 @@ public class HomeController extends BaseController<HomeScreen> {
         screen.getLiveFeedTitle().setVisible(showLiveFeed);
         screen.getLiveFeedDiffCount().setVisible(showLiveFeed);
         screen.getClearFeedButton().setVisible(showClearLiveFeed);
+        screen.getNotificationPanel().setVisible(hasNotifications);
+
+        // Set notification text area
+        screen.getNotificationTextArea().setText(notifications);
 
         // File search views
         screen.getSearchResultCount()
@@ -356,20 +367,55 @@ public class HomeController extends BaseController<HomeScreen> {
 
         ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans != null ? recentScans : List.of());
         screen.getRecentScanTable().setModel(mostRecentScansListModel);
+        screen.getRecentScanTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        DefaultListModel<MonitoredDirectory> monitoredDirsModel = new DefaultListModel<>();
+
+        if (allMonitoredDirectories != null) {
+            allMonitoredDirectories.forEach(monitoredDirsModel::addElement);
+        }
+
+        screen.getMonitoredDirectoryList().setModel(monitoredDirsModel);
+
+        screen.getMonitoredDirectoryList().setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof MonitoredDirectory dir) {
+                    setText(dir.path());
+                    if (!dir.baselineEstablished()) {
+                        setForeground(Color.YELLOW);
+                        setToolTipText(StringConstants.TOOLTIP_BASELINE_NOT_ESTABLISHED);
+                    } else if (MonitoredDirectoryUtils.isScanOlderThanAWeek(dir)) {
+                        setForeground(Color.ORANGE);
+                        setToolTipText(StringConstants.TOOLTIP_OLD_SCAN);
+                    } else {
+                        setToolTipText(dir.path());
+                    }
+                }
+                return this;
+            }
+        });
 
         MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(
                 allMonitoredDirectories != null ? allMonitoredDirectories : List.of());
         screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
+        screen.getMonitoredDirectoriesTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         DiffTableModel diffTableModel = new DiffTableModel(recentDiffs != null ? recentDiffs : List.of());
         screen.getDiffTable().setModel(diffTableModel);
+        screen.getDiffTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         FileTableModel fileTableModel = new FileTableModel(fileResults != null ? fileResults : List.of());
         screen.getFilesTable().setModel(fileTableModel);
+        screen.getFilesTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         ScanSummaryTableModel fileSummaryTableModel = new ScanSummaryTableModel(
                 fileSummaries != null ? fileSummaries : List.of());
         screen.getFileScanSummaryTable().setModel(fileSummaryTableModel);
+        screen.getFileScanSummaryTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // Update theme picker
         screen.getThemePicker().removeAllItems();

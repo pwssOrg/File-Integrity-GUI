@@ -12,6 +12,14 @@ public final class StringConstants {
     public static final String GENERIC_OK = "OK";
     public static final String GENERIC_CANCEL = "Cancel";
 
+    // Home screen related strings
+    public static final String TOOLTIP_BASELINE_NOT_ESTABLISHED = "Baseline not established";
+    public static final String TOOLTIP_OLD_SCAN = "This monitored directory has not been scanned for at least 7 days.";
+    public static final String NOTIFICATION_NO_BASELINE = "⚠️ [No Baseline] ";
+    public static final String NOTIFICATION_OLD_SCAN = "⏰ [Scan Overdue] ";
+    public static final String NOTIFICATION_NO_MONITORED_DIRS = "No directories are being monitored.";
+
+
     // Scan related strings
     public static final String SCAN_FULL = "Full scan";
     public static final String SCAN_STOP = "Stop scan";
