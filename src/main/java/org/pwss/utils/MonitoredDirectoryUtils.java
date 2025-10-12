@@ -6,18 +6,33 @@ import java.util.List;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.slf4j.Logger;
 
+/**
+ * Utility class for handling operations related to monitored directories.
+ */
 public final class MonitoredDirectoryUtils {
 
-    // Logger instance for logging purposes
-    private final Logger log;
+    /**
+     * Logger instance for logging purposes
+     */
+    private final static Logger log = org.slf4j.LoggerFactory.getLogger(MonitoredDirectoryUtils.class);
 
-    // Private constructor to prevent instantiation
+    /**
+     * Private constructor to prevent instantiation
+     */
     private MonitoredDirectoryUtils() {
-        this.log =  org.slf4j.LoggerFactory.getLogger(MonitoredDirectoryUtils.class);
     }
 
+    /**
+     * Generates a notification message based on the state of monitored directories.
+     *
+     * @param dirs List of monitored directories to check
+     * @return A string containing notifications about the state of each directory,
+     *         or an empty string if no
+     *         directories are present
+     */
     public static String getMonitoredDirectoryNotificationMessage(List<MonitoredDirectory> dirs) {
         if (dirs == null || dirs.isEmpty()) {
+            log.debug("Generated notification message: {}", StringConstants.NOTIFICATION_NO_MONITORED_DIRS);
             return StringConstants.NOTIFICATION_NO_MONITORED_DIRS;
         }
 
@@ -40,7 +55,14 @@ public final class MonitoredDirectoryUtils {
      * @return true if more than 7 days have passed since last scan, false otherwise
      */
     public static boolean isScanOlderThanAWeek(MonitoredDirectory dir) {
-        if (dir == null || dir.lastScanned() == null) {
+        if (dir == null) {
+            log.error("Can not check if scan is older than a week due to a null error");
+            log.debug("Monitored Directory is null in method: isScanOlderThanAWeek");
+            return false;
+        }
+
+        if (dir.lastScanned() == null) {
+            log.debug("Monitored Directory with id {} has not been scanned for 7 days", dir.id());
             return true; // treat null as "needs scan"
         }
 
@@ -56,10 +78,18 @@ public final class MonitoredDirectoryUtils {
      * is more than one minute.
      *
      * @param dir the MonitoredDirectory to check
-     * @return true if more than 1 minute has passed since last scan, false otherwise
+     * @return true if more than 1 minute has passed since last scan, false
+     *         otherwise
      */
     public static boolean isScanOlderThan1Minute(MonitoredDirectory dir) {
-        if (dir == null || dir.lastScanned() == null) {
+        if (dir == null) {
+            log.error("Can not check if scan is older than a minute due to a null error");
+            log.debug("Monitored Directory is null in method: isScanOlderThan1Minute");
+            return false;
+        }
+
+        if (dir.lastScanned() == null) {
+            log.debug("Monitored Directory with id {} has not been scanned for 1 minute", dir.id());
             return true; // treat null as "needs scan"
         }
 

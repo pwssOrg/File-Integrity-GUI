@@ -58,9 +58,9 @@ public class HomeScreen extends BaseScreen {
     private JTextPane scanSummaryDetails;
     private JLabel searchResultCount;
     private JButton newDirectoryButton2;
-    private JComboBox themePicker;
+    private JComboBox<AppTheme> themePicker;
     private JButton logoutButton;
-    private JList monitoredDirectoryList;
+    private JList<MonitoredDirectory> monitoredDirectoryList;
     private JPanel notificationPanel;
     private JTextArea notificationTextArea;
 
@@ -233,7 +233,7 @@ public class HomeScreen extends BaseScreen {
         panel2.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JScrollPane scrollPane2 = new JScrollPane();
         panel2.add(scrollPane2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        monitoredDirectoryList = new JList();
+        monitoredDirectoryList = new JList<MonitoredDirectory>();
         monitoredDirectoryList.setEnabled(true);
         monitoredDirectoryList.setSelectionMode(0);
         scrollPane2.setViewportView(monitoredDirectoryList);
@@ -360,7 +360,7 @@ public class HomeScreen extends BaseScreen {
         settingsTab.add(spacer1, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, 1, null, null, null, 0, false));
         final Spacer spacer2 = new Spacer();
         settingsTab.add(spacer2, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        themePicker = new JComboBox();
+        themePicker = new JComboBox<AppTheme>();
         settingsTab.add(themePicker, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         logoutButton = new JButton();
         logoutButton.setText("Logout");
