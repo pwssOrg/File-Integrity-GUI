@@ -21,7 +21,6 @@ import org.pwss.navigation.Screen;
  * @author PWSS ORG
  */
 public class PwssHttpClient {
-    public final static long ENDPOINT_CODE = 4350345983458934L;
     /**
      * A singleton instance of the `PwssHttpClient` class.
      * Ensures that only one instance of the client is created and shared across the application.
