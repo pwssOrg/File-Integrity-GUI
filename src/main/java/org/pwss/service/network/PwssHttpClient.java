@@ -10,8 +10,12 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+
+import org.pwss.exception.ssl.SSLsetupErrorException;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A singleton HTTP client for making requests to the API server.
@@ -21,7 +25,10 @@ import org.pwss.navigation.Screen;
  * @author PWSS ORG
  */
 public class PwssHttpClient {
-    public final static long ENDPOINT_CODE = 4350345983458934L;
+    
+
+    private static Logger log = LoggerFactory.getLogger(PwssHttpClient.class);
+
     /**
      * A singleton instance of the `PwssHttpClient` class.
      * Ensures that only one instance of the client is created and shared across the application.
@@ -35,12 +42,12 @@ public class PwssHttpClient {
     /**
      * The HttpClient instance used to send HTTP requests.
      */
-    private final HttpClient client;
+    private  HttpClient client;
     /**
      * The base URL of the API server.
      * This is used to construct the full API URL for requests.
      */
-    private final String BASE_URL = "http://127.0.0.1";
+    private final String BASE_URL = "https://localhost";
     /**
      * The port on which the API server is running.
      * This is used to construct the full API URL for requests.
@@ -63,9 +70,14 @@ public class PwssHttpClient {
 
     private PwssHttpClient() {
         this.objectMapper = new ObjectMapper();
-        this.client = HttpClient.newBuilder()
-                .connectTimeout(Duration.ofSeconds(TIMEOUT_SECONDS))
-                .build();
+        try {
+            this.client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(TIMEOUT_SECONDS))
+                    .sslContext(SSLSetup.createSSLcontext())
+                    .build();
+        } catch (SSLsetupErrorException e) {
+           log.error("Fatal SSL ERROR",e.getMessage());
+        }
         this.defaultHeaders = Map.of(
                 "Content-Type", "application/json",
                 "Accept", "application/json"
