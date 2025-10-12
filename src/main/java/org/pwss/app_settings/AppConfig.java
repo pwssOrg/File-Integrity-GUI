@@ -61,7 +61,7 @@ public final class AppConfig {
      * the frontend application is restarted.
      *
      * @param appTheme The value to set for the application theme (an integer
-     *                 between 0 and 4)
+     *                 between 1 and 4)
      * @return true if setting was successful, otherwise false
      */
     public static final boolean setAppTheme(int appTheme) {

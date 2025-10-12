@@ -1,6 +1,11 @@
 package org.pwss.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -8,11 +13,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JComboBox;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import javax.swing.UIManager;
+import org.pwss.app_settings.AppConfig;
 import org.pwss.controller.util.NavigationContext;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
@@ -42,6 +52,7 @@ import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.service.NoteService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
+import org.pwss.utils.AppTheme;
 import org.pwss.utils.LiveFeedUtils;
 import org.pwss.utils.ReportUtils;
 import org.pwss.utils.StringConstants;
@@ -49,6 +60,9 @@ import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
 import org.slf4j.LoggerFactory;
+
+
+import static org.pwss.app_settings.AppConfig.APP_THEME;
 
 public class HomeController extends BaseController<HomeScreen> {
 
@@ -298,6 +312,28 @@ public class HomeController extends BaseController<HomeScreen> {
                 screen.getScanSummaryDetails().setText("");
             }
         });
+        screen.getThemePicker().addActionListener(e -> {
+            AppTheme selectedTheme = (AppTheme) screen.getThemePicker().getSelectedItem();
+            if (selectedTheme != null) {
+                log.debug("Selected theme: {}", selectedTheme.getDisplayName());
+                AppConfig.setAppTheme(selectedTheme.getValue());
+                // Set FlatLaf Look and Feel
+                try {
+                    if (AppConfig.APP_THEME == 1)
+                        UIManager.setLookAndFeel(new FlatDarculaLaf());
+                    else if (AppConfig.APP_THEME == 2)
+                        UIManager.setLookAndFeel(new FlatLightLaf());
+                    else if (AppConfig.APP_THEME == 3)
+                        UIManager.setLookAndFeel(new FlatMacLightLaf());
+                    else if (AppConfig.APP_THEME == 4)
+                        UIManager.setLookAndFeel(new FlatMacDarkLaf());
+                } catch (Exception ex) {
+                    log.debug("Failed to initialize LaF", ex);
+                    log.error("Failed to initialize LaF", ex.getMessage());
+                    SwingUtilities.invokeLater(() -> screen.showError("Failed to apply theme"));
+                }
+            }
+        });
     }
 
     @Override
@@ -334,6 +370,32 @@ public class HomeController extends BaseController<HomeScreen> {
         ScanSummaryTableModel fileSummaryTableModel = new ScanSummaryTableModel(
                 fileSummaries != null ? fileSummaries : List.of());
         screen.getFileScanSummaryTable().setModel(fileSummaryTableModel);
+
+        // Update theme picker
+        screen.getThemePicker().removeAllItems();
+        // Populate the combo box with AppTheme values
+        for (AppTheme theme : AppTheme.values()) {
+            screen.getThemePicker().addItem(theme);
+        }
+        // Set the selected item based on the current app theme
+        screen.getThemePicker().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AppTheme) {
+                    setText(((AppTheme) value).getDisplayName());
+                }
+                return this;
+            }
+        });
+        // Select the current theme in the combo box
+        for (AppTheme theme : AppTheme.values()) {
+            if (theme.getValue() == APP_THEME) {
+                screen.getThemePicker().setSelectedItem(theme);
+                break;
+            }
+        }
     }
 
     /**
