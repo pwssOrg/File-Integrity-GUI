@@ -21,7 +21,7 @@ public final class MonitoredDirectoryUtils {
             return StringConstants.NOTIFICATION_NO_MONITORED_DIRS;
         }
 
-        StringBuilder message = new StringBuilder("Monitored Directories:\n");
+        StringBuilder message = new StringBuilder();
         for (MonitoredDirectory dir : dirs) {
             if (!dir.baselineEstablished()) {
                 message.append(StringConstants.NOTIFICATION_NO_BASELINE).append(dir.path()).append("\n");

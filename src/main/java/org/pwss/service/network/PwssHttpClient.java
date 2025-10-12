@@ -79,6 +79,13 @@ public class PwssHttpClient {
     }
 
     /**
+     * Clears the current session, removing any stored session cookies or headers.
+     */
+    public void clearSession() {
+        this.session = null;
+    }
+
+    /**
      * Sends an asynchronous HTTP request to the specified endpoint using the given method, body, and headers.
      *
      * @param endpoint The `Endpoint` enum constant representing the API endpoint.
@@ -165,7 +172,7 @@ public class PwssHttpClient {
                         if (response.statusCode() == 401) {
                             // If we get a 401 Unauthorized, log the user out
                             NavigationEvents.navigateTo(Screen.LOGIN);
-                            this.session = null; // Clear session
+                            this.clearSession();
                         }
                         // Any other unexpected error
                         return CompletableFuture.failedFuture(e);

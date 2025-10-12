@@ -55,6 +55,7 @@ import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.service.NoteService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
+import org.pwss.service.network.PwssHttpClient;
 import org.pwss.utils.AppTheme;
 import org.pwss.utils.LiveFeedUtils;
 import org.pwss.utils.MonitoredDirectoryUtils;
@@ -337,6 +338,10 @@ public class HomeController extends BaseController<HomeScreen> {
                     SwingUtilities.invokeLater(() -> screen.showError("Failed to apply theme"));
                 }
             }
+        });
+        screen.getLogoutButton().addActionListener(e -> {
+            PwssHttpClient.getInstance().clearSession();
+            NavigationEvents.navigateTo(Screen.LOGIN);
         });
     }
 

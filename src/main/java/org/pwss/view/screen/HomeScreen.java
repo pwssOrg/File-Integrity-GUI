@@ -238,14 +238,15 @@ public class HomeScreen extends BaseScreen {
         monitoredDirectoryList.setSelectionMode(0);
         scrollPane2.setViewportView(monitoredDirectoryList);
         notificationPanel = new JPanel();
-        notificationPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        homeTab.add(notificationPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        notificationPanel.setLayout(new GridLayoutManager(2, 1, new Insets(0, 0, 10, 0), -1, -1));
+        homeTab.add(notificationPanel, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, true));
         final JLabel label3 = new JLabel();
         Font label3Font = this.$$$getFont$$$(null, Font.BOLD, 16, label3.getFont());
         if (label3Font != null) label3.setFont(label3Font);
         label3.setText("Notifications");
         notificationPanel.add(label3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         notificationTextArea = new JTextArea();
+        notificationTextArea.setEditable(false);
         notificationPanel.add(notificationTextArea, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(150, 50), null, 0, false));
         scanTab = new JPanel();
         scanTab.setLayout(new GridLayoutManager(10, 4, new Insets(10, 10, 10, 10), -1, -1));

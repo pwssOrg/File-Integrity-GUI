@@ -44,6 +44,8 @@ public class LoginController extends BaseController<LoginScreen> {
 
     @Override
     public void onShow() {
+        getScreen().getUsernameField().setText("");
+        getScreen().getPasswordField().setText("");
         refreshView();
     }
 
