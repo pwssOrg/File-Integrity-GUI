@@ -2,6 +2,7 @@ package org.pwss.app_settings;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Properties;
 
 import org.slf4j.LoggerFactory;
@@ -207,8 +208,10 @@ final class ConfigLoader {
      */
     final boolean setSplashScreenFlag(String splashScreenFlag) {
 
-        try {
-            properties.setProperty(SPLASHSCREEN_KEY, splashScreenFlag);
+        properties.setProperty(SPLASHSCREEN_KEY, splashScreenFlag);
+
+        try (FileOutputStream fos = new FileOutputStream(CONFIG_FILE_PATH)) {
+            properties.store(fos, null);
             return true;
         } catch (Exception exception) {
             log.debug("Splash screen flag could not be set in app.config file", exception);
@@ -225,8 +228,10 @@ final class ConfigLoader {
      */
     final boolean setAppTheme(String appTheme) {
 
-        try {
-            properties.setProperty(APP_THEME_KEY, appTheme);
+        properties.setProperty(APP_THEME_KEY, appTheme);
+
+        try (FileOutputStream fos = new FileOutputStream(CONFIG_FILE_PATH)) {
+            properties.store(fos, null);
             return true;
         } catch (Exception exception) {
             log.debug("App theme could not be set in app.config file", exception);
@@ -242,8 +247,11 @@ final class ConfigLoader {
      * @return true if setting was successful, otherwise false
      */
     final boolean setLicenseKey(String licenseKey) {
+
         properties.setProperty(LICENSE_KEY, licenseKey);
-        try {
+
+        try (FileOutputStream fos = new FileOutputStream(CONFIG_FILE_PATH)) {
+            properties.store(fos, null);
             return true;
         } catch (Exception exception) {
             log.debug("License key could not be set in app.config file", exception);

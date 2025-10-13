@@ -8,10 +8,26 @@ import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.NewDirectoryScreen;
 
+/**
+ * Controller class that handles operations related to the New Directory screen.
+ */
 public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
-    private final MonitoredDirectoryService monitoredDirectoryService;
-    private String selectedPath = null;
 
+    /**
+     * Service responsible for managing monitored directories.
+     */
+    private final MonitoredDirectoryService monitoredDirectoryService;
+
+    /**
+     * The currently selected directory path. This can be null if no path is selected.
+     */
+    private String selectedPath;
+
+    /**
+     * Constructs a NewDirectoryController with the given screen.
+     *
+     * @param screen The screen instance that this controller will manage
+     */
     public NewDirectoryController(NewDirectoryScreen screen) {
         super(screen);
         this.monitoredDirectoryService = new MonitoredDirectoryService();
@@ -33,7 +49,8 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
 
     @Override
     void refreshView() {
-        getScreen().getPathLabel().setText(selectedPath != null ? selectedPath : StringConstants.NEW_DIR_NO_PATH_SELECTED);
+        getScreen().getPathLabel()
+                .setText(selectedPath != null ? selectedPath : StringConstants.NEW_DIR_NO_PATH_SELECTED);
         getScreen().getCreateButton().setEnabled(selectedPath != null && !selectedPath.isEmpty());
     }
 
@@ -62,10 +79,13 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
         if (selectedPath != null && !selectedPath.isEmpty()) {
             try {
                 monitoredDirectoryService.createNewMonitoredDirectory(selectedPath, includeSubdirectories, makeActive);
-                JOptionPane.showMessageDialog(getScreen().getRootPanel(), StringConstants.NEW_DIR_SUCCESS_TEXT, StringConstants.GENERIC_SUCCESS, JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(getScreen().getRootPanel(), StringConstants.NEW_DIR_SUCCESS_TEXT,
+                        StringConstants.GENERIC_SUCCESS, JOptionPane.INFORMATION_MESSAGE);
                 NavigationEvents.navigateTo(Screen.HOME);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(getScreen().getRootPanel(), StringConstants.NEW_DIR_ERROR_PREFIX + e.getMessage(), StringConstants.GENERIC_ERROR, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(getScreen().getRootPanel(),
+                        StringConstants.NEW_DIR_ERROR_PREFIX + e.getMessage(), StringConstants.GENERIC_ERROR,
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }

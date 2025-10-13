@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.JComboBox;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;

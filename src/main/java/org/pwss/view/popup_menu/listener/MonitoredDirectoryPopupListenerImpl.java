@@ -9,14 +9,38 @@ import org.pwss.service.NoteService;
 import org.pwss.utils.StringConstants;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Implementation of MonitoredDirectoryPopupListener that handles interactions
+ * related to monitored directories.
+ */
 public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPopupListener {
+    /**
+     * Logger instance for logging messages within this implementation.
+     */
     private final org.slf4j.Logger log;
-
+    /**
+     * Home controller instance responsible for managing the home screen operations.
+     */
     private final HomeController controller;
+    /**
+     * Service responsible for managing monitored directories.
+     */
     private final MonitoredDirectoryService directoryService;
+    /**
+     * Service responsible for managing notes associated with monitored directories.
+     */
     private final NoteService noteService;
 
-    public MonitoredDirectoryPopupListenerImpl(HomeController controller, MonitoredDirectoryService directoryService, NoteService noteService) {
+    /**
+     * Constructs a new instance of MonitoredDirectoryPopupListenerImpl.
+     *
+     * @param controller       The HomeController to manage home screen operations
+     * @param directoryService The service to manage monitored directories
+     * @param noteService      The service to manage notes associated with monitored
+     *                         directories
+     */
+    public MonitoredDirectoryPopupListenerImpl(HomeController controller, MonitoredDirectoryService directoryService,
+            NoteService noteService) {
         this.log = LoggerFactory.getLogger(MonitoredDirectoryPopupListenerImpl.class);
         this.controller = controller;
         this.directoryService = directoryService;
@@ -46,8 +70,8 @@ public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPo
     @Override
     public void onEditDirectory(MonitoredDirectory dir) {
         // TODO: Implement edit directory functionality
-        
-        // We need to be able to update and save notes. Maybe here? :) / Pwgit-Create 
+
+        // We need to be able to update and save notes. Maybe here? :) / Pwgit-Create
     }
 
     @Override
