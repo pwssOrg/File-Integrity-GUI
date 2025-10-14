@@ -351,6 +351,35 @@ public class HomeController extends BaseController<HomeScreen> {
     }
 
     @Override
+    public void onCreate() {
+        // Update theme picker
+        screen.getThemePicker().removeAllItems();
+        // Populate the combo box with AppTheme values
+        for (AppTheme theme : AppTheme.values()) {
+            screen.getThemePicker().addItem(theme);
+        }
+        // Set the selected item based on the current app theme
+        screen.getThemePicker().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AppTheme) {
+                    setText(((AppTheme) value).getDisplayName());
+                }
+                return this;
+            }
+        });
+        // Select the current theme in the combo box
+        for (AppTheme theme : AppTheme.values()) {
+            if (theme.getValue() == APP_THEME) {
+                screen.getThemePicker().setSelectedItem(theme);
+                break;
+            }
+        }
+    }
+
+    @Override
     protected void refreshView() {
         // Update UI components based on the current state
         screen.getScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
@@ -426,32 +455,6 @@ public class HomeController extends BaseController<HomeScreen> {
                 fileSummaries != null ? fileSummaries : List.of());
         screen.getFileScanSummaryTable().setModel(fileSummaryTableModel);
         screen.getFileScanSummaryTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
-        // Update theme picker
-        screen.getThemePicker().removeAllItems();
-        // Populate the combo box with AppTheme values
-        for (AppTheme theme : AppTheme.values()) {
-            screen.getThemePicker().addItem(theme);
-        }
-        // Set the selected item based on the current app theme
-        screen.getThemePicker().setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value,
-                                                          int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof AppTheme) {
-                    setText(((AppTheme) value).getDisplayName());
-                }
-                return this;
-            }
-        });
-        // Select the current theme in the combo box
-        for (AppTheme theme : AppTheme.values()) {
-            if (theme.getValue() == APP_THEME) {
-                screen.getThemePicker().setSelectedItem(theme);
-                break;
-            }
-        }
     }
 
     /**
@@ -484,6 +487,7 @@ public class HomeController extends BaseController<HomeScreen> {
     public void performStartScan(boolean singleDirectory) {
         try {
             boolean startScanSuccess;
+            boolean baseLineScan;
             JTable table = screen.getMonitoredDirectoriesTable();
             MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) table.getModel();
             ArrayList<MonitoredDirectory> scanningDirs = new ArrayList<>();
@@ -491,24 +495,32 @@ public class HomeController extends BaseController<HomeScreen> {
                 int viewRow = table.getSelectedRow();
                 if (viewRow == -1) {
                     startScanSuccess = false;
+                    baseLineScan = false;
                 } else {
                     int modelRow = table.convertRowIndexToModel(viewRow);
                     Optional<MonitoredDirectory> dir = model.getDirectoryAt(modelRow);
                     if (dir.isPresent()) {
                         startScanSuccess = scanService.startScanById(dir.get().id());
                         scanningDirs.add(dir.get());
+                        baseLineScan = !dir.get().baselineEstablished();
                     } else {
+                        baseLineScan = false;
                         startScanSuccess = false;
                     }
                 }
             } else {
+                baseLineScan = false;
                 startScanSuccess = scanService.startScan();
                 scanningDirs.addAll(allMonitoredDirectories);
             }
             SwingUtilities.invokeLater(() -> {
                 if (startScanSuccess) {
                     clearLiveFeed();
-                    screen.showSuccess(StringConstants.SCAN_STARTED_SUCCESS);
+                    if (baseLineScan) {
+                        screen.showSuccess(StringConstants.SCAN_STARTED_BASELINE_SUCCESS);
+                    } else {
+                        screen.showSuccess(StringConstants.SCAN_STARTED_SUCCESS);
+                    }
                     startPollingScanLiveFeed(singleDirectory, scanningDirs);
                 } else {
                     screen.showError(StringConstants.SCAN_STARTED_FAILURE);

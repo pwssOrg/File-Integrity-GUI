@@ -24,6 +24,7 @@ public final class StringConstants {
     public static final String SCAN_FULL = "Full scan";
     public static final String SCAN_STOP = "Stop scan";
     public static final String SCAN_STARTED_SUCCESS = "Scan started successfully!";
+    public static final String SCAN_STARTED_BASELINE_SUCCESS = "Baseline scan started successfully!";
     public static final String SCAN_STOPPED_SUCCESS = "Scan stopped successfully!";
     public static final String SCAN_STARTED_FAILURE = "Failed to start scan.";
     public static final String SCAN_STOPPED_FAILURE = "Failed to stop scan.";

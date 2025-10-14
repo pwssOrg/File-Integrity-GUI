@@ -30,6 +30,8 @@ public abstract class BaseController<Screen extends BaseScreen> {
      */
     public BaseController(Screen screen) {
         this.screen = screen;
+        // Run onCreate lifecycle method
+        onCreate();
         // Initialize event listeners
         initListeners();
     }
@@ -88,6 +90,15 @@ public abstract class BaseController<Screen extends BaseScreen> {
      * The default implementation does nothing.
      */
     public void onShow() {
+        // Default implementation does nothing
+    }
+
+    /**
+     * Method called when the view is created.
+     * Subclasses can override this method to perform actions during the creation of the view.
+     * The default implementation does nothing.
+     */
+    public void onCreate() {
         // Default implementation does nothing
     }
 }
