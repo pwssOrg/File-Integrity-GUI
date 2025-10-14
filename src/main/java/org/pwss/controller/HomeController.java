@@ -319,27 +319,11 @@ public class HomeController extends BaseController<HomeScreen> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 AppTheme selectedTheme = (AppTheme) e.getItem();
                 if (selectedTheme != null) {
-                    log.debug("Selected theme: {}", selectedTheme.getDisplayName());
                     boolean result = AppConfig.setAppTheme(selectedTheme.getValue());
                     if (result) {
                         log.debug("Theme changed to {}. Restart application to apply.", selectedTheme.getDisplayName());
                     } else {
                         log.error("Failed to change theme to {}", selectedTheme.getDisplayName());
-                    }
-                    // Set FlatLaf Look and Feel
-                    try {
-                        if (AppConfig.APP_THEME == 1)
-                            UIManager.setLookAndFeel(new FlatDarculaLaf());
-                        else if (AppConfig.APP_THEME == 2)
-                            UIManager.setLookAndFeel(new FlatLightLaf());
-                        else if (AppConfig.APP_THEME == 3)
-                            UIManager.setLookAndFeel(new FlatMacLightLaf());
-                        else if (AppConfig.APP_THEME == 4)
-                            UIManager.setLookAndFeel(new FlatMacDarkLaf());
-                    } catch (Exception ex) {
-                        log.debug("Failed to initialize LaF", ex);
-                        log.error("Failed to initialize LaF", ex.getMessage());
-                        SwingUtilities.invokeLater(() -> screen.showError("Failed to apply theme"));
                     }
                 }
             }
