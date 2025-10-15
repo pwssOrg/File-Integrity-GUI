@@ -12,12 +12,36 @@ import org.pwss.service.ScanSummaryService;
 import org.pwss.utils.ReportUtils;
 import org.pwss.view.screen.ScanDetailsScreen;
 
+/**
+ * Controller class that handles operations related to the scan details screen.
+ */
 public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
+
+    /**
+     * Service responsible for managing scan summaries.
+     */
     private final ScanSummaryService scanSummaryService;
+    /**
+     * Service responsible for performing and managing scans.
+     */
     private final ScanService scanService;
+
+    /**
+     * List of scan summaries. This can be empty if no summaries are available.
+     */
     private List<ScanSummary> scanSummaries;
+    /**
+     * List of differences (diffs) between scans. This can be empty if no diffs are
+     * available.
+     */
     private List<Diff> diffs;
 
+    /**
+     * Constructs a ScanDetailsController with the given screen and initializes
+     * services and lists.
+     *
+     * @param screen The screen instance that this controller will manage
+     */
     public ScanDetailsController(ScanDetailsScreen screen) {
         super(screen);
         this.scanSummaryService = new ScanSummaryService();
@@ -43,7 +67,8 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
     }
 
     /**
-     * Fetches scan summaries and diffs from the service based on the scan ID in the context.
+     * Fetches scan summaries and diffs from the service based on the scan ID in the
+     * context.
      */
     private void fetchData() {
         try {

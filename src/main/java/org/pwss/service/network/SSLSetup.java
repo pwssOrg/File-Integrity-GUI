@@ -2,7 +2,7 @@ package org.pwss.service.network;
 
 import java.io.File;
 import java.io.FileInputStream;
-
+import java.io.InputStream;
 import java.security.KeyStore;
 
 import javax.net.ssl.SSLContext;
@@ -32,12 +32,11 @@ final class SSLSetup {
      */
     final static SSLContext createSSLcontext() throws SSLsetupErrorException {
 
-        try (FileInputStream fileInputStream = new FileInputStream(
-                "src" + File.separator + "main" + File.separator + "resources" + File.separator + "truststore.jks")) {
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("truststore.jks")) {
 
             char[] truststorePassword = System.getenv("TRUSTSTORE_FIS_GUI").toCharArray();
             KeyStore truststore = KeyStore.getInstance("JKS");
-            truststore.load(fileInputStream, truststorePassword);
+            truststore.load(inputStream, truststorePassword);
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(truststore);

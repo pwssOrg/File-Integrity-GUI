@@ -1,16 +1,26 @@
 package org.pwss.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import org.pwss.app_settings.AppConfig;
 import org.pwss.controller.util.NavigationContext;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
@@ -40,7 +50,9 @@ import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.service.NoteService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
+import org.pwss.utils.AppTheme;
 import org.pwss.utils.LiveFeedUtils;
+import org.pwss.utils.MonitoredDirectoryUtils;
 import org.pwss.utils.ReportUtils;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
@@ -48,11 +60,11 @@ import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
 import org.slf4j.LoggerFactory;
 
+import static org.pwss.app_settings.AppConfig.APP_THEME;
+import static org.pwss.app_settings.AppConfig.USE_SPLASH_SCREEN;
+
 public class HomeController extends BaseController<HomeScreen> {
 
-    /**
-     * Logger for logging messages within this controller.
-     */
     /**
      * Logger for logging messages within this controller.
      */
@@ -124,6 +136,11 @@ public class HomeController extends BaseController<HomeScreen> {
     private Timer scanStatusTimer;
 
     /**
+     * Flag indicating whether to show the splash screen on startup.
+     */
+    private boolean showSplashScreenSetting;
+
+    /**
      * Constructor to initialize HomeController with a HomeScreen view instance.
      *
      * @param view The home screen view that this controller will manage.
@@ -136,6 +153,48 @@ public class HomeController extends BaseController<HomeScreen> {
         this.noteService = new NoteService();
         this.monitoredDirectoryPopupFactory = new MonitoredDirectoryPopupFactory(
                 new MonitoredDirectoryPopupListenerImpl(this, monitoredDirectoryService, noteService));
+        this.showSplashScreenSetting = USE_SPLASH_SCREEN;
+    }
+
+    @Override
+    public void onCreate() {
+        // Update theme picker
+        screen.getThemePicker().removeAllItems();
+        // Populate the combo box with AppTheme values
+        for (AppTheme theme : AppTheme.values()) {
+            screen.getThemePicker().addItem(theme);
+        }
+        // Set the selected item based on the current app theme
+        screen.getThemePicker().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AppTheme) {
+                    setText(((AppTheme) value).getDisplayName());
+                }
+                return this;
+            }
+        });
+        // Select the current theme in the combo box
+        for (AppTheme theme : AppTheme.values()) {
+            if (theme.getValue() == APP_THEME) {
+                screen.getThemePicker().setSelectedItem(theme);
+                break;
+            }
+        }
+        // Setup splash screen checkbox
+        screen.getShowSplashScreenCheckBox().addActionListener(e -> {
+            if (showSplashScreenSetting != screen.getShowSplashScreenCheckBox().isSelected()) {
+                showSplashScreenSetting = screen.getShowSplashScreenCheckBox().isSelected();
+                boolean success = AppConfig.setSplashScreenFlagInAppConfig(showSplashScreenSetting);
+                if (success) {
+                    log.debug("Updated splash screen setting to {}.", showSplashScreenSetting);
+                } else {
+                    log.error("Failed to update splash screen setting in app config.");
+                }
+            }
+        });
     }
 
     @Override
@@ -153,22 +212,26 @@ public class HomeController extends BaseController<HomeScreen> {
             // Fetch all monitored directories for display in the monitored directories
             // table
             allMonitoredDirectories = monitoredDirectoryService.getAllDirectories();
-            // Fetch recent scans for display in the scan table
-            recentScans = scanService.getMostRecentScansAll();
-            if (recentScans.isEmpty()) {
-                recentDiffs = List.of();
-            } else {
-                // Fetch diffs for the most recent scan to show in the diffs table
-                recentDiffs = recentScans.stream()
-                        .flatMap(scan -> safeGetDiffs(scan.id()).stream())
-                        .toList();
+
+            // Only fetch diffs if there are monitored directories present
+            if (!allMonitoredDirectories.isEmpty()) {
+                // Fetch recent scans for display in the scan table
+                recentScans = scanService.getMostRecentScansAll();
+                if (recentScans.isEmpty()) {
+                    recentDiffs = List.of();
+                } else {
+                    // Fetch diffs for the most recent scan to show in the diffs table
+                    recentDiffs = recentScans.stream()
+                            .flatMap(scan -> safeGetDiffs(scan.id()).stream())
+                            .toList();
+                }
             }
             // Check if a scan is currently running
             boolean scanCurrentlyRunning = scanService.scanRunning();
             // If a scan has started since the last check, initiate polling
             if (scanCurrentlyRunning && !scanRunning) {
                 scanRunning = true;
-                startPollingScanLiveFeed(false);
+                startPollingScanLiveFeed(false, Collections.emptyList());
             }
         } catch (MonitoredDirectoryGetAllException | ExecutionException | InterruptedException | JsonProcessingException
                 | GetAllMostRecentScansException | ScanStatusException e) {
@@ -205,7 +268,6 @@ public class HomeController extends BaseController<HomeScreen> {
         screen.getAddNewDirectoryButton()
                 .addActionListener(e -> NavigationEvents.navigateTo(Screen.NEW_DIRECTORY));
         screen.getScanButton().addActionListener(e -> handleScanButtonClick(false));
-        screen.getQuickScanButton().addActionListener(e -> handleScanButtonClick(false));
         screen.getMonitoredDirectoriesTable().addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -291,13 +353,31 @@ public class HomeController extends BaseController<HomeScreen> {
                 screen.getScanSummaryDetails().setText("");
             }
         });
+        screen.getThemePicker().addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                AppTheme selectedTheme = (AppTheme) e.getItem();
+                if (selectedTheme != null) {
+                    boolean result = AppConfig.setAppTheme(selectedTheme.getValue());
+                    if (result) {
+                        log.debug("Theme changed to {}. Restart application to apply.", selectedTheme.getDisplayName());
+                    } else {
+                        log.error("Failed to change theme to {}", selectedTheme.getDisplayName());
+                    }
+                }
+            }
+        });
+        screen.getRestartButton().addActionListener(e -> {
+            // Restart the application
+        });
     }
 
     @Override
     protected void refreshView() {
         // Update UI components based on the current state
         screen.getScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
-        screen.getQuickScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
+
+        String notifications = MonitoredDirectoryUtils.getMonitoredDirectoryNotificationMessage(allMonitoredDirectories);
+        boolean hasNotifications = !notifications.isEmpty();
 
         // Scan running views
         boolean showLiveFeed = !screen.getLiveFeedText().getText().isEmpty() || scanRunning;
@@ -307,6 +387,12 @@ public class HomeController extends BaseController<HomeScreen> {
         screen.getLiveFeedTitle().setVisible(showLiveFeed);
         screen.getLiveFeedDiffCount().setVisible(showLiveFeed);
         screen.getClearFeedButton().setVisible(showClearLiveFeed);
+        screen.getNotificationPanel().setVisible(hasNotifications);
+
+        screen.getShowSplashScreenCheckBox().setSelected(showSplashScreenSetting);
+
+        // Set notification text area
+        screen.getNotificationTextArea().setText(notifications);
 
         // File search views
         screen.getSearchResultCount()
@@ -314,20 +400,55 @@ public class HomeController extends BaseController<HomeScreen> {
 
         ScanTableModel mostRecentScansListModel = new ScanTableModel(recentScans != null ? recentScans : List.of());
         screen.getRecentScanTable().setModel(mostRecentScansListModel);
+        screen.getRecentScanTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        DefaultListModel<MonitoredDirectory> monitoredDirsModel = new DefaultListModel<>();
+
+        if (allMonitoredDirectories != null) {
+            allMonitoredDirectories.forEach(monitoredDirsModel::addElement);
+        }
+
+        screen.getMonitoredDirectoryList().setModel(monitoredDirsModel);
+
+        screen.getMonitoredDirectoryList().setCellRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+
+                if (value instanceof MonitoredDirectory dir) {
+                    setText(dir.path());
+                    if (!dir.baselineEstablished()) {
+                        setForeground(Color.YELLOW);
+                        setToolTipText(StringConstants.TOOLTIP_BASELINE_NOT_ESTABLISHED);
+                    } else if (MonitoredDirectoryUtils.isScanOlderThanAWeek(dir)) {
+                        setForeground(Color.ORANGE);
+                        setToolTipText(StringConstants.TOOLTIP_OLD_SCAN);
+                    } else {
+                        setToolTipText(dir.path());
+                    }
+                }
+                return this;
+            }
+        });
 
         MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(
                 allMonitoredDirectories != null ? allMonitoredDirectories : List.of());
         screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
+        screen.getMonitoredDirectoriesTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         DiffTableModel diffTableModel = new DiffTableModel(recentDiffs != null ? recentDiffs : List.of());
         screen.getDiffTable().setModel(diffTableModel);
+        screen.getDiffTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         FileTableModel fileTableModel = new FileTableModel(fileResults != null ? fileResults : List.of());
         screen.getFilesTable().setModel(fileTableModel);
+        screen.getFilesTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         ScanSummaryTableModel fileSummaryTableModel = new ScanSummaryTableModel(
                 fileSummaries != null ? fileSummaries : List.of());
         screen.getFileScanSummaryTable().setModel(fileSummaryTableModel);
+        screen.getFileScanSummaryTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
     /**
@@ -360,29 +481,41 @@ public class HomeController extends BaseController<HomeScreen> {
     public void performStartScan(boolean singleDirectory) {
         try {
             boolean startScanSuccess;
+            boolean baseLineScan;
             JTable table = screen.getMonitoredDirectoriesTable();
             MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) table.getModel();
+            ArrayList<MonitoredDirectory> scanningDirs = new ArrayList<>();
             if (singleDirectory) {
                 int viewRow = table.getSelectedRow();
                 if (viewRow == -1) {
                     startScanSuccess = false;
+                    baseLineScan = false;
                 } else {
                     int modelRow = table.convertRowIndexToModel(viewRow);
                     Optional<MonitoredDirectory> dir = model.getDirectoryAt(modelRow);
                     if (dir.isPresent()) {
                         startScanSuccess = scanService.startScanById(dir.get().id());
+                        scanningDirs.add(dir.get());
+                        baseLineScan = !dir.get().baselineEstablished();
                     } else {
+                        baseLineScan = false;
                         startScanSuccess = false;
                     }
                 }
             } else {
+                baseLineScan = false;
                 startScanSuccess = scanService.startScan();
+                scanningDirs.addAll(allMonitoredDirectories);
             }
             SwingUtilities.invokeLater(() -> {
                 if (startScanSuccess) {
                     clearLiveFeed();
-                    screen.showSuccess(StringConstants.SCAN_STARTED_SUCCESS);
-                    startPollingScanLiveFeed(singleDirectory);
+                    if (baseLineScan) {
+                        screen.showSuccess(StringConstants.SCAN_STARTED_BASELINE_SUCCESS);
+                    } else {
+                        screen.showSuccess(StringConstants.SCAN_STARTED_SUCCESS);
+                    }
+                    startPollingScanLiveFeed(singleDirectory, scanningDirs);
                 } else {
                     screen.showError(StringConstants.SCAN_STARTED_FAILURE);
                 }
@@ -427,8 +560,28 @@ public class HomeController extends BaseController<HomeScreen> {
                         new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                         StringConstants.GENERIC_YES);
             } else {
+                String message;
+                if (singleDirectory) {
+                    try {
+                        // If single directory scan, check if it was a baseline scan
+                        Scan latestScan = scanService.getMostRecentScans(1).getFirst();
+                        if (latestScan.isBaselineScan()) {
+                            message = StringConstants.SCAN_BASELINE_COMPLETED;
+                        } else {
+                            message = StringConstants.SCAN_COMPLETED_NO_DIFFS;
+                        }
+                    } catch (GetMostRecentScansException | ExecutionException | InterruptedException
+                             | JsonProcessingException e) {
+                        log.error(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX, e.getMessage());
+                        log.debug(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX, e);
+                        screen.showError(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX);
+                        return;
+                    }
+                } else {
+                    message = StringConstants.SCAN_COMPLETED_NO_DIFFS;
+                }
                 choice = screen.showOptionDialog(JOptionPane.INFORMATION_MESSAGE,
-                        StringConstants.SCAN_COMPLETED_NO_DIFFS,
+                        message,
                         new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                         StringConstants.GENERIC_YES);
             }
@@ -486,10 +639,22 @@ public class HomeController extends BaseController<HomeScreen> {
      *
      * @param singleDirectory if true, indicates that the scan is for a single
      *                        directory; otherwise, for all directories.
+     * @param scanningDirs    the list of directories being scanned
      */
-    private void startPollingScanLiveFeed(boolean singleDirectory) {
+    private void startPollingScanLiveFeed(boolean singleDirectory, List<MonitoredDirectory> scanningDirs) {
         if (scanStatusTimer != null && scanStatusTimer.isRunning()) {
             return; // Polling is already active
+        }
+
+        // Log directories that are establishing their baseline
+        for (MonitoredDirectory dir : scanningDirs) {
+            if (!dir.baselineEstablished()) {
+                log.debug("Establishing baseline for {}", dir.path());
+                String currentLiveFeedText = screen.getLiveFeedText().getText();
+                String newEntry = StringConstants.SCAN_ESTABLISHING_BASELINE + dir.path() + "\n";
+                String updatedLiveFeedText = currentLiveFeedText + newEntry;
+                screen.getLiveFeedText().setText(updatedLiveFeedText);
+            }
         }
 
         scanStatusTimer = new Timer(1000, e -> {

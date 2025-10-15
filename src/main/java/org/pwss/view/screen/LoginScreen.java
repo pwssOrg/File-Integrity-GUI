@@ -57,6 +57,10 @@ public class LoginScreen extends BaseScreen {
         return cancelButton;
     }
 
+    public JTextField getUsernameField() {
+        return usernameField;
+    }
+
     public JPasswordField getPasswordField() {
         return passwordField;
     }

@@ -25,8 +25,10 @@ import org.slf4j.LoggerFactory;
  * @author PWSS ORG
  */
 public class PwssHttpClient {
-    
 
+    /**
+     * Logger instance for logging messages within this class.
+     */
     private static Logger log = LoggerFactory.getLogger(PwssHttpClient.class);
 
     /**
@@ -89,6 +91,13 @@ public class PwssHttpClient {
             instance = new PwssHttpClient();
         }
         return instance;
+    }
+
+    /**
+     * Clears the current session, removing any stored session cookies or headers.
+     */
+    public void clearSession() {
+        this.session = null;
     }
 
     /**
@@ -178,7 +187,7 @@ public class PwssHttpClient {
                         if (response.statusCode() == 401) {
                             // If we get a 401 Unauthorized, log the user out
                             NavigationEvents.navigateTo(Screen.LOGIN);
-                            this.session = null; // Clear session
+                            this.clearSession();
                         }
                         // Any other unexpected error
                         return CompletableFuture.failedFuture(e);
