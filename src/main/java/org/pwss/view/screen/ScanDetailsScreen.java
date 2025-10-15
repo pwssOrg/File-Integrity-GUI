@@ -104,10 +104,9 @@ public class ScanDetailsScreen extends BaseScreen {
     }
 
     /**
-     * Returns the text pane used to display details of differences (diffs) between
-     * scans.
+     * Returns the text pane used to display details about a selected scan summary.
      *
-     * @return The JTextPane instance showing diff details
+     * @return The JTextPane instance showing scan summary details
      */
     public JTextPane getScanSummaryDetails() {
         return scanSummaryDetails;
