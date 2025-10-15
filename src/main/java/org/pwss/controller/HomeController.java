@@ -1,10 +1,6 @@
 package org.pwss.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
-import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
@@ -24,7 +20,6 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.UIManager;
 import org.pwss.app_settings.AppConfig;
 import org.pwss.controller.util.NavigationContext;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
@@ -55,7 +50,6 @@ import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.service.NoteService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
-import org.pwss.service.network.PwssHttpClient;
 import org.pwss.utils.AppTheme;
 import org.pwss.utils.LiveFeedUtils;
 import org.pwss.utils.MonitoredDirectoryUtils;
@@ -66,14 +60,11 @@ import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
 import org.slf4j.LoggerFactory;
 
-
 import static org.pwss.app_settings.AppConfig.APP_THEME;
+import static org.pwss.app_settings.AppConfig.USE_SPLASH_SCREEN;
 
 public class HomeController extends BaseController<HomeScreen> {
 
-    /**
-     * Logger for logging messages within this controller.
-     */
     /**
      * Logger for logging messages within this controller.
      */
@@ -145,6 +136,11 @@ public class HomeController extends BaseController<HomeScreen> {
     private Timer scanStatusTimer;
 
     /**
+     * Flag indicating whether to show the splash screen on startup.
+     */
+    private boolean showSplashScreenSetting;
+
+    /**
      * Constructor to initialize HomeController with a HomeScreen view instance.
      *
      * @param view The home screen view that this controller will manage.
@@ -157,6 +153,48 @@ public class HomeController extends BaseController<HomeScreen> {
         this.noteService = new NoteService();
         this.monitoredDirectoryPopupFactory = new MonitoredDirectoryPopupFactory(
                 new MonitoredDirectoryPopupListenerImpl(this, monitoredDirectoryService, noteService));
+        this.showSplashScreenSetting = USE_SPLASH_SCREEN;
+    }
+
+    @Override
+    public void onCreate() {
+        // Update theme picker
+        screen.getThemePicker().removeAllItems();
+        // Populate the combo box with AppTheme values
+        for (AppTheme theme : AppTheme.values()) {
+            screen.getThemePicker().addItem(theme);
+        }
+        // Set the selected item based on the current app theme
+        screen.getThemePicker().setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof AppTheme) {
+                    setText(((AppTheme) value).getDisplayName());
+                }
+                return this;
+            }
+        });
+        // Select the current theme in the combo box
+        for (AppTheme theme : AppTheme.values()) {
+            if (theme.getValue() == APP_THEME) {
+                screen.getThemePicker().setSelectedItem(theme);
+                break;
+            }
+        }
+        // Setup splash screen checkbox
+        screen.getShowSplashScreenCheckBox().addActionListener(e -> {
+            if (showSplashScreenSetting != screen.getShowSplashScreenCheckBox().isSelected()) {
+                showSplashScreenSetting = screen.getShowSplashScreenCheckBox().isSelected();
+                boolean success = AppConfig.setSplashScreenFlagInAppConfig(showSplashScreenSetting);
+                if (success) {
+                    log.debug("Updated splash screen setting to {}.", showSplashScreenSetting);
+                } else {
+                    log.error("Failed to update splash screen setting in app config.");
+                }
+            }
+        });
     }
 
     @Override
@@ -328,39 +366,9 @@ public class HomeController extends BaseController<HomeScreen> {
                 }
             }
         });
-        screen.getLogoutButton().addActionListener(e -> {
-            PwssHttpClient.getInstance().clearSession();
-            NavigationEvents.navigateTo(Screen.LOGIN);
+        screen.getRestartButton().addActionListener(e -> {
+            // Restart the application
         });
-    }
-
-    @Override
-    public void onCreate() {
-        // Update theme picker
-        screen.getThemePicker().removeAllItems();
-        // Populate the combo box with AppTheme values
-        for (AppTheme theme : AppTheme.values()) {
-            screen.getThemePicker().addItem(theme);
-        }
-        // Set the selected item based on the current app theme
-        screen.getThemePicker().setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value,
-                                                          int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof AppTheme) {
-                    setText(((AppTheme) value).getDisplayName());
-                }
-                return this;
-            }
-        });
-        // Select the current theme in the combo box
-        for (AppTheme theme : AppTheme.values()) {
-            if (theme.getValue() == APP_THEME) {
-                screen.getThemePicker().setSelectedItem(theme);
-                break;
-            }
-        }
     }
 
     @Override
@@ -380,6 +388,8 @@ public class HomeController extends BaseController<HomeScreen> {
         screen.getLiveFeedDiffCount().setVisible(showLiveFeed);
         screen.getClearFeedButton().setVisible(showClearLiveFeed);
         screen.getNotificationPanel().setVisible(hasNotifications);
+
+        screen.getShowSplashScreenCheckBox().setSelected(showSplashScreenSetting);
 
         // Set notification text area
         screen.getNotificationTextArea().setText(notifications);
