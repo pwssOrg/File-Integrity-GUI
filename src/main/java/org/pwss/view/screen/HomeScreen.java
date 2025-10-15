@@ -229,7 +229,7 @@ public class HomeScreen extends BaseScreen {
         panel2.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JScrollPane scrollPane2 = new JScrollPane();
         panel2.add(scrollPane2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        monitoredDirectoryList = new JList();
+        monitoredDirectoryList = new JList<MonitoredDirectory>();
         monitoredDirectoryList.setEnabled(true);
         monitoredDirectoryList.setSelectionMode(0);
         scrollPane2.setViewportView(monitoredDirectoryList);

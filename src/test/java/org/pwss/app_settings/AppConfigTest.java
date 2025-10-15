@@ -18,14 +18,14 @@ public class AppConfigTest {
     void setAppThemeTest() {
 
         final int originalAppTheme = AppConfig.APP_THEME;
-        boolean EXCPECTED = true;
+        boolean EXPECTED = true;
 
         boolean ACTUAL = AppConfig.setAppTheme(4);
 
         // Restore file to original state
         AppConfig.setAppTheme(originalAppTheme);
 
-        Assertions.assertEquals(EXCPECTED, ACTUAL);
+        Assertions.assertEquals(EXPECTED, ACTUAL);
     }
 
     /**
@@ -38,14 +38,14 @@ public class AppConfigTest {
     void setLicenseKeyTest() {
 
         final String originalLicenseKey = AppConfig.LICENSE_KEY;
-        boolean EXCPECTED = true;
+        boolean EXPECTED = true;
 
         boolean ACTUAL = AppConfig.setLicenseKey("This should not persist!");
 
         // Restore file to original state
         AppConfig.setLicenseKey(originalLicenseKey);
 
-        Assertions.assertEquals(EXCPECTED, ACTUAL);
+        Assertions.assertEquals(EXPECTED, ACTUAL);
     }
 
     /**
@@ -58,13 +58,13 @@ public class AppConfigTest {
     void setSplashScreenTest() {
 
         final boolean originalUseSplashScreen = AppConfig.USE_SPLASH_SCREEN;
-        boolean EXCPECTED = true;
+        boolean EXPECTED = true;
 
         boolean ACTUAL = AppConfig.setSplashScreenFlagInAppConfig(true);
 
         // Restore file to original state
         AppConfig.setSplashScreenFlagInAppConfig(originalUseSplashScreen);
 
-        Assertions.assertEquals(EXCPECTED, ACTUAL);
+        Assertions.assertEquals(EXPECTED, ACTUAL);
     }
 }
