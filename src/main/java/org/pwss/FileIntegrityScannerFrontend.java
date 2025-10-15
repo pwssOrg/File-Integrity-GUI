@@ -56,7 +56,7 @@ class FileIntegrityScannerFrontend {
             // Create Main UI of the application on the Event Dispatch Thread
             SwingUtilities.invokeLater(() -> {
                 // Create the main frame
-                JFrame frame = new JFrame("File Integrity Scanner");
+                JFrame frame = new JFrame("Integrity Hash");
                 frame.setResizable(true);
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 frame.setLocationRelativeTo(null); // center on screen
