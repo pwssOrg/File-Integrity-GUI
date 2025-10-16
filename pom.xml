@@ -6,7 +6,7 @@
 
     <!-- Project coordinates -->
     <groupId>org.pwss</groupId>
-    <artifactId>file_integrity_gui</artifactId>
+    <artifactId>integrity_hash</artifactId>
     <packaging>jar</packaging>
     <version>1.0</version>
     <description>A GUI application for file integrity checking</description>
