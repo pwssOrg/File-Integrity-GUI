@@ -1,4 +1,6 @@
 # Integrity Hash (Java Swing Frontend)
+[![Build FIS-GUI](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/build.yml)
+[![SCA Scan - File Integrity GUI](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/snyk-scan.yml/badge.svg)](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/snyk-scan.yml)
 
 ## Overview
 
@@ -35,11 +37,6 @@ The Swing-based frontend is a **desktop companion application** that allows user
 - **Java 21+**  
 - **Maven 4.0.0+**  
 - **Backend File-Integrity Scanner (Spring Application)** running locally  
-
-## Workflow Badges
-
-[![Build FIS-GUI](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/build.yml)
-[![SCA Scan - File Integrity GUI](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/snyk-scan.yml/badge.svg)](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/snyk-scan.yml)
 
 ## Contact Information
 
