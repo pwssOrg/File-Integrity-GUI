@@ -19,7 +19,7 @@ The Swing-based frontend is a **desktop companion application** that allows user
     Inspect metadata, compare hash snapshots, and review scan timelines with timestamps.
 
 - **Hash Algorithm Visualization:**  
-    Supports displaying results for SHA-256, SHA-3 (256-bit), and BLAKE_2b (512-bit).
+    Supports displaying results for SHA-256, SHA-3 (256-bit), and BLAKE2b (512-bit).
 
 - **Secure Local Operation:**  
     All operations and communications occur locally — **no external network services or cloud dependencies**.
