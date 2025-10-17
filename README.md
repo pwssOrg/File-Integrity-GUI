@@ -42,8 +42,8 @@ The Swing-based frontend is a **desktop companion application** that allows user
 
 For any questions or support, please reach out to:
 
-	@pwgit-create	Peter pwgit-create
-	@lilstiffy	Stefan lilstiffy
+- @pwgit-create — Peter (pwgit-create)
+- @lilstiffy — Stefan (lilstiffy)
 
 ### Discussion Forum
 
