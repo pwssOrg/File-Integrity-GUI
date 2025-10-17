@@ -27,7 +27,7 @@ The Swing-based frontend is a **desktop companion application** that allows user
 - **Lightweight Swing UI:**  
     Built with pure Java Swing for performance and reliability — platform‑independent across Windows, macOS, and Linux.
 <kbd>
-<img  src="https://github.com/pwssOrg/File-Integrity-GUI/blob/develop/.github/assets/images/640x486.jpg" alt="drawing" width="640" height="486"/>
+<img  src="https://github.com/pwssOrg/File-Integrity-GUI/blob/develop/.github/assets/images/640x486.jpg" alt="drawing"/>
 </kbd>
 
 
