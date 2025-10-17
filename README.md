@@ -4,13 +4,9 @@
 
 Integrity Hash is a secure, user-friendly Java Swing desktop client for managing and visualizing file-integrity scans. It connects locally to the File-Integrity Scanner backend to monitor scans, verify file hashes, and review historical results — all without external network dependencies.
 
----
-
 ## What is the File-Integrity Scanner Frontend?
 
 The Swing-based frontend is a **desktop companion application** that allows users to interact with the File-Integrity Scanner backend in real time. It simplifies complex operations such as initiating scans, verifying file hashes, and viewing scan history, all through a clean, responsive, and local user interface.
-
----
 
 ## Key Features
 
