@@ -211,7 +211,7 @@ public class LoginController extends BaseController<LoginScreen> {
             log.error("User creation request failed {}", e.getMessage());
             SwingUtilities.invokeLater(() -> screen.showError(e.getMessage()));
             return false;
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.debug("An unexpected error occurred", e);
             log.error("An unexpected error occurred {}", e.getMessage());
             SwingUtilities.invokeLater(() -> screen.showError("An unexpected error occurred"));
