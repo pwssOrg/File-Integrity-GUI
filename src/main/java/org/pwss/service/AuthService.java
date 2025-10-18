@@ -53,8 +53,8 @@ public class AuthService {
      * @param password The password of the user attempting to log in.
      * @param licenseKey The license key associated with the user attempting to log in.
      * @return `true` if the login is successful, otherwise `false`.
+     * @throws LoginException          If the login fails due to invalid credentials, invalid license key, or server error.
      * @throws JsonProcessingException If an error occurs while serializing the login request to JSON.
-     * @throws LoginException          If the login attempt fails due to invalid credentials or server error.
      * @throws ExecutionException      If an error occurs during the asynchronous execution of the request.
      * @throws InterruptedException    If the thread executing the request is interrupted.
      */
@@ -78,6 +78,7 @@ public class AuthService {
      * @param password The password of the user to be created.
      * @param licenseKey The license key associated with the user to be created.
      * @return `true` if the user creation request is successful (HTTP status indicates success), otherwise `false`.
+     * @throws CreateUserException      If the user creation fails due to invalid license key, user already exists, or server error.
      * @throws JsonProcessingException If an error occurs while serializing the user creation request to JSON.
      * @throws ExecutionException      If an error occurs during the asynchronous execution of the request.
      * @throws InterruptedException    If the thread executing the request is interrupted.
