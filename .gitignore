@@ -3,13 +3,13 @@
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### IntelliJ IDEA ###
+#IntelliJ IDE
 .idea
 *.iws
 *.iml
 *.ipr
 
-### Eclipse ###
+# Eclipse
 .apt_generated
 .classpath
 .factorypath
@@ -18,20 +18,23 @@
 .springBeans
 .sts4-cache
 
-### Maven ###
+# Maven
 target/
 
-### VS Code ###
+# VS Code
 .vscode/
 
-### Mac OS ###
+# Mac OS
 .DS_Store
 
-### Metadata ###
+# Metadata 
 app_storage/
 
-### Options
+# App Config
 options/
 
-## Truststore 
+# Truststore
 truststore.jks
+
+# Logback 
+logback.xml
