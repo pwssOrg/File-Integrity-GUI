@@ -202,7 +202,7 @@ public class LoginController extends BaseController<LoginScreen> {
             }
         } catch (JsonProcessingException e) {
             log.debug("Error preparing user creation request", e);
-            log.error("Error preparing user creation request", e.getMessage());
+            log.error("Error preparing user creation request: {}", e.getMessage());
             SwingUtilities
                     .invokeLater(() -> screen.showError("Error preparing user creation request"));
             return false;
