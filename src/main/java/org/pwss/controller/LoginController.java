@@ -60,7 +60,6 @@ public class LoginController extends BaseController<LoginScreen> {
     public void onShow() {
         getScreen().getUsernameField().setText("");
         getScreen().getPasswordField().setText("");
-        log.debug("LICENSE_KEY value: {}", LICENSE_KEY);
         log.debug("Current LICENSE_KEY: {}", licenseKeySet ? "SET" : "NOT SET");
         log.debug("Create User Mode: {}", createUserMode);
         refreshView();
