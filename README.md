@@ -59,6 +59,12 @@ For any questions or support, please reach out to:
 
 ### Discussion Forum
 
-Please visit our discussion forum for project-related documentation and discussions: [Project Discussion Forum](https://github.com/orgs/pwssOrg/discussions/categories/file-integrity-gui)
+
+:arrow_down:
+
+ <a href="https://github.com/orgs/pwssOrg/discussions/categories/file-integrity-gui">
+    <img src="https://github.com/pwssOrg/File-Integrity-GUI/blob/develop/.github/assets/images/640x486.jpg"
+         alt="drawing" style="border: 5px solid #ddd; border-radius: 10px;" width="128" height="96"/>
+  </a>
 
 
