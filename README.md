@@ -46,7 +46,13 @@ The Swing-based frontend is a **desktop companion application** that allows user
 
 - **Java 21+**  
 - **Maven 4.0.0+**  
-- **Backend File-Integrity Scanner (Spring Application)** running locally
+- **Local Backend Server**: Ensure the local backend server is running to use the Integrity Hash GUI App.
+- **License**: We kindly ask you to purchase one from PWSS Org.
+
+## Security
+
+To use SSL with the local backend server, you will need a `truststore.jks` file that contains the public key for
+the local backend server.
 
 ## Contact Information
 

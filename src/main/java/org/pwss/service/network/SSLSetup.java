@@ -1,7 +1,5 @@
 package org.pwss.service.network;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.security.KeyStore;
 
@@ -32,7 +30,8 @@ final class SSLSetup {
      */
     final static SSLContext createSSLcontext() throws SSLsetupErrorException {
 
-        try (InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("truststore.jks")) {
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("truststore.jks")) {
 
             char[] truststorePassword = System.getenv("TRUSTSTORE_FIS_GUI").toCharArray();
             KeyStore truststore = KeyStore.getInstance("JKS");
