@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.pwss.model.table.ScanSummaryTableModel;
 import org.pwss.model.table.ScanTableModel;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
+import org.pwss.service.AppService;
 import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.service.NoteService;
 import org.pwss.service.ScanService;
@@ -63,7 +65,7 @@ import org.slf4j.LoggerFactory;
 import static org.pwss.app_settings.AppConfig.APP_THEME;
 import static org.pwss.app_settings.AppConfig.USE_SPLASH_SCREEN;
 
-public class HomeController extends BaseController<HomeScreen> {
+public final class HomeController extends BaseController<HomeScreen> {
 
     /**
      * Logger for logging messages within this controller.
@@ -89,6 +91,11 @@ public class HomeController extends BaseController<HomeScreen> {
      * Service for managing notes.
      */
     private final NoteService noteService;
+
+    /**
+     * Service for managing the application lifecycle.
+     */
+    private final AppService appService;
 
     /**
      * Factory for creating popup menus related to monitored directories.
@@ -151,6 +158,7 @@ public class HomeController extends BaseController<HomeScreen> {
         this.monitoredDirectoryService = new MonitoredDirectoryService();
         this.scanSummaryService = new ScanSummaryService();
         this.noteService = new NoteService();
+        this.appService = new AppService();
         this.monitoredDirectoryPopupFactory = new MonitoredDirectoryPopupFactory(
                 new MonitoredDirectoryPopupListenerImpl(this, monitoredDirectoryService, noteService));
         this.showSplashScreenSetting = USE_SPLASH_SCREEN;
@@ -367,7 +375,14 @@ public class HomeController extends BaseController<HomeScreen> {
             }
         });
         screen.getRestartButton().addActionListener(e -> {
-            // Restart the application
+            try {
+                appService.restartApp();
+            } catch (URISyntaxException uriSyntaxException) {
+               log.error("Could not convert the code source location to URI {}", uriSyntaxException.getMessage());
+
+               log.debug("Could not convert the code source location to URI {}", uriSyntaxException);
+
+            }
         });
     }
 
