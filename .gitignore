@@ -35,11 +35,11 @@ build/
 .DS_Store
 
 ### Metadata ###
-metadata.temp
-app_storage/metadata/metadata.temp
 app_storage/
 
 ### Options
-options/app.config
-app.config
 options/
+
+## Truststore 
+truststore.jks
+
