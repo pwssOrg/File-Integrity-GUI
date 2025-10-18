@@ -250,7 +250,7 @@ public class LoginController extends BaseController<LoginScreen> {
             SwingUtilities.invokeLater(() -> screen.showError("Error preparing login request"));
         } catch (LoginException e) {
             log.debug("Login request failed", e);
-            log.error("Login request failed",e.getMessage());
+            log.error("Login request failed: {}", e.getMessage());
             SwingUtilities.invokeLater(() -> screen.showError(e.getMessage()));
         } catch (Exception e) {
             log.debug("An unexpected error occurred", e);
