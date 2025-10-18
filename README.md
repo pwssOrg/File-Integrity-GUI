@@ -1,7 +1,7 @@
 # Integrity Hash (Java Swing Frontend)
 
 
-<img width="1917" height="540" alt="pic3" src="https://github.com/user-attachments/assets/1ace97d1-b78b-441a-8178-ef2e5c71ac80" />
+<img width="1917" height="540" alt="pic3" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/suggestion/.github/assets/images/pic3.png" />
 
 [![Build FIS-GUI](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/build.yml)
 [![SCA Scan - File Integrity GUI](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/snyk-scan.yml/badge.svg)](https://github.com/pwssOrg/File-Integrity-GUI/actions/workflows/snyk-scan.yml)
@@ -25,7 +25,7 @@ The Swing-based frontend is a **desktop companion application** that allows user
 - **Verify integrity of your files:**  
     Monitor file integrity status, view scan results and detect anomalies.
 
-  <img width="776" height="392" alt="pic2" src="https://github.com/user-attachments/assets/04224b86-da91-4076-ad2a-f6ff207075e0" />
+  <img width="776" height="392" alt="pic2" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/suggestion/.github/assets/images/pic2.png" />
 
 
 - **Detailed File View & History:**  
@@ -37,7 +37,7 @@ The Swing-based frontend is a **desktop companion application** that allows user
 - **Secure Local Operation:**  
     All operations and communications occur locally — **no external network services or cloud dependencies**.
 
-  <img width="386" height="193" alt="login2" src="https://github.com/user-attachments/assets/22b702b0-b2eb-4cf3-abba-ce8d1d3b0b6c" />
+  <img width="386" height="193" alt="login2" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/suggestion/.github/assets/images/login2.png" />
 
 
 - **Lightweight Swing UI:**  
