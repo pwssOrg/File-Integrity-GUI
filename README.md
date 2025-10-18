@@ -25,7 +25,7 @@ The Swing-based frontend is a **desktop companion application** that allows user
 - **Verify integrity of your files:**  
     Monitor file integrity status, view scan results and detect anomalies.
 
-  <img width="776" height="392" alt="pic2" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/suggestion/.github/assets/images/pic2.png" />
+  <img width="776" height="392" alt="Home Screen" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/suggestion/.github/assets/images/pic2.png" />
 
 
 - **Detailed File View & History:**  
@@ -37,7 +37,7 @@ The Swing-based frontend is a **desktop companion application** that allows user
 - **Secure Local Operation:**  
     All operations and communications occur locally — **no external network services or cloud dependencies**.
 
-  <img width="386" height="193" alt="login2" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/suggestion/.github/assets/images/login2.png" />
+  <img width="386" height="193" alt="Integrity Hash Login Screen" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/suggestion/.github/assets/images/login2.png" />
 
 
 - **Lightweight Swing UI:**  
@@ -64,7 +64,7 @@ For any questions or support, please reach out to:
 
  <a href="https://github.com/orgs/pwssOrg/discussions/categories/file-integrity-gui">
     <img src="https://github.com/pwssOrg/File-Integrity-GUI/blob/develop/.github/assets/images/640x486.jpg"
-         alt="drawing" style="border: 5px solid #ddd; border-radius: 10px;" width="128" height="96"/>
+         alt="purple-and-blue-light-digital-wallpaper"  width="128" height="96"/>
   </a>
 
 
