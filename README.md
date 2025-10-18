@@ -26,14 +26,20 @@ The Swing-based frontend is a **desktop companion application** that allows user
 - **Verify integrity of your files:**  
     Monitor file integrity status, view scan results and detect anomalies.
 
-  <img width="776" height="392" alt="Home Screen" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/develop/.github/assets/images/pic2.png" />
+ 
+  <img width="1586" height="793" alt="scan_in_progress" src="https://github.com/user-attachments/assets/e166badc-617f-40f0-924e-3f70c48e8db0" />
+
 
 
 - **Detailed File View & History:**  
     Inspect metadata, compare hash snapshots, and review scan timelines with timestamps.
+  <img width="1586" height="793" alt="fileSearch" src="https://github.com/user-attachments/assets/9dbdb3fd-a63e-4422-af2b-6bcb12b467ea" />
+
 
 - **Hash Algorithm Visualization:**  
     Supports displaying results for SHA-256, SHA-3 (256-bit), and BLAKE2b (512-bit).
+  <img width="1586" height="793" alt="scan_results" src="https://github.com/user-attachments/assets/51c1ff7c-94d1-4ffa-8cf0-9bf32d541893" />
+
 
 - **Secure Local Operation:**  
     All operations and communications occur locally — **no external network services or cloud dependencies**.
@@ -43,6 +49,7 @@ The Swing-based frontend is a **desktop companion application** that allows user
 
 - **Lightweight Swing UI:**  
     Built with pure Java Swing for performance and reliability — platform‑independent across Windows, macOS, and Linux.
+   <img width="776" height="392" alt="Home Screen" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/develop/.github/assets/images/pic2.png" />
 ## Requirements
 
 - **Java 21+**  
@@ -50,10 +57,18 @@ The Swing-based frontend is a **desktop companion application** that allows user
 - **Local Backend Server**: Ensure the local backend server is running to use the Integrity Hash GUI App.
 - **License**: We kindly ask you to purchase one from PWSS Org.
 
-## Security
+## Security 
 
 To use SSL with the local backend server, you will need a `truststore.jks` file that contains the public key for
 the local backend server.
+
+## Diff 
+<img width="378" height="151" alt="diff1" src="https://github.com/user-attachments/assets/19f75e5c-1c02-4162-9132-4fa08b3b120d" />
+
+Receive notifications about file diffs and observe the distinction and original hashes from all three hash algorithms. The PostgreSQL database secures your file integrity history and cannot be deleted unless your database account is compromised, which is great.  For organizations that like to backtrack file history or for authorities who have hacked someone's computer and require all the evidence and file changes to conduct a quick investigation, this feature is invaluable.
+
+<img width="1586" height="793" alt="diff_detected" src="https://github.com/user-attachments/assets/c9b8b76a-c6d4-40a7-b840-c3aaed752026" />
+
 
 ## Contact Information
 
