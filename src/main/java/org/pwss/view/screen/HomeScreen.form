@@ -65,7 +65,9 @@
                         <constraints>
                           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                         </constraints>
-                        <properties/>
+                        <properties>
+                          <toolTipText value="Double click a scan to see details"/>
+                        </properties>
                         <border type="none"/>
                         <children>
                           <component id="8d4c2" class="javax.swing.JTable" binding="recentScanTable">
@@ -108,6 +110,7 @@
                             <properties>
                               <enabled value="true"/>
                               <selectionMode value="0"/>
+                              <toolTipText value="Monitored directories list"/>
                             </properties>
                           </component>
                         </children>
@@ -169,7 +172,9 @@
                 <constraints>
                   <grid row="1" column="0" row-span="5" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                 </constraints>
-                <properties/>
+                <properties>
+                  <toolTipText value="Right click a monitored directory for different actions"/>
+                </properties>
                 <border type="none"/>
                 <children>
                   <component id="26c46" class="javax.swing.JTable" binding="monitoredDirectoriesTable">
