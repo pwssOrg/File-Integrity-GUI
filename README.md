@@ -79,9 +79,9 @@ Please be careful when quarantining files that are system files.  A quarantined 
 
 
 
-PWSS clients will have a trust store bundled with the Integrity Hash application and can easily set up the startup script for both the application (FE BE) and the Postgresql database underneath. SSL can be used in your local environment without any additional setup. No local wireshark sniffing for your credentials, in other words. :closed_lock_with_key:
+PWSS clients will have a trust store bundled with the Integrity Hash application and can easily use our install script (Windows and Linux) for both the application (FE BE) and the Postgresql database underneath. SSL can be used in your local environment without any additional setup. No local wireshark sniffing for your credentials, in other words. :closed_lock_with_key:
 
-Your machine will have the local server certificate, but what happens if an attacker identifies it after they got foothold of your environment?? They would need the password and then launch a noisy man in the middle tool. In many enterprise environments, it won't be feasible.  You have total control over your database password and username, and we won't be aware of it even if you use our setup script. The setup process for this local application will be straightforward for non-developers.   Understanding the value of this is important if you care about security.
+Your machine will have the local server certificate, but what happens if an attacker identifies it after they got foothold of your environment? They would need the password and then launch a noisy man in the middle tool. In many enterprise environments, it won't be feasible.  You have control over your database password and username, and we won't be aware of it even if you use our setup script. The setup process for this local application will be straightforward for non-developers.   Understanding the value of this is important if you care about security.
 
 ## Contact Information
 
