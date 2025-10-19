@@ -11,7 +11,7 @@ import org.pwss.exception.scan.GetMostRecentScansException;
 import org.pwss.exception.scan.GetScanDiffsException;
 import org.pwss.exception.scan.LiveFeedException;
 import org.pwss.exception.scan.ScanStatusException;
-import org.pwss.exception.scan.StartScanAllException;
+import org.pwss.exception.scan.StartFullScanException;
 import org.pwss.exception.scan.StartScanByIdException;
 import org.pwss.exception.scan.StopScanException;
 import org.pwss.model.entity.Diff;
@@ -40,22 +40,22 @@ public class ScanService {
      * Starts a scan by sending a request to the START_SCAN endpoint.
      *
      * @return `true` if the scan start request is successful, otherwise `false`.
-     * @throws StartScanAllException If the scan start attempt fails due to various reasons such as invalid credentials, no active monitored directories, scan already running, or server error.
+     * @throws StartFullScanException If the scan start attempt fails due to various reasons such as invalid credentials, no active monitored directories, scan already running, or server error.
      * @throws ExecutionException    If an error occurs during the asynchronous execution of the request.
      * @throws InterruptedException  If the thread executing the request is interrupted.
      */
-    public boolean startScan() throws StartScanAllException, ExecutionException, InterruptedException {
+    public boolean startScan() throws StartFullScanException, ExecutionException, InterruptedException {
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN, null);
 
         return switch (response.statusCode()) {
             case 200 -> true;
             case 401 ->
-                    throw new StartScanAllException("Start scan all failed: User not authorized to perform this action.");
+                    throw new StartFullScanException("Start scan all failed: User not authorized to perform this action.");
             case 412 ->
-                    throw new StartScanAllException("Start scan all failed: No active monitored directories found.");
-            case 425 -> throw new StartScanAllException("Start scan all failed: Scan is already running.");
+                    throw new StartFullScanException("Start scan all failed: No active monitored directories found.");
+            case 425 -> throw new StartFullScanException("Start scan all failed: Scan is already running.");
             case 500 ->
-                    throw new StartScanAllException("Start scan all failed: An error occurred on the server while attempting to start the scan.");
+                    throw new StartFullScanException("Start scan all failed: An error occurred on the server while attempting to start the scan.");
             default -> false;
         };
     }

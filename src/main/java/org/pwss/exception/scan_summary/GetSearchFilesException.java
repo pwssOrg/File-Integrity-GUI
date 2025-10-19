@@ -1,21 +1,34 @@
 package org.pwss.exception.scan_summary;
 
-public final class GetSearchFilesException extends Exception {
+import org.pwss.exception.PWSSbaseException;
 
-    private static final long serialVersionUID = 1L;
+/**
+ * Exception thrown when an error occurs during the search for files.
+ * This exception extends PWSSbaseException and is used to indicate specific
+ * issues encountered
+ * while searching for files, such as invalid input, failed queries, or other
+ * related problems.
+ */
+public final class GetSearchFilesException extends PWSSbaseException {
 
+    private static final long serialVersionUID = 2L;
+
+    /**
+     * The search text associated with the file search operation that caused this
+     * exception.
+     */
     private String fileSearchText;
 
     /**
-     * Constructs a `GetSearchFilesException` with no detail message or cause.
+     * Constructs a GetSearchFilesException with no detail message or cause.
      */
     public GetSearchFilesException() {
         super(formatMessage(null, null));
     }
 
     /**
-     * Constructs a `GetSearchFilesException` with the specified detail message.
-     * The message is appended with " \nPWSS-FE @Exception".
+     * Constructs a GetSearchFilesException with the specified detail message.
+     * The message is appended with "\nPWSS-FE @Exception".
      *
      * @param message The detail message to be included in the exception.
      */
@@ -24,7 +37,7 @@ public final class GetSearchFilesException extends Exception {
     }
 
     /**
-     * Constructs a `GetSearchFilesException` with the specified cause.
+     * Constructs a GetSearchFilesException with the specified cause.
      *
      * @param cause The cause of the exception.
      */
@@ -33,7 +46,8 @@ public final class GetSearchFilesException extends Exception {
     }
 
     /**
-     * Constructs a `GetSearchFilesException` with the specified detail message and cause.
+     * Constructs a GetSearchFilesException with the specified detail message and
+     * cause.
      *
      * @param message The detail message to be included in the exception.
      * @param cause   The cause of the exception.
@@ -43,8 +57,9 @@ public final class GetSearchFilesException extends Exception {
     }
 
     /**
-     * Constructs a `GetSearchFilesException` with the specified detail message
-     * and file search text string. The message is appended with " \nPWSS-FE @Exception".
+     * Constructs a GetSearchFilesException with the specified detail message
+     * and file search text string. The message is appended with
+     * "\nPWSS-FE @Exception".
      *
      * @param message        The detail message to be included in the exception.
      * @param fileSearchText The file search text to be included in the exception.
@@ -54,6 +69,15 @@ public final class GetSearchFilesException extends Exception {
         this.fileSearchText = fileSearchText;
     }
 
+    /**
+     * Formats the exception message by appending additional details if they exist.
+     *
+     * @param message        The detail message to be included in the exception.
+     * @param fileSearchText The file search text string to be included in the
+     *                       exception.
+     * @return A formatted string containing the exception message and any
+     *         additional details.
+     */
     private static String formatMessage(String message, String fileSearchText) {
         StringBuilder sb = new StringBuilder();
 
@@ -63,8 +87,6 @@ public final class GetSearchFilesException extends Exception {
         if (fileSearchText != null) {
             sb.append("\nFile Search Text: ").append(fileSearchText);
         }
-        sb.append("\nPWSS-FE @Exception");
-
         return sb.toString();
     }
 
@@ -73,8 +95,7 @@ public final class GetSearchFilesException extends Exception {
      *
      * @return The file search text string, or null if not set.
      */
-    public String getFileSearchText() {
+    public final String getFileSearchText() {
         return fileSearchText;
     }
-
 }

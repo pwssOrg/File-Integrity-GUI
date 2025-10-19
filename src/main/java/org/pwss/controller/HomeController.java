@@ -29,7 +29,7 @@ import org.pwss.exception.scan.GetMostRecentScansException;
 import org.pwss.exception.scan.GetScanDiffsException;
 import org.pwss.exception.scan.LiveFeedException;
 import org.pwss.exception.scan.ScanStatusException;
-import org.pwss.exception.scan.StartScanAllException;
+import org.pwss.exception.scan.StartFullScanException;
 import org.pwss.exception.scan.StartScanByIdException;
 import org.pwss.exception.scan.StopScanException;
 import org.pwss.exception.scan_summary.GetSearchFilesException;
@@ -535,7 +535,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                     screen.showError(StringConstants.SCAN_STARTED_FAILURE);
                 }
             });
-        } catch (ExecutionException | InterruptedException | StartScanAllException | StartScanByIdException
+        } catch (ExecutionException | InterruptedException | StartFullScanException | StartScanByIdException
                 | JsonProcessingException e) {
             log.debug(StringConstants.SCAN_START_ERROR, e);
             log.error(StringConstants.SCAN_START_ERROR + " {}", e.getMessage());

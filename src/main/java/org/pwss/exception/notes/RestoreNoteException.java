@@ -2,44 +2,32 @@ package org.pwss.exception.notes;
 
 import java.io.Serial;
 
-public final class RestoreNoteException extends Exception {
+import org.pwss.exception.PWSSbaseException;
 
-    @Serial
-    private static final long serialVersionUID = 1L;
+/**
+ * Exception thrown when an error occurs while restoring a note.
+ * This exception extends PWSSbaseException and is used to indicate specific
+ * issues encountered
+ * during the process of restoring a note, such as invalid input,
+ * failed commands, or other related problems.
+ */
+public final class RestoreNoteException extends PWSSbaseException {
 
     /**
-     * Constructs a `RestoreNoteException` with no detail message or cause.
+     * The serial version UID for object serialization. It ensures compatibility
+     * between different versions
+     * of this exception class when deserializing objects.
      */
-    public RestoreNoteException() {
-        super();
-    }
+    @Serial
+    private static final long serialVersionUID = 2L;
 
     /**
-     * Constructs a `RestoreNoteException` with the specified detail message.
-     * The message is appended with " \nPWSS @Exception".
+     * Constructs a RestoreNoteException with the specified detail message.
+     * The message is appended with "\nPWSS @Exception".
      *
      * @param message The detail message to be included in the exception.
      */
     public RestoreNoteException(String message) {
-        super(message + " \nPWSS-FE @Exception");
-    }
-
-    /**
-     * Constructs a `RestoreNoteException` with the specified cause.
-     *
-     * @param cause The cause of the exception.
-     */
-    public RestoreNoteException(Throwable cause) {
-        super(cause);
-    }
-
-    /**
-     * Constructs a `RestoreNoteException` with the specified detail message and cause.
-     *
-     * @param message The detail message to be included in the exception.
-     * @param cause   The cause of the exception.
-     */
-    public RestoreNoteException(String message, Throwable cause) {
-        super(message, cause);
+        super(message);
     }
 }
