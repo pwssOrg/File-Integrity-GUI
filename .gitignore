@@ -1,15 +1,15 @@
-target/
+
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### IntelliJ IDEA ###
+#IntelliJ IDE
 .idea
 *.iws
 *.iml
 *.ipr
 
-### Eclipse ###
+# Eclipse
 .apt_generated
 .classpath
 .factorypath
@@ -18,28 +18,23 @@ target/
 .springBeans
 .sts4-cache
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# Maven
+target/
 
-### VS Code ###
+# VS Code
 .vscode/
 
-### Mac OS ###
+# Mac OS
 .DS_Store
 
-### Metadata ###
-metadata.temp
-app_storage/metadata/metadata.temp
+# Metadata 
 app_storage/
 
-### Options
-options/app.config
-app.config
+# App Config
 options/
+
+# Truststore
+truststore.jks
+
+# Logback 
+logback.xml
