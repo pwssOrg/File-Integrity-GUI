@@ -1,19 +1,18 @@
-package org.pwss.exception.scan_summary;
+package org.pwss.exception.scan;
 
 import java.io.Serial;
 
 import org.pwss.exception.PWSSbaseException;
 
 /**
- * Exception thrown when an error occurs while retrieving a summary for a scan
- * operation.
+ * Exception thrown when an error occurs while starting a full scan.
  * This exception extends PWSSbaseException and is used to indicate specific
  * issues encountered
- * during the process of gathering or processing summary data related to scans,
- * such as invalid input,
- * failed database queries, or other related problems.
+ * during the process of initiating a full scan operation, such as invalid
+ * input,
+ * failed commands, or other related problems.
  */
-public final class GetSummaryForScanException extends PWSSbaseException {
+public final class StartFullScanException extends PWSSbaseException {
 
     /**
      * The serial version UID for object serialization. It ensures compatibility
@@ -24,12 +23,12 @@ public final class GetSummaryForScanException extends PWSSbaseException {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructs a GetSummaryForScanException with the specified detail message.
+     * Constructs a StartFullScanException with the specified detail message.
      * The message is appended with "\nPWSS @Exception".
      *
      * @param message The detail message to be included in the exception.
      */
-    public GetSummaryForScanException(String message) {
+    public StartFullScanException(String message) {
         super(message);
     }
 }

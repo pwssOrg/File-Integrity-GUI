@@ -1,40 +1,35 @@
 package org.pwss.exception.scan;
 
-public final class ScanStatusException extends Exception {
+import java.io.Serial;
+
+import org.pwss.exception.PWSSbaseException;
+
+/**
+ * Exception thrown when an error occurs while retrieving or processing scan
+ * status.
+ * This exception extends PWSSbaseException and is used to indicate specific
+ * issues encountered
+ * during the process of fetching or analyzing scan status information, such as
+ * invalid input,
+ * failed queries, or other related problems.
+ */
+public final class ScanStatusException extends PWSSbaseException {
 
     /**
-     * Constructs a `ScanStatusException` with no detail message or cause.
+     * The serial version UID for object serialization. It ensures compatibility
+     * between different versions
+     * of this exception class when deserializing objects.
      */
-    public ScanStatusException() {
-        super();
-    }
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Constructs a `ScanStatusException` with the specified detail message.
-     * The message is appended with " \nPWSS @Exception".
+     * Constructs a ScanStatusException with the specified detail message.
+     * The message is appended with "\nPWSS @Exception".
      *
      * @param message The detail message to be included in the exception.
      */
     public ScanStatusException(String message) {
-        super(message + " \nPWSS-FE @Exception");
-    }
-
-    /**
-     * Constructs a `ScanStatusException` with the specified cause.
-     *
-     * @param cause The cause of the exception.
-     */
-    public ScanStatusException(Throwable cause) {
-        super(cause);
-    }
-
-    /**
-     * Constructs a `ScanStatusException` with the specified detail message and cause.
-     *
-     * @param message The detail message to be included in the exception.
-     * @param cause   The cause of the exception.
-     */
-    public ScanStatusException(String message, Throwable cause) {
-        super(message, cause);
+        super(message);
     }
 }
