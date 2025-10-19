@@ -62,12 +62,20 @@ The Swing-based frontend is a **desktop companion application** that allows user
 To use SSL with the local backend server, you will need a `truststore.jks` file that contains the public key for
 the local backend server.
 
+
+
 ## Diff 
 <img width="378" height="151" alt="diff1" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/ignoreFile_Fix/.github/assets/images/diff1.png" />
 
 Receive notifications about file diffs and observe the distinction and original hashes from all three hash algorithms. The PostgreSQL database secures your file integrity history and cannot be deleted unless your database account is compromised, which is great.  For organizations that like to backtrack file history or for authorities who have hacked someone's computer and require all the evidence and file changes to conduct a quick investigation, this feature is invaluable.
 
 <img width="1586" height="793" alt="diff_detected" src="https://github.com/pwssOrg/File-Integrity-GUI/blob/ignoreFile_Fix/.github/assets/images/diff_detected.png" />
+
+### Shady file? :lock:
+
+When a file that shouldn't be changed suddenly appears in a diff and you don't want to take any chances - Quarantine the file instantly from the app!   Once the quarantine operation is finished, the file will no longer be able to cause any more damage.  Have you made a mistake and would like to retrieve your quarantined file? No worries, just unquench the file and it will end up in the same location as before in the same state. 
+
+Please be careful when quarantining files that are system files.  A quarantined file won't work if it's quarantined, so my best suggestion to you is to avoid the Windows folder. Anti-virus products and Windows Defender (if you're using Integrity Hash on Windows) will handle that.  Integrity hash is a product that safeguards the files that are important to you or your organization. No more undetectable file injections or undetectable SCI FI quantum attack. Even if you have full access to a computer's kernel. Try to screw up the OS so much that all three hash algorithms become compromised. There are only a handful of individuals in the world who can accomplish that with just one algorithm (like SHA-256).  In order to prevent a diff result, it is necessary for all three hash algorithms to match.
 
 
 ## Contact Information
