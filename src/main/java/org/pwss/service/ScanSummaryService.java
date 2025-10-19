@@ -6,7 +6,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.pwss.exception.scan_summary.GetMostRecentSummaryException;
-import org.pwss.exception.scan_summary.GetSearchFilesException;
+import org.pwss.exception.scan_summary.FileSearchException;
 import org.pwss.exception.scan_summary.GetSummaryForFileException;
 import org.pwss.exception.scan_summary.GetSummaryForScanException;
 import org.pwss.model.entity.File;
@@ -85,24 +85,24 @@ public class ScanSummaryService {
      * @param queryString The search query string used to find files.
      * @param ascending   A boolean indicating whether the search results should be sorted in ascending order.
      * @return A list of File objects that match the search criteria if the request is successful.
-     * @throws GetSearchFilesException If the attempt to search for files fails due to various reasons such as invalid credentials, invalid search parameters, or server error.
+     * @throws FileSearchException If the attempt to search for files fails due to various reasons such as invalid credentials, invalid search parameters, or server error.
      * @throws ExecutionException      If an error occurs during the asynchronous execution of the request.
      * @throws InterruptedException    If the thread executing the request is interrupted.
      * @throws JsonProcessingException If an error occurs while processing JSON data.
      */
-    public List<File> searchFiles(String queryString, boolean ascending) throws GetSearchFilesException, ExecutionException, InterruptedException, JsonProcessingException {
+    public List<File> searchFiles(String queryString, boolean ascending) throws FileSearchException, ExecutionException, InterruptedException, JsonProcessingException {
         String body = objectMapper.writeValueAsString(new GetFilesSearchRequest(queryString, 1000, "basename", ascending));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.SUMMARY_FILE_SEARCH, body);
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), File[].class));
             case 401 ->
-                    throw new GetSearchFilesException("Search files failed: User not authorized to perform this action.");
+                    throw new FileSearchException("Search files failed: User not authorized to perform this action.");
             case 404 -> List.of();
             case 422 ->
-                    throw new GetSearchFilesException("Search files failed: The provided search parameters are invalid.");
+                    throw new FileSearchException("Search files failed: The provided search parameters are invalid.");
             case 500 ->
-                    throw new GetSearchFilesException("Search files failed: An error occurred on the server while attempting to search for files.");
+                    throw new FileSearchException("Search files failed: An error occurred on the server while attempting to search for files.");
             default -> null;
         };
     }

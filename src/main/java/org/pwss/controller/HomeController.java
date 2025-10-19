@@ -32,7 +32,7 @@ import org.pwss.exception.scan.ScanStatusException;
 import org.pwss.exception.scan.StartFullScanException;
 import org.pwss.exception.scan.StartScanByIdException;
 import org.pwss.exception.scan.StopScanException;
-import org.pwss.exception.scan_summary.GetSearchFilesException;
+import org.pwss.exception.scan_summary.FileSearchException;
 import org.pwss.exception.scan_summary.GetSummaryForFileException;
 import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.File;
@@ -725,7 +725,7 @@ public final class HomeController extends BaseController<HomeScreen> {
             String searchQuery = searchContainingInput ? "%" + query + "%" : query;
             fileResults = scanSummaryService.searchFiles(searchQuery, !descendingOrder);
             refreshView();
-        } catch (GetSearchFilesException | ExecutionException | InterruptedException | JsonProcessingException e) {
+        } catch (FileSearchException | ExecutionException | InterruptedException | JsonProcessingException e) {
             log.error("Error when searching for files: {}", e.getMessage());
             log.debug("Debug File Search Exception", e);
             SwingUtilities.invokeLater(() -> screen.showError(e.getMessage()));

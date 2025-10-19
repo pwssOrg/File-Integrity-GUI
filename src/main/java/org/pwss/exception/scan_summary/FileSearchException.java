@@ -9,7 +9,7 @@ import org.pwss.exception.PWSSbaseException;
  * while searching for files, such as invalid input, failed queries, or other
  * related problems.
  */
-public final class GetSearchFilesException extends PWSSbaseException {
+public final class FileSearchException extends PWSSbaseException {
 
     private static final long serialVersionUID = 2L;
 
@@ -20,51 +20,51 @@ public final class GetSearchFilesException extends PWSSbaseException {
     private String fileSearchText;
 
     /**
-     * Constructs a GetSearchFilesException with no detail message or cause.
+     * Constructs a FileSearchException with no detail message or cause.
      */
-    public GetSearchFilesException() {
+    public FileSearchException() {
         super(formatMessage(null, null));
     }
 
     /**
-     * Constructs a GetSearchFilesException with the specified detail message.
+     * Constructs a FileSearchException with the specified detail message.
      * The message is appended with "\nPWSS-FE @Exception".
      *
      * @param message The detail message to be included in the exception.
      */
-    public GetSearchFilesException(String message) {
+    public FileSearchException(String message) {
         super(formatMessage(message, null));
     }
 
     /**
-     * Constructs a GetSearchFilesException with the specified cause.
+     * Constructs a FileSearchException with the specified cause.
      *
      * @param cause The cause of the exception.
      */
-    public GetSearchFilesException(Throwable cause) {
+    public FileSearchException(Throwable cause) {
         super(cause);
     }
 
     /**
-     * Constructs a GetSearchFilesException with the specified detail message and
+     * Constructs a FileSearchException with the specified detail message and
      * cause.
      *
      * @param message The detail message to be included in the exception.
      * @param cause   The cause of the exception.
      */
-    public GetSearchFilesException(String message, Throwable cause) {
+    public FileSearchException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * Constructs a GetSearchFilesException with the specified detail message
+     * Constructs a FileSearchException with the specified detail message
      * and file search text string. The message is appended with
      * "\nPWSS-FE @Exception".
      *
      * @param message        The detail message to be included in the exception.
      * @param fileSearchText The file search text to be included in the exception.
      */
-    public GetSearchFilesException(String message, String fileSearchText) {
+    public FileSearchException(String message, String fileSearchText) {
         super(formatMessage(message, fileSearchText));
         this.fileSearchText = fileSearchText;
     }
