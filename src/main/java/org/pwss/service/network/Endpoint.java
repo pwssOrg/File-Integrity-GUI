@@ -104,7 +104,17 @@ public enum Endpoint {
     /**
      * Endpoint for restoring a note.
      */
-    NOTE_RESTORE(HTTP_Method.POST, A.BASE_URL + A.NOTE + "restore");
+    NOTE_RESTORE(HTTP_Method.POST, A.BASE_URL + A.NOTE + "restore"),
+
+    // File endpoints
+    /**
+     * Endpoint for unquarantining a file.
+     */
+    UNQUARANTINE_FILE(HTTP_Method.POST, A.BASE_URL + A.FILE + "unquarantine"),
+    /**
+     * Endpoint for quarantining a file.
+     */
+    QUARANTINE_FILE(HTTP_Method.POST, A.BASE_URL + A.FILE + "quarantine");
 
 
     /**
@@ -174,4 +184,8 @@ final class A {
      * Path segment for note-related endpoints.
      */
     static final String NOTE = "note/";
+    /**
+     * Path segment for file-related endpoints.
+     */
+    static final String FILE = "file/";
 }
