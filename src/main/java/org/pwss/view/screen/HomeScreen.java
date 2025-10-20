@@ -28,41 +28,187 @@ import javax.swing.text.StyleContext;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.utils.AppTheme;
 
+
+/**
+ * The HomeScreen class represents the main screen of the application.
+ * It extends BaseScreen and contains various UI components that make up
+ * the home screen's user interface. These components include panels,
+ * buttons, tables, progress bars, text areas, and more.
+ */
 public class HomeScreen extends BaseScreen {
+    /**
+     * The root panel containing all other UI components.
+     */
     private JPanel rootPanel;
+
+    /**
+     * A tabbed pane that allows switching between different tabs in the home screen.
+     */
     private JTabbedPane tabbedPane;
+
+    /**
+     * Panel representing the home tab of the application.
+     */
     private JPanel homeTab;
+
+    /**
+     * Panel representing the scan tab of the application.
+     */
     private JPanel scanTab;
+
+    /**
+     * Panel representing the recent diffs tab of the application.
+     */
     private JPanel recentDiffsTab;
+
+    /**
+     * Button to trigger a new scan operation.
+     */
     private JButton scanButton;
+
+    /**
+     * Table displaying differences found during scans.
+     */
     private JTable diffTable;
+
+    /**
+     * Button for adding a new directory to be monitored.
+     */
     private JButton newDirectoryButton;
+
+    /**
+     * Table showing results of recent scans.
+     */
     private JTable recentScanTable;
+
+    /**
+     * Table listing all currently monitored directories.
+     */
     private JTable monitoredDirectoriesTable;
+
+    /**
+     * Progress bar for displaying scan progress.
+     */
     private JProgressBar scanProgress;
+
+    /**
+     * Container panel that holds the scan progress bar and related elements.
+     */
     private JPanel scanProgressContainer;
+
+    /**
+     * Label displaying text about the current status of the scan progress.
+     */
     private JLabel scanProgressLabel;
+
+    /**
+     * Text pane for displaying live feed information.
+     */
     private JTextPane liveFeedText;
+
+    /**
+     * Title label for the live feed section.
+     */
     private JLabel liveFeedTitle;
+
+    /**
+     * Scroll pane container for the live feed text pane.
+     */
     private JScrollPane liveFeedContainer;
+
+    /**
+     * Label displaying the count of diffs in the live feed.
+     */
     private JLabel liveFeedDiffCount;
+
+    /**
+     * Panel representing the settings tab of the application.
+     */
     private JPanel settingsTab;
+
+    /**
+     * Text pane for displaying details about differences (diffs).
+     */
     private JTextPane diffDetails;
+
+    /**
+     * Button to clear the live feed text.
+     */
     private JButton clearFeedButton;
+
+    /**
+     * Panel representing the files tab of the application.
+     */
     private JPanel filesTab;
+
+    /**
+     * Table for displaying files.
+     */
     private JTable filesTable;
+
+    /**
+     * Search field for searching through files.
+     */
     private JTextField fileSearchField;
+
+    /**
+     * Checkbox to include containing directories in search results.
+     */
     private JCheckBox searchContainingCheckBox;
+
+    /**
+     * Checkbox to sort search results in descending order.
+     */
     private JCheckBox descendingCheckBox;
+
+    /**
+     * Table for displaying a summary of file scans.
+     */
     private JTable fileSummaryTable;
+
+    /**
+     * Text pane for displaying details about scan summaries.
+     */
     private JTextPane scanSummaryDetails;
+
+    /**
+     * Label to display the count of search results.
+     */
     private JLabel searchResultCount;
+
+    /**
+     * Combo box for selecting application themes.
+     */
     private JComboBox<AppTheme> themePicker;
+
+    /**
+     * Button to restart an operation or the application.
+     */
     private JButton restartButton;
+
+    /**
+     * List displaying monitored directories.
+     */
     private JList<MonitoredDirectory> monitoredDirectoryList;
+
+    /**
+     * Panel for displaying notifications.
+     */
     private JPanel notificationPanel;
+
+    /**
+     * Text area for displaying detailed notification messages.
+     */
     private JTextArea notificationTextArea;
+
+    /**
+     * Table for displaying quarantined items.
+     */
     private JTable quarantineTable;
+
+    /**
+     * Checkbox to show or hide the splash screen on application startup.
+     */
     private JCheckBox showSplashScreenCheckBox;
 
     @Override
@@ -75,108 +221,247 @@ public class HomeScreen extends BaseScreen {
         return rootPanel;
     }
 
+    /**
+     * Returns the button used to add a new directory.
+     *
+     * @return JButton representing the "Add New Directory" button.
+     */
     public JButton getAddNewDirectoryButton() {
         return newDirectoryButton;
     }
 
+    /**
+     * Returns the scan button.
+     *
+     * @return JButton representing the "Scan" button.
+     */
     public JButton getScanButton() {
         return scanButton;
     }
 
+    /**
+     * Returns the recent scans table.
+     *
+     * @return JTable displaying results of recent scans.
+     */
     public JTable getRecentScanTable() {
         return recentScanTable;
     }
 
+    /**
+     * Returns the monitored directories table.
+     *
+     * @return JTable listing all currently monitored directories.
+     */
     public JTable getMonitoredDirectoriesTable() {
         return monitoredDirectoriesTable;
     }
 
+    /**
+     * Returns the diffs table.
+     *
+     * @return JTable displaying differences found during scans.
+     */
     public JTable getDiffTable() {
         return diffTable;
     }
 
+    /**
+     * Returns the container panel for scan progress elements.
+     *
+     * @return JPanel containing the scan progress bar and label.
+     */
     public JPanel getScanProgressContainer() {
         return scanProgressContainer;
     }
 
+    /**
+     * Returns the scroll pane container for live feed text.
+     *
+     * @return JScrollPane that contains the live feed JTextPane.
+     */
     public JScrollPane getLiveFeedContainer() {
         return liveFeedContainer;
     }
 
+    /**
+     * Returns the live feed text pane.
+     *
+     * @return JTextPane displaying live feed information.
+     */
     public JTextPane getLiveFeedText() {
         return liveFeedText;
     }
 
+    /**
+     * Returns the title label for the live feed section.
+     *
+     * @return JLabel representing the live feed title.
+     */
     public JLabel getLiveFeedTitle() {
         return liveFeedTitle;
     }
 
+    /**
+     * Returns the label displaying the count of diffs in the live feed.
+     *
+     * @return JLabel showing the live feed diff count.
+     */
     public JLabel getLiveFeedDiffCount() {
         return liveFeedDiffCount;
     }
 
+    /**
+     * Returns the tabbed pane component.
+     *
+     * @return JTabbedPane allowing switching between different tabs.
+     */
     public JTabbedPane getTabbedPane() {
         return tabbedPane;
     }
 
+    /**
+     * Returns the text pane for displaying diff details.
+     *
+     * @return JTextPane showing details about differences (diffs).
+     */
     public JTextPane getDiffDetails() {
         return diffDetails;
     }
 
+    /**
+     * Returns the button used to clear the live feed.
+     *
+     * @return JButton representing the "Clear Feed" button.
+     */
     public JButton getClearFeedButton() {
         return clearFeedButton;
     }
 
+    /**
+     * Returns the file search field.
+     *
+     * @return JTextField for searching through files.
+     */
     public JTextField getFileSearchField() {
         return fileSearchField;
     }
 
+    /**
+     * Returns the table displaying a summary of file scans.
+     *
+     * @return JTable showing file scan summaries.
+     */
     public JTable getFileScanSummaryTable() {
         return fileSummaryTable;
     }
 
+    /**
+     * Returns the checkbox for sorting search results in descending order.
+     *
+     * @return JCheckBox representing the "Descending" option.
+     */
     public JCheckBox getDescendingCheckBox() {
         return descendingCheckBox;
     }
 
+    /**
+     * Returns the table displaying files.
+     *
+     * @return JTable listing files.
+     */
     public JTable getFilesTable() {
         return filesTable;
     }
 
+    /**
+     * Returns the checkbox for including containing directories in search results.
+     *
+     * @return JCheckBox representing the "Search Containing" option.
+     */
     public JCheckBox getSearchContainingCheckBox() {
         return searchContainingCheckBox;
     }
 
+    /**
+     * Returns the text pane for displaying scan summary details.
+     *
+     * @return JTextPane showing details about scan summaries.
+     */
     public JTextPane getScanSummaryDetails() {
         return scanSummaryDetails;
     }
 
+    /**
+     * Returns the label displaying the count of search results.
+     *
+     * @return JLabel representing the search result count.
+     */
     public JLabel getSearchResultCount() {
         return searchResultCount;
     }
 
+    /**
+     * Returns the combo box for selecting application themes.
+     *
+     * @return JComboBox containing AppTheme options.
+     */
     public JComboBox<AppTheme> getThemePicker() {
         return themePicker;
     }
 
+    /**
+     * Returns the checkbox to show or hide the splash screen on startup.
+     *
+     * @return JCheckBox representing the "Show Splash Screen" option.
+     */
     public JCheckBox getShowSplashScreenCheckBox() {
         return showSplashScreenCheckBox;
     }
 
+    /**
+     * Returns the button used to restart an operation or the application.
+     *
+     * @return JButton representing the "Restart" button.
+     */
     public JButton getRestartButton() {
         return restartButton;
     }
 
+    /**
+     * Returns the list displaying monitored directories.
+     *
+     * @return JList containing MonitoredDirectory objects.
+     */
     public JList<MonitoredDirectory> getMonitoredDirectoryList() {
         return monitoredDirectoryList;
     }
 
+    /**
+     * Returns the panel for displaying notifications.
+     *
+     * @return JPanel showing notification messages.
+     */
+    public JPanel getNotificationPanel() {
+        return notificationPanel;
+    }
+
+    /**
+     * Returns the text area for displaying detailed notification messages.
+     *
+     * @return JTextArea containing notification details.
+     */
     public JTextArea getNotificationTextArea() {
         return notificationTextArea;
     }
 
-    public JPanel getNotificationPanel() {
-        return notificationPanel;
+    /**
+     * Returns the table displaying quarantined items.
+     *
+     * @return JTable listing quarantined items.
+     */
+    public JTable getQuarantineTable() {
+        return quarantineTable;
     }
 
     {
