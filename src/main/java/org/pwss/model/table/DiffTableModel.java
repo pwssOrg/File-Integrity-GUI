@@ -12,7 +12,7 @@ import org.pwss.model.entity.Diff;
  */
 public class DiffTableModel extends AbstractTableModel {
     private final List<Diff> data;
-    private final String[] columns = {"\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected"};
+    private final String[] columns = {"\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected", "Quarantine"};
 
     /**
      * Constructs a new DiffTableModel with the specified list of diffs.
@@ -53,8 +53,14 @@ public class DiffTableModel extends AbstractTableModel {
             case 0 -> diff.baseline().file().path();
             case 1 -> diff.integrityFail().file().mtime();
             case 2 -> diff.time().created();
+            case 3 -> "⚠️";
             default -> null;
         };
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 3;
     }
 
     /**

@@ -5,6 +5,8 @@ import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.ScanSummary;
 import org.pwss.model.table.DiffTableModel;
 import org.pwss.model.table.SimpleSummaryTableModel;
+import org.pwss.model.table.cell.ButtonEditor;
+import org.pwss.model.table.cell.ButtonRenderer;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.service.ScanService;
@@ -109,6 +111,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
                 screen.getDiffDetails().setText("");
             }
         });
+
         // Back button listener
         screen.getBackButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.HOME));
     }
@@ -122,5 +125,8 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
         // Populate diffs table
         DiffTableModel diffTableModel = new DiffTableModel(diffs);
         screen.getDiffTable().setModel(diffTableModel);
+
+        screen.getDiffTable().getColumn("Quarantine").setCellRenderer(new ButtonRenderer());
+        screen.getDiffTable().getColumn("Quarantine").setCellEditor(new ButtonEditor("⚠️"));
     }
 }
