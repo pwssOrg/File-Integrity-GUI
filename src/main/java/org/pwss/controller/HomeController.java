@@ -47,6 +47,7 @@ import org.pwss.model.table.ScanSummaryTableModel;
 import org.pwss.model.table.ScanTableModel;
 import org.pwss.model.table.cell.ButtonEditor;
 import org.pwss.model.table.cell.ButtonRenderer;
+import org.pwss.model.table.cell.CellButtonListener;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.service.AppService;
