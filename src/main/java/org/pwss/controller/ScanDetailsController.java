@@ -1,28 +1,38 @@
 package org.pwss.controller;
 
 import java.util.List;
+import java.util.Optional;
+import javax.swing.JOptionPane;
 import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.ScanSummary;
 import org.pwss.model.table.DiffTableModel;
 import org.pwss.model.table.SimpleSummaryTableModel;
 import org.pwss.model.table.cell.ButtonEditor;
 import org.pwss.model.table.cell.ButtonRenderer;
+import org.pwss.model.table.cell.CellButtonListener;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
+import org.pwss.service.FileService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
 import org.pwss.utils.ReportUtils;
+import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.ScanDetailsScreen;
 
 /**
  * Controller class that handles operations related to the scan details screen.
  */
-public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
+public class ScanDetailsController extends BaseController<ScanDetailsScreen> implements CellButtonListener {
 
     /**
      * Service responsible for managing scan summaries.
      */
     private final ScanSummaryService scanSummaryService;
+
+    /**
+     * Service for quarantine file operations.
+     */
+    private final FileService fileService;
     /**
      * Service responsible for performing and managing scans.
      */
@@ -47,6 +57,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
     public ScanDetailsController(ScanDetailsScreen screen) {
         super(screen);
         this.scanSummaryService = new ScanSummaryService();
+        this.fileService = new FileService();
         this.scanService = new ScanService();
         this.scanSummaries = List.of();
         this.diffs = List.of();
@@ -127,6 +138,33 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
         screen.getDiffTable().setModel(diffTableModel);
 
         screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
-        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("🗿"));
+        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("🗿", this));
+    }
+
+    @Override
+    public void onCellButtonClicked(int row, int column) {
+        DiffTableModel model = (DiffTableModel) screen.getDiffTable().getModel();
+        Optional<Diff> diff = model.getDiffAt(row);
+
+        diff.ifPresent(d -> {
+            int choice = screen.showOptionDialog(
+                    JOptionPane.WARNING_MESSAGE,
+                    "OS SPECIFIC WARNING MESSAGE HERE",
+                    new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
+                    StringConstants.GENERIC_NO
+            );
+            if (choice == 0) {
+                try {
+                    boolean success = fileService.quarantineFile(d.integrityFail().file().id());
+                    if (success) {
+                        screen.showInfo("File quarantined successfully.");
+                    } else {
+                        screen.showError("Failed to quarantine the file.");
+                    }
+                } catch (Exception e) {
+                    screen.showError(e.getMessage());
+                }
+            }
+        });
     }
 }

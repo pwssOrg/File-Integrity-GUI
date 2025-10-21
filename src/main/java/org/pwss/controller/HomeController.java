@@ -47,9 +47,11 @@ import org.pwss.model.table.ScanSummaryTableModel;
 import org.pwss.model.table.ScanTableModel;
 import org.pwss.model.table.cell.ButtonEditor;
 import org.pwss.model.table.cell.ButtonRenderer;
+import org.pwss.model.table.cell.CellButtonListener;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.service.AppService;
+import org.pwss.service.FileService;
 import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.service.NoteService;
 import org.pwss.service.ScanService;
@@ -67,6 +69,7 @@ import org.slf4j.LoggerFactory;
 import static org.pwss.app_settings.AppConfig.APP_THEME;
 import static org.pwss.app_settings.AppConfig.USE_SPLASH_SCREEN;
 
+// TODO: NEEDS REFACTORING - VERY LARGE CLASS
 public final class HomeController extends BaseController<HomeScreen> {
 
     /**
@@ -83,6 +86,11 @@ public final class HomeController extends BaseController<HomeScreen> {
      * Service to manage monitored directories.
      */
     private final MonitoredDirectoryService monitoredDirectoryService;
+
+    /**
+     * Service for file operations such as quarantine.
+     */
+    private final FileService fileService;
 
     /**
      * Service for retrieving and managing scan summaries.
@@ -158,6 +166,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         super(view);
         this.scanService = new ScanService();
         this.monitoredDirectoryService = new MonitoredDirectoryService();
+        this.fileService = new FileService();
         this.scanSummaryService = new ScanSummaryService();
         this.noteService = new NoteService();
         this.appService = new AppService();
@@ -458,7 +467,31 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getDiffTable().setModel(diffTableModel);
         screen.getDiffTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
-        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("🗿"));
+        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("🗿", (row, column) -> {
+            DiffTableModel model = (DiffTableModel) screen.getDiffTable().getModel();
+            Optional<Diff> diff = model.getDiffAt(row);
+
+            diff.ifPresent(d -> {
+                int choice = screen.showOptionDialog(
+                        JOptionPane.WARNING_MESSAGE,
+                        "OS SPECIFIC WARNING MESSAGE HERE",
+                        new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
+                        StringConstants.GENERIC_NO
+                );
+                if (choice == 0) {
+                    try {
+                        boolean success = fileService.quarantineFile(d.integrityFail().file().id());
+                        if (success) {
+                            screen.showInfo("File quarantined successfully.");
+                        } else {
+                            screen.showError("Failed to quarantine the file.");
+                        }
+                    } catch (Exception e) {
+                        screen.showError(e.getMessage());
+                    }
+                }
+            });
+        }));
 
         FileTableModel fileTableModel = new FileTableModel(fileResults != null ? fileResults : List.of());
         screen.getFilesTable().setModel(fileTableModel);
