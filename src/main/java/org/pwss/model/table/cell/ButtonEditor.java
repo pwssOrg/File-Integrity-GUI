@@ -4,26 +4,37 @@ import java.awt.Component;
 import java.awt.Insets;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
-import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
-import org.pwss.model.table.DiffTableModel;
-import org.pwss.utils.OSUtils;
+
 
 /**
  * A custom table cell editor that displays a JButton in a JTable cell.
  */
 public class ButtonEditor extends AbstractCellEditor implements TableCellEditor {
+    /**
+     * The button component used as the editor in the table cell.
+     */
     private final JButton button;
+    /**
+     * The JTable instance that is being edited.
+     */
     private JTable table;
+    /**
+     * A flag indicating whether the button was clicked.
+     */
     private boolean clicked;
+    /**
+     * The listener that handles button click events in the table cell.
+     */
+    private CellButtonListener listener;
 
     /**
      * Constructs a ButtonEditor with the specified button text.
      *
      * @param text the text to display on the button
      */
-    public ButtonEditor(String text) {
+    public ButtonEditor(String text, CellButtonListener listener) {
         button = new JButton(text);
         button.setOpaque(true);
         button.setFocusable(false);
@@ -31,6 +42,8 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
         button.setBorderPainted(false);
         button.setContentAreaFilled(true);
         button.setMargin(new Insets(0, 0, 0, 0));
+
+        this.listener = listener;
 
         // When clicked, stop editing (which triggers getCellEditorValue)
         button.addActionListener(e -> fireEditingStopped());
@@ -46,18 +59,14 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
 
     @Override
     public Object getCellEditorValue() {
-        if (clicked && table.getModel() instanceof DiffTableModel model) {
-            int modelRow = table.convertRowIndexToModel(table.getEditingRow());
-            model.getDiffAt(modelRow).ifPresent(diff ->
-                    JOptionPane.showMessageDialog(
-                            button,
-                            OSUtils.describeOS(),
-                            OSUtils.getOSName(), ///  FOR TESTING not supposed to be here :p
-                            JOptionPane.INFORMATION_MESSAGE
-                    )
-            );
+        if (clicked) {
+            clicked = false;
+            if (listener != null && table != null) {
+                int row = table.getEditingRow();
+                int column = table.getEditingColumn();
+                listener.onCellButtonClicked(row, column);
+            }
         }
-        clicked = false;
         return null;
     }
 
