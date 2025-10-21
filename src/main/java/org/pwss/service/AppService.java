@@ -58,11 +58,6 @@ public final class AppService {
         try {
             builder.start();
 
-            // Register a shutdown hook to kill the current JVM after starting the new one
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                log.info("Restarting application...");
-                System.exit(0); // This will terminate the current JVM instance
-            }));
 
         } catch (Exception ex) {
 
