@@ -126,7 +126,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> {
         DiffTableModel diffTableModel = new DiffTableModel(diffs);
         screen.getDiffTable().setModel(diffTableModel);
 
-        screen.getDiffTable().getColumn("Quarantine").setCellRenderer(new ButtonRenderer());
-        screen.getDiffTable().getColumn("Quarantine").setCellEditor(new ButtonEditor("⚠️"));
+        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
+        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("🗿"));
     }
 }

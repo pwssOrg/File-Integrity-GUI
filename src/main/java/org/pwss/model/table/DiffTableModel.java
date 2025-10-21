@@ -12,7 +12,7 @@ import org.pwss.model.entity.Diff;
  */
 public class DiffTableModel extends AbstractTableModel {
     private final List<Diff> data;
-    private final String[] columns = {"\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected", "👮 Quarantine"};
+    public static final String[] columns = {"\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected", "👮 Quarantine"};
 
     /**
      * Constructs a new DiffTableModel with the specified list of diffs.
