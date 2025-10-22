@@ -4,7 +4,7 @@ $portInUse = netstat -ano | Select-String ":15400"
 
 if ($null -eq $portInUse) {
     Write-Host "Nothing is running on port 15400. Starting the process..."
-    java -jar "..\File-Integrity-Scanner\File-Integrity-Scanner\target\File-Integrity-Scanner-1.5.jar" & 
+    java -jar "..\File-Integrity-Scanner\File-Integrity-Scanner\target\File-Integrity-Scanner-1.5.1.jar" &
     Write-Host "File-Integrity-Scanner started."
     java -jar .\target\file_integrity_gui-1.0-jar-with-dependencies.jar
 } else {
