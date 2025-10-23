@@ -69,7 +69,7 @@ public class FileService {
         }
 
         return switch (response.statusCode()) {
-            case 200 -> parsed.map(QuarantineResponse::succesful).orElse(false);
+            case 200 -> parsed.map(QuarantineResponse::successful).orElse(false);
             case 401 -> throw new QuarantineFileException("Unauthorized: Invalid credentials for file quarantine");
             case 422 -> throw new QuarantineFileException("File cannot be quarantined: " + fileId);
             case 500 -> throw new QuarantineFileException("Server error during file quarantine");
