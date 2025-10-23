@@ -10,7 +10,7 @@ import org.pwss.model.entity.Diff;
  * The DiffTableModel is a model for a table that displays differences (diffs) between file states.
  * It extends AbstractTableModel and provides data to the JTable component in a Swing application.
  */
-public class DiffTableModel extends AbstractTableModel {
+public class QuarantineTableModel extends AbstractTableModel {
     private final List<Diff> data;
     public static final String[] columns = {"\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected", "👮 Quarantine"};
 
@@ -19,7 +19,7 @@ public class DiffTableModel extends AbstractTableModel {
      *
      * @param data the list of Diff objects to be displayed in the table
      */
-    public DiffTableModel(List<Diff> data) {
+    public QuarantineTableModel(List<Diff> data) {
         this.data = data;
     }
 
