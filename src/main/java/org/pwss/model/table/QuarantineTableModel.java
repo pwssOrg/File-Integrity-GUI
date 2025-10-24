@@ -1,25 +1,22 @@
 package org.pwss.model.table;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.table.AbstractTableModel;
-import org.pwss.model.entity.Diff;
+import org.pwss.model.entity.QuarantineMetadata;
 
 /**
- * The DiffTableModel is a model for a table that displays differences (diffs) between file states.
- * It extends AbstractTableModel and provides data to the JTable component in a Swing application.
+ * Table model for displaying quarantine metadata in a table.
  */
 public class QuarantineTableModel extends AbstractTableModel {
-    private final List<Diff> data;
-    public static final String[] columns = {"\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected", "👮 Quarantine"};
+    private final List<QuarantineMetadata> data;
+    public static final String[] columns = {"File id", "File path",};
 
     /**
-     * Constructs a new DiffTableModel with the specified list of diffs.
-     *
-     * @param data the list of Diff objects to be displayed in the table
+     * Constructs a QuarantineTableModel with the specified data.
+     * @param data the list of QuarantineMetadata to be displayed in the table.
      */
-    public QuarantineTableModel(List<Diff> data) {
+    public QuarantineTableModel(List<QuarantineMetadata> data) {
         this.data = data;
     }
 
@@ -39,21 +36,11 @@ public class QuarantineTableModel extends AbstractTableModel {
     }
 
     @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        return switch (columnIndex) {
-            case 1, 2 -> Date.class;
-            default -> super.getColumnClass(columnIndex);
-        };
-    }
-
-    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Diff diff = data.get(rowIndex);
+        QuarantineMetadata metadata = data.get(rowIndex);
         return switch (columnIndex) {
-            case 0 -> diff.baseline().file().path();
-            case 1 -> diff.integrityFail().file().mtime();
-            case 2 -> diff.time().created();
-            case 3 -> "🗿";
+            case 0 -> metadata.fileId();
+            case 1 -> metadata.keyName();
             default -> null;
         };
     }
@@ -64,13 +51,13 @@ public class QuarantineTableModel extends AbstractTableModel {
     }
 
     /**
-     * Get the Diff object at the specified row index.
+     * Get the QuarantineMetadata object at the specified row index.
      *
      * @param rowIndex the index of the row in the table.
-     * @return an Optional containing the Diff object at the specified row index,
+     * @return an Optional containing the QuarantineMetadata object at the specified row index,
      * or an empty Optional if the index is out of bounds.
      */
-    public Optional<Diff> getDiffAt(int rowIndex) {
+    public Optional<QuarantineMetadata> getMetadataAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < data.size()) {
             return Optional.of(data.get(rowIndex));
         }

@@ -3,19 +3,24 @@ package org.pwss.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import org.pwss.exception.file.QuarantineFileException;
 import org.pwss.exception.file.UnquarantineFileException;
+import org.pwss.exception.metadata.MetadataKeyNameRetrievalException;
 import org.pwss.exception.metadata.MetadataRemoveException;
 import org.pwss.exception.metadata.MetadataSaveException;
 import org.pwss.metadata.MetadataManager;
+import org.pwss.model.entity.QuarantineMetadata;
 import org.pwss.model.request.file.QuarantineRequest;
 import org.pwss.model.request.file.UnquarantineRequest;
 import org.pwss.model.response.QuarantineResponse;
 import org.pwss.service.network.Endpoint;
 import org.pwss.service.network.PwssHttpClient;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The `FileService` class provides methods for quarantining and unquarantining files.
@@ -38,7 +43,7 @@ public class FileService {
      * Constructs a new `FileService` instance.
      */
     public FileService() {
-        this.log = org.slf4j.LoggerFactory.getLogger(FileService.class);
+        this.log = LoggerFactory.getLogger(FileService.class);
         this.objectMapper = new ObjectMapper();
         this.metadataManager = new MetadataManager();
     }
@@ -63,7 +68,7 @@ public class FileService {
                 ? Optional.ofNullable(objectMapper.readValue(response.body(), QuarantineResponse.class))
                 : Optional.empty();
 
-        if (parsed.isPresent()) {
+        if (parsed.isPresent() && parsed.get().successful()) {
             QuarantineResponse res = parsed.get();
             handleQuarantine(res.keyName(), fileId);
         }
@@ -99,6 +104,22 @@ public class FileService {
             case 500 -> throw new UnquarantineFileException("Server error during file unquarantine");
             default -> throw new UnquarantineFileException("File unquarantine failed: Unexpected status code ");
         };
+    }
+
+    /**
+     * Retrieves metadata for all quarantined files.
+     *
+     * @return A list of `QuarantineMetadata` objects representing all quarantined files.
+     * @throws MetadataKeyNameRetrievalException If there is an error retrieving key names for quarantined files.
+     */
+    public List<QuarantineMetadata> getAllQuarantinedFiles() throws MetadataKeyNameRetrievalException {
+        final List<Long> quarantinedFileIds = metadataManager.getFileIdsOfAllQuarantinedFiles();
+        final List<QuarantineMetadata> quarantinedMetadata = new ArrayList<>(quarantinedFileIds.size());
+        for (Long fileId : quarantinedFileIds) {
+            final String keyName = metadataManager.retrieveKeyNameOfQuarantinedFile(fileId);
+            quarantinedMetadata.add(new QuarantineMetadata(fileId, keyName));
+        }
+        return quarantinedMetadata;
     }
 
     /**
