@@ -23,6 +23,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.pwss.app_settings.AppConfig;
 import org.pwss.controller.util.NavigationContext;
+import org.pwss.exception.metadata.MetadataKeyNameRetrievalException;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
 import org.pwss.exception.scan.GetMostRecentScansException;
@@ -34,15 +35,18 @@ import org.pwss.exception.scan.StartScanByIdException;
 import org.pwss.exception.scan.StopScanException;
 import org.pwss.exception.scan_summary.FileSearchException;
 import org.pwss.exception.scan_summary.GetSummaryForFileException;
+import org.pwss.metadata.MetadataManager;
 import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.File;
 import org.pwss.model.entity.MonitoredDirectory;
+import org.pwss.model.entity.QuarantineMetadata;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.entity.ScanSummary;
 import org.pwss.model.response.LiveFeedResponse;
 import org.pwss.model.table.DiffTableModel;
 import org.pwss.model.table.FileTableModel;
 import org.pwss.model.table.MonitoredDirectoryTableModel;
+import org.pwss.model.table.QuarantineTableModel;
 import org.pwss.model.table.ScanSummaryTableModel;
 import org.pwss.model.table.ScanTableModel;
 import org.pwss.model.table.cell.ButtonEditor;
@@ -136,6 +140,11 @@ public final class HomeController extends BaseController<HomeScreen> {
      * List of scan summaries for specific files.
      */
     private List<ScanSummary> fileSummaries;
+
+    /**
+     * List of files that have been quarantined.
+     */
+    private List<QuarantineMetadata> quarantinedFiles;
 
     /**
      * Flag indicating whether a scan is currently running.
@@ -244,6 +253,12 @@ public final class HomeController extends BaseController<HomeScreen> {
                             .flatMap(scan -> safeGetDiffs(scan.id()).stream())
                             .toList();
                 }
+            }
+            try {
+                quarantinedFiles = fileService.getAllQuarantinedFiles();
+            } catch (MetadataKeyNameRetrievalException e) {
+                log.error("Error retrieving quarantine metadata: {}", e.getMessage());
+                quarantinedFiles = List.of();
             }
             // Check if a scan is currently running
             boolean scanCurrentlyRunning = scanService.scanRunning();
@@ -501,6 +516,10 @@ public final class HomeController extends BaseController<HomeScreen> {
                 fileSummaries != null ? fileSummaries : List.of());
         screen.getFileScanSummaryTable().setModel(fileSummaryTableModel);
         screen.getFileScanSummaryTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        QuarantineTableModel quarantineTableModel = new QuarantineTableModel(quarantinedFiles);
+        screen.getQuarantineTable().setModel(quarantineTableModel);
+        screen.getQuarantineTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
     /**
