@@ -85,22 +85,31 @@ public class FileService {
     /**
      * Unquarantines a file by sending a request to the unquarantine endpoint.
      *
-     * @param keyPath The unique key path of the file to be unquarantined.
+     * @param metadata The `QuarantineMetadata` object containing information about the file to be unquarantined.
      * @return A `QuarantineResponse` object containing the response details.
      * @throws UnquarantineFileException If the file cannot be unquarantined due to various reasons such as
      *                                   unauthorized access, unprocessable entity, or server errors.
      * @throws JsonProcessingException   If there is an error during JSON serialization or deserialization.
      * @throws ExecutionException        If an exception occurs during the asynchronous operation.
      * @throws InterruptedException      If the operation is interrupted while waiting for the response.
+     * @throws MetadataRemoveException   If there is an error removing metadata for the unquarantined file.
      */
-    public QuarantineResponse unquarantineFile(String keyPath) throws UnquarantineFileException, JsonProcessingException, ExecutionException, InterruptedException {
-        final String body = objectMapper.writeValueAsString(new UnquarantineRequest(keyPath));
+    public boolean unquarantineFile(QuarantineMetadata metadata) throws UnquarantineFileException, JsonProcessingException, ExecutionException, InterruptedException, MetadataRemoveException {
+        final String body = objectMapper.writeValueAsString(new UnquarantineRequest(metadata.keyName()));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.UNQUARANTINE_FILE, body);
 
+        Optional<QuarantineResponse> parsed = (response.statusCode() == 200)
+                ? Optional.ofNullable(objectMapper.readValue(response.body(), QuarantineResponse.class))
+                : Optional.empty();
+
+        if (parsed.isPresent() && parsed.get().successful()) {
+            handleUnquarantine(metadata.fileId());
+        }
+
         return switch (response.statusCode()) {
-            case 200 -> objectMapper.readValue(response.body(), QuarantineResponse.class);
+            case 200 -> true;
             case 401 -> throw new UnquarantineFileException("Unauthorized: Invalid credentials for file unquarantine");
-            case 422 -> throw new UnquarantineFileException("File cannot be unquarantined: " + keyPath);
+            case 422 -> throw new UnquarantineFileException("File cannot be unquarantined: " + metadata.keyName());
             case 500 -> throw new UnquarantineFileException("Server error during file unquarantine");
             default -> throw new UnquarantineFileException("File unquarantine failed: Unexpected status code ");
         };
