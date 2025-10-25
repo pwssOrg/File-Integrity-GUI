@@ -535,10 +535,10 @@ public final class HomeController extends BaseController<HomeScreen> {
                     try {
                         boolean success = fileService.unquarantineFile(metadata);
                         if (success) {
-                            screen.showInfo("File quarantined successfully.");
+                            screen.showInfo("The file has been unquarantined successfully.");
                             fetchDataAndRefreshView();
                         } else {
-                            screen.showError("Failed to quarantine the file.");
+                            screen.showError("Failed to unquarantine the file.");
                         }
                     } catch (Exception e) {
                         screen.showError(e.getMessage());
