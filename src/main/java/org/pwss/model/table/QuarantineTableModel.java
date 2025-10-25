@@ -10,7 +10,7 @@ import org.pwss.model.entity.QuarantineMetadata;
  */
 public class QuarantineTableModel extends AbstractTableModel {
     private final List<QuarantineMetadata> data;
-    public static final String[] columns = {"File id", "File path",};
+    public static final String[] columns = {"Quarantined file id", "Quarantined file path", "👮 Unquarantine"};
 
     /**
      * Constructs a QuarantineTableModel with the specified data.
@@ -41,13 +41,14 @@ public class QuarantineTableModel extends AbstractTableModel {
         return switch (columnIndex) {
             case 0 -> metadata.fileId();
             case 1 -> metadata.keyName();
+            case 2 -> "🗿";
             default -> null;
         };
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex == 3;
+        return columnIndex == 2;
     }
 
     /**

@@ -35,7 +35,6 @@ import org.pwss.exception.scan.StartScanByIdException;
 import org.pwss.exception.scan.StopScanException;
 import org.pwss.exception.scan_summary.FileSearchException;
 import org.pwss.exception.scan_summary.GetSummaryForFileException;
-import org.pwss.metadata.MetadataManager;
 import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.File;
 import org.pwss.model.entity.MonitoredDirectory;
@@ -51,7 +50,6 @@ import org.pwss.model.table.ScanSummaryTableModel;
 import org.pwss.model.table.ScanTableModel;
 import org.pwss.model.table.cell.ButtonEditor;
 import org.pwss.model.table.cell.ButtonRenderer;
-import org.pwss.model.table.cell.CellButtonListener;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.service.AppService;
@@ -498,6 +496,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                         boolean success = fileService.quarantineFile(d.integrityFail().file().id());
                         if (success) {
                             screen.showInfo("File quarantined successfully.");
+                            fetchDataAndRefreshView();
                         } else {
                             screen.showError("Failed to quarantine the file.");
                         }
@@ -520,6 +519,33 @@ public final class HomeController extends BaseController<HomeScreen> {
         QuarantineTableModel quarantineTableModel = new QuarantineTableModel(quarantinedFiles);
         screen.getQuarantineTable().setModel(quarantineTableModel);
         screen.getQuarantineTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2]).setCellRenderer(new ButtonRenderer());
+        screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2]).setCellEditor(new ButtonEditor("🗿", (row, column) -> {
+            QuarantineTableModel model = (QuarantineTableModel) screen.getQuarantineTable().getModel();
+            Optional<QuarantineMetadata> optMetadata = model.getMetadataAt(row);
+
+            optMetadata.ifPresent(metadata -> {
+                int choice = screen.showOptionDialog(
+                        JOptionPane.WARNING_MESSAGE,
+                        "DO U WANNA UNQUARANTINE DIS FILE?",
+                        new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
+                        StringConstants.GENERIC_NO
+                );
+                if (choice == 0) {
+                    try {
+                        boolean success = fileService.unquarantineFile(metadata);
+                        if (success) {
+                            screen.showInfo("File quarantined successfully.");
+                            fetchDataAndRefreshView();
+                        } else {
+                            screen.showError("Failed to quarantine the file.");
+                        }
+                    } catch (Exception e) {
+                        screen.showError(e.getMessage());
+                    }
+                }
+            });
+        }));
     }
 
     /**
