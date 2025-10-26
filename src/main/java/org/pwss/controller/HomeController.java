@@ -61,6 +61,7 @@ import org.pwss.service.ScanSummaryService;
 import org.pwss.utils.AppTheme;
 import org.pwss.utils.LiveFeedUtils;
 import org.pwss.utils.MonitoredDirectoryUtils;
+import org.pwss.utils.OSUtils;
 import org.pwss.utils.ReportUtils;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
@@ -480,14 +481,14 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getDiffTable().setModel(diffTableModel);
         screen.getDiffTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
-        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("🗿", (row, column) -> {
+        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("\uD83D\uDCE5", (row, column) -> {
             DiffTableModel model = (DiffTableModel) screen.getDiffTable().getModel();
             Optional<Diff> diff = model.getDiffAt(row);
 
             diff.ifPresent(d -> {
                 int choice = screen.showOptionDialog(
                         JOptionPane.WARNING_MESSAGE,
-                        "OS SPECIFIC WARNING MESSAGE HERE",
+                        OSUtils.getQuarantineWarningMessage(),
                         new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
                         StringConstants.GENERIC_NO
                 );
@@ -520,7 +521,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getQuarantineTable().setModel(quarantineTableModel);
         screen.getQuarantineTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2]).setCellRenderer(new ButtonRenderer());
-        screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2]).setCellEditor(new ButtonEditor("🗿", (row, column) -> {
+        screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2]).setCellEditor(new ButtonEditor("\uD83D\uDCE4", (row, column) -> {
             QuarantineTableModel model = (QuarantineTableModel) screen.getQuarantineTable().getModel();
             Optional<QuarantineMetadata> optMetadata = model.getMetadataAt(row);
 

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import javax.swing.table.AbstractTableModel;
 import org.pwss.model.entity.QuarantineMetadata;
+import org.pwss.utils.OSUtils;
 
 /**
  * Table model for displaying quarantine metadata in a table.
@@ -40,8 +41,8 @@ public class QuarantineTableModel extends AbstractTableModel {
         QuarantineMetadata metadata = data.get(rowIndex);
         return switch (columnIndex) {
             case 0 -> metadata.fileId();
-            case 1 -> metadata.keyName();
-            case 2 -> "🗿";
+            case 1 -> OSUtils.formatQuarantinePath(metadata.keyName());
+            case 2 -> "\uD83D\uDCE4";
             default -> null;
         };
     }
