@@ -53,7 +53,7 @@ public class DiffTableModel extends AbstractTableModel {
             case 0 -> diff.baseline().file().path();
             case 1 -> diff.integrityFail().file().mtime();
             case 2 -> diff.time().created();
-            case 3 -> "🗿";
+            case 3 -> "\uD83D\uDCE5";
             default -> null;
         };
     }

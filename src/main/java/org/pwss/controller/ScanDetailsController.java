@@ -15,6 +15,7 @@ import org.pwss.navigation.Screen;
 import org.pwss.service.FileService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
+import org.pwss.utils.OSUtils;
 import org.pwss.utils.ReportUtils;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.ScanDetailsScreen;
@@ -138,7 +139,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
         screen.getDiffTable().setModel(diffTableModel);
 
         screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
-        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("🗿", this));
+        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("\uD83D\uDCE5", this));
     }
 
     @Override
@@ -149,7 +150,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
         diff.ifPresent(d -> {
             int choice = screen.showOptionDialog(
                     JOptionPane.WARNING_MESSAGE,
-                    "OS SPECIFIC WARNING MESSAGE HERE",
+                    OSUtils.getQuarantineWarningMessage(),
                     new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
                     StringConstants.GENERIC_NO
             );
