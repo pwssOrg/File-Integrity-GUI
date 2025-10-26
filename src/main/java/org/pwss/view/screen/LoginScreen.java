@@ -15,6 +15,10 @@ import javax.swing.JTextField;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 
+/**
+ * Login screen UI component for user authentication.
+ * Extends the BaseScreen class to provide specific UI elements for login functionality.
+ */
 public class LoginScreen extends BaseScreen {
     private JTextField usernameField;
     private JPasswordField passwordField;

@@ -9,6 +9,10 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+/**
+ * Screen for creating a new directory.
+ * Extends the BaseScreen class and provides UI components for directory creation.
+ */
 public class NewDirectoryScreen extends BaseScreen {
     private JButton cancelButton;
     private JButton createButton;
