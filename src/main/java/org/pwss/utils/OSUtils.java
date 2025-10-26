@@ -2,6 +2,7 @@ package org.pwss.utils;
 
 /**
  * Utility class for operating system detection and information.
+ * Provides methods to determine the current OS type and related functionalities.
  */
 public final class OSUtils {
 
