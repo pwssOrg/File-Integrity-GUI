@@ -77,7 +77,8 @@ public final class OSUtils {
      * @return true if the current OS is Unix-based, false otherwise.
      */
     public static final boolean isUnix() {
-        return determineOSType() == OperatingSystem.LINUX || determineOSType() == OperatingSystem.MACOS;
+        final OperatingSystem operatingSystem = determineOSType();
+        return operatingSystem == OperatingSystem.LINUX || operatingSystem == OperatingSystem.MACOS;
     }
 
     /**
@@ -129,8 +130,6 @@ public final class OSUtils {
         }
         // Start with the original path
         String outString = path;
-        // Replace leading drive marker like "C_drive__" -> "C:\"
-        outString = outString.replaceFirst("(?i)^([A-Za-z])_drive__", "$1:\\\\");
 
         // Preserve double-dot occurrences with a placeholder so single-dot replacement won't clash
         final String DD_PLACEHOLDER = "\u0000DD\u0000";
@@ -141,6 +140,8 @@ public final class OSUtils {
         outString = outString.replaceFirst("(?i)\\.([A-Za-z0-9]+)$", EXT_PLACEHOLDER + "$1");
 
         if (isWindows()) {
+            // Replace leading drive marker like "C_drive__" -> "C:\"
+            outString = outString.replaceFirst("(?i)^([A-Za-z])_drive__.", "$1:\\\\");
             // Replace single dots with a single backslash
             outString = outString.replace(".", "\\");
             // Restore double-dot placeholder
