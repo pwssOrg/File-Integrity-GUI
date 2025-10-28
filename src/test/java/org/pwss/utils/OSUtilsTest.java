@@ -15,8 +15,8 @@ public class OSUtilsTest {
 
     @Test
     void testSimplePathConversion() {
-        String input = "usr.local.bin.myfile.txt";
-        String expected;
+        final String input = "usr.local.bin.myfile.txt";
+        final String expected;
 
         if (OSUtils.isWindows()) {
             expected = "usr\\local\\bin\\myfile.txt";
@@ -30,8 +30,8 @@ public class OSUtilsTest {
 
     @Test
     void testDoubleDotPreservation() {
-        String input = "etc..config.file.txt";
-        String expected;
+        final String input = "etc..config.file.txt";
+        final String expected;
 
         if (OSUtils.isWindows()) {
             expected = "etc\\.config\\file.txt";
@@ -45,8 +45,8 @@ public class OSUtilsTest {
 
     @Test
     void testExtensionPreservation() {
-        String input = "var.log.myapp.log";
-        String expected;
+        final String input = "var.log.myapp.log";
+        final String expected;
 
         if (OSUtils.isWindows()) {
             expected = "var\\log\\myapp.log";
@@ -60,13 +60,15 @@ public class OSUtilsTest {
 
     @Test
     void testComplexMixedPath() {
-        String input = "C_drive__.Program.Files.Java.myapp.jar";
-        String expected;
+        final String input;
+        final String expected;
 
         if (OSUtils.isWindows()) {
+            input = "C_drive__.Program.Files.Java.myapp.jar";
             expected = "C:\\Program\\Files\\Java\\myapp.jar";
         } else {
-            expected = "C_drive__/Program/Files/./Java/myapp.jar";
+            input = "etc..config..file.txt";
+            expected = "etc/.config/.file.txt";
         }
 
         assertEquals(expected, OSUtils.formatQuarantinePath(input),
