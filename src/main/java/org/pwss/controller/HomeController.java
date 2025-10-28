@@ -528,7 +528,7 @@ public final class HomeController extends BaseController<HomeScreen> {
             optMetadata.ifPresent(metadata -> {
                 int choice = screen.showOptionDialog(
                         JOptionPane.WARNING_MESSAGE,
-                        "DO U WANNA UNQUARANTINE DIS FILE?",
+                        "Are you sure you want to unquarantine this file?",
                         new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
                         StringConstants.GENERIC_NO
                 );
