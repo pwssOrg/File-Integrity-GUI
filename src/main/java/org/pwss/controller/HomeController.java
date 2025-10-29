@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicLong;
+
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -153,7 +155,7 @@ public final class HomeController extends BaseController<HomeScreen> {
     /**
      * Total count of differences detected in the scans.
      */
-    private long totalDiffCount = 0;
+    private AtomicLong totalDiffCount = new AtomicLong(0);
 
     /**
      * Timer for checking the status of ongoing scans at regular intervals.
@@ -195,7 +197,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getThemePicker().setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value,
-                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                    int index, boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof AppTheme) {
                     setText(((AppTheme) value).getDisplayName());
@@ -403,9 +405,9 @@ public final class HomeController extends BaseController<HomeScreen> {
             try {
                 appService.restartApp();
             } catch (URISyntaxException uriSyntaxException) {
-               log.error("Could not convert the code source location to URI {}", uriSyntaxException.getMessage());
+                log.error("Could not convert the code source location to URI {}", uriSyntaxException.getMessage());
 
-               log.debug("Could not convert the code source location to URI {}", uriSyntaxException);
+                log.debug("Could not convert the code source location to URI {}", uriSyntaxException);
 
             }
         });
@@ -416,7 +418,8 @@ public final class HomeController extends BaseController<HomeScreen> {
         // Update UI components based on the current state
         screen.getScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
 
-        String notifications = MonitoredDirectoryUtils.getMonitoredDirectoryNotificationMessage(allMonitoredDirectories);
+        String notifications = MonitoredDirectoryUtils
+                .getMonitoredDirectoryNotificationMessage(allMonitoredDirectories);
         boolean hasNotifications = !notifications.isEmpty();
 
         // Scan running views
@@ -453,7 +456,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getMonitoredDirectoryList().setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
+                    boolean isSelected, boolean cellHasFocus) {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
                 if (value instanceof MonitoredDirectory dir) {
@@ -481,32 +484,32 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getDiffTable().setModel(diffTableModel);
         screen.getDiffTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
-        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("\uD83D\uDCE5", (row, column) -> {
-            DiffTableModel model = (DiffTableModel) screen.getDiffTable().getModel();
-            Optional<Diff> diff = model.getDiffAt(row);
+        screen.getDiffTable().getColumn(DiffTableModel.columns[3])
+                .setCellEditor(new ButtonEditor("\uD83D\uDCE5", (row, column) -> {
+                    DiffTableModel model = (DiffTableModel) screen.getDiffTable().getModel();
+                    Optional<Diff> diff = model.getDiffAt(row);
 
-            diff.ifPresent(d -> {
-                int choice = screen.showOptionDialog(
-                        JOptionPane.WARNING_MESSAGE,
-                        OSUtils.getQuarantineWarningMessage(),
-                        new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
-                        StringConstants.GENERIC_NO
-                );
-                if (choice == 0) {
-                    try {
-                        boolean success = fileService.quarantineFile(d.integrityFail().file().id());
-                        if (success) {
-                            screen.showInfo("File quarantined successfully.");
-                            fetchDataAndRefreshView();
-                        } else {
-                            screen.showError("Failed to quarantine the file.");
+                    diff.ifPresent(d -> {
+                        int choice = screen.showOptionDialog(
+                                JOptionPane.WARNING_MESSAGE,
+                                OSUtils.getQuarantineWarningMessage(),
+                                new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
+                                StringConstants.GENERIC_NO);
+                        if (choice == 0) {
+                            try {
+                                boolean success = fileService.quarantineFile(d.integrityFail().file().id());
+                                if (success) {
+                                    screen.showInfo("File quarantined successfully.");
+                                    fetchDataAndRefreshView();
+                                } else {
+                                    screen.showError("Failed to quarantine the file.");
+                                }
+                            } catch (Exception e) {
+                                screen.showError(e.getMessage());
+                            }
                         }
-                    } catch (Exception e) {
-                        screen.showError(e.getMessage());
-                    }
-                }
-            });
-        }));
+                    });
+                }));
 
         FileTableModel fileTableModel = new FileTableModel(fileResults != null ? fileResults : List.of());
         screen.getFilesTable().setModel(fileTableModel);
@@ -521,32 +524,32 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getQuarantineTable().setModel(quarantineTableModel);
         screen.getQuarantineTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2]).setCellRenderer(new ButtonRenderer());
-        screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2]).setCellEditor(new ButtonEditor("\uD83D\uDCE4", (row, column) -> {
-            QuarantineTableModel model = (QuarantineTableModel) screen.getQuarantineTable().getModel();
-            Optional<QuarantineMetadata> optMetadata = model.getMetadataAt(row);
+        screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2])
+                .setCellEditor(new ButtonEditor("\uD83D\uDCE4", (row, column) -> {
+                    QuarantineTableModel model = (QuarantineTableModel) screen.getQuarantineTable().getModel();
+                    Optional<QuarantineMetadata> optMetadata = model.getMetadataAt(row);
 
-            optMetadata.ifPresent(metadata -> {
-                int choice = screen.showOptionDialog(
-                        JOptionPane.WARNING_MESSAGE,
-                        "Are you sure you want to unquarantine this file?",
-                        new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
-                        StringConstants.GENERIC_NO
-                );
-                if (choice == 0) {
-                    try {
-                        boolean success = fileService.unquarantineFile(metadata);
-                        if (success) {
-                            screen.showInfo("The file has been unquarantined successfully.");
-                            fetchDataAndRefreshView();
-                        } else {
-                            screen.showError("Failed to unquarantine the file.");
+                    optMetadata.ifPresent(metadata -> {
+                        int choice = screen.showOptionDialog(
+                                JOptionPane.WARNING_MESSAGE,
+                                "Are you sure you want to unquarantine this file?",
+                                new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
+                                StringConstants.GENERIC_NO);
+                        if (choice == 0) {
+                            try {
+                                boolean success = fileService.unquarantineFile(metadata);
+                                if (success) {
+                                    screen.showInfo("The file has been unquarantined successfully.");
+                                    fetchDataAndRefreshView();
+                                } else {
+                                    screen.showError("Failed to unquarantine the file.");
+                                }
+                            } catch (Exception e) {
+                                screen.showError(e.getMessage());
+                            }
                         }
-                    } catch (Exception e) {
-                        screen.showError(e.getMessage());
-                    }
-                }
-            });
-        }));
+                    });
+                }));
     }
 
     /**
@@ -653,7 +656,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         if (completed) {
             int choice;
             // Prompt the user to view scan results based on whether differences were found
-            if (totalDiffCount > 0) {
+            if (totalDiffCount.get() > 0) {
                 choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE, StringConstants.SCAN_COMPLETED_DIFFS,
                         new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                         StringConstants.GENERIC_YES);
@@ -669,7 +672,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                             message = StringConstants.SCAN_COMPLETED_NO_DIFFS;
                         }
                     } catch (GetMostRecentScansException | ExecutionException | InterruptedException
-                             | JsonProcessingException e) {
+                            | JsonProcessingException e) {
                         log.error(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX, e.getMessage());
                         log.debug(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX, e);
                         screen.showError(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX);
@@ -700,7 +703,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                         screen.showError(StringConstants.SCAN_SHOW_RESULTS_ERROR_PREFIX);
                     }
                 } else {
-                    if (totalDiffCount > 0) {
+                    if (totalDiffCount.get() > 0) {
                         // If full scan, and we have diffs, navigate to the diffs tab to show all
                         // differences.
                         screen.getTabbedPane().setSelectedIndex(2);
@@ -723,7 +726,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         // Clear the live feed text area
         screen.getLiveFeedText().setText("");
         // Reset diff count for the next scan
-        totalDiffCount = 0;
+        totalDiffCount.set(0);
         // Update the live feed diff count in preparation for the next scan
         screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
         // Refresh the view to reflect the cleared live feed
@@ -766,7 +769,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                 screen.getLiveFeedText().setText(updatedLiveFeedText);
 
                 // Update the total difference count based on new warnings
-                totalDiffCount += LiveFeedUtils.countWarnings(liveFeed.livefeed());
+                totalDiffCount.addAndGet(LiveFeedUtils.countWarnings(liveFeed.livefeed()));
                 screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
 
                 // Update scanRunning state and refresh the UI if necessary
@@ -775,7 +778,14 @@ public final class HomeController extends BaseController<HomeScreen> {
                     refreshView();
                 }
                 if (!liveFeed.isScanRunning()) {
+
                     scanStatusTimer.stop(); // Terminate polling when the scan completes
+
+                    liveFeed = scanService.getLiveFeed();
+
+                    totalDiffCount.getAndAdd(LiveFeedUtils.countWarnings(liveFeed.livefeed()));
+                    screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
+
                     onFinishScan(true, singleDirectory);
                 }
             } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {

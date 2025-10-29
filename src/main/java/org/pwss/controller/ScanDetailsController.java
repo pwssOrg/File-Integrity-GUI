@@ -159,6 +159,8 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
                     boolean success = fileService.quarantineFile(d.integrityFail().file().id());
                     if (success) {
                         screen.showInfo("File quarantined successfully.");
+                        screen.getDiffTable().getColumn(d).setCellRenderer(new ButtonRenderer());
+                        screen.getDiffTable().getColumn(d).setCellEditor(new ButtonEditor("🗿", this));
                     } else {
                         screen.showError("Failed to quarantine the file.");
                     }
