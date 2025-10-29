@@ -3,18 +3,26 @@ package org.pwss.model.table;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import javax.swing.table.AbstractTableModel;
 import org.pwss.metadata.MetadataManager;
 import org.pwss.model.entity.Diff;
 
 /**
- * The DiffTableModel is a model for a table that displays differences (diffs) between file states.
- * It extends AbstractTableModel and provides data to the JTable component in a Swing application.
+ * The DiffTableModel is a model for a table that displays differences (diffs)
+ * between file states.
+ * It extends AbstractTableModel and provides data to the JTable component in a
+ * Swing application.
  */
 public class DiffTableModel extends AbstractTableModel {
     private final List<Diff> data;
     private final MetadataManager metadataManager;
-    public static final String[] columns = {"\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected", "👮 Quarantine"};
+    public static final String[] columns = { "\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected",
+            "👮 Quarantine" };
 
     /**
      * Constructs a new DiffTableModel with the specified list of diffs.
@@ -22,8 +30,17 @@ public class DiffTableModel extends AbstractTableModel {
      * @param data the list of Diff objects to be displayed in the table
      */
     public DiffTableModel(List<Diff> data) {
-        this.data = data;
+
+        this.data = data.stream()
+                .filter(distinctByKey(diff -> diff.integrityFail().file().id()))
+                .toList();
         this.metadataManager = new MetadataManager();
+    }
+
+    // TODO: Add Java Docs
+    private <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 
     @Override
@@ -71,7 +88,8 @@ public class DiffTableModel extends AbstractTableModel {
             return false;
         }
 
-        // Get the diff safely and set cell editable only if the file is not already quarantined
+        // Get the diff safely and set cell editable only if the file is not already
+        // quarantined
         return getDiffAt(rowIndex)
                 .map(Diff::integrityFail)
                 .map(fail -> !metadataManager.isFileQuarantined(fail.file().id()))
@@ -83,7 +101,7 @@ public class DiffTableModel extends AbstractTableModel {
      *
      * @param rowIndex the index of the row in the table.
      * @return an Optional containing the Diff object at the specified row index,
-     * or an empty Optional if the index is out of bounds.
+     *         or an empty Optional if the index is out of bounds.
      */
     public Optional<Diff> getDiffAt(int rowIndex) {
         if (rowIndex >= 0 && rowIndex < data.size()) {

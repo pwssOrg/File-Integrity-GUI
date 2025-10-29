@@ -31,7 +31,9 @@ public final class LiveFeedUtils {
         if (entry == null || entry.isEmpty()) {
             return 0;
         }
-        // Split by the warning symbol and subtract 1 to get the count
-        return entry.split("⚠️").length - 1;
+
+        return (int) entry.codePoints()
+                .filter(c -> c == 0x26A0) // ⚠
+                .count();
     }
 }

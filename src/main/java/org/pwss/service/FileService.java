@@ -23,7 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The `FileService` class provides methods for quarantining and unquarantining files.
+ * The `FileService` class provides methods for quarantining and unquarantining
+ * files.
  */
 public class FileService {
     /**
@@ -31,7 +32,8 @@ public class FileService {
      */
     private final Logger log;
     /**
-     * An instance of the ObjectMapper used for JSON serialization and deserialization.
+     * An instance of the ObjectMapper used for JSON serialization and
+     * deserialization.
      */
     private final ObjectMapper objectMapper;
     /**
@@ -53,14 +55,21 @@ public class FileService {
      *
      * @param fileId The ID of the file to be quarantined.
      * @return true if the file was successfully quarantined; false otherwise.
-     * @throws QuarantineFileException  If the file cannot be quarantined due to various reasons such as
-     *                                  unauthorized access, unprocessable entity, or server errors.
-     * @throws JsonProcessingException  If there is an error during JSON serialization or deserialization.
-     * @throws ExecutionException       If an exception occurs during the asynchronous operation.
-     * @throws InterruptedException     If the operation is interrupted while waiting for the response.
-     * @throws MetadataSaveException    If there is an error saving metadata for the quarantined file.
+     * @throws QuarantineFileException If the file cannot be quarantined due to
+     *                                 various reasons such as
+     *                                 unauthorized access, unprocessable entity, or
+     *                                 server errors.
+     * @throws JsonProcessingException If there is an error during JSON
+     *                                 serialization or deserialization.
+     * @throws ExecutionException      If an exception occurs during the
+     *                                 asynchronous operation.
+     * @throws InterruptedException    If the operation is interrupted while waiting
+     *                                 for the response.
+     * @throws MetadataSaveException   If there is an error saving metadata for the
+     *                                 quarantined file.
      */
-    public boolean quarantineFile(long fileId) throws QuarantineFileException, JsonProcessingException, ExecutionException, InterruptedException, MetadataSaveException {
+    public boolean quarantineFile(long fileId) throws QuarantineFileException, JsonProcessingException,
+            ExecutionException, InterruptedException, MetadataSaveException {
         final String body = objectMapper.writeValueAsString(new QuarantineRequest(fileId));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.QUARANTINE_FILE, body);
 
@@ -85,16 +94,24 @@ public class FileService {
     /**
      * Unquarantines a file by sending a request to the unquarantine endpoint.
      *
-     * @param metadata The `QuarantineMetadata` object containing information about the file to be unquarantined.
+     * @param metadata The `QuarantineMetadata` object containing information about
+     *                 the file to be unquarantined.
      * @return A `QuarantineResponse` object containing the response details.
-     * @throws UnquarantineFileException If the file cannot be unquarantined due to various reasons such as
-     *                                   unauthorized access, unprocessable entity, or server errors.
-     * @throws JsonProcessingException   If there is an error during JSON serialization or deserialization.
-     * @throws ExecutionException        If an exception occurs during the asynchronous operation.
-     * @throws InterruptedException      If the operation is interrupted while waiting for the response.
-     * @throws MetadataRemoveException   If there is an error removing metadata for the unquarantined file.
+     * @throws UnquarantineFileException If the file cannot be unquarantined due to
+     *                                   various reasons such as
+     *                                   unauthorized access, unprocessable entity,
+     *                                   or server errors.
+     * @throws JsonProcessingException   If there is an error during JSON
+     *                                   serialization or deserialization.
+     * @throws ExecutionException        If an exception occurs during the
+     *                                   asynchronous operation.
+     * @throws InterruptedException      If the operation is interrupted while
+     *                                   waiting for the response.
+     * @throws MetadataRemoveException   If there is an error removing metadata for
+     *                                   the unquarantined file.
      */
-    public boolean unquarantineFile(QuarantineMetadata metadata) throws UnquarantineFileException, JsonProcessingException, ExecutionException, InterruptedException, MetadataRemoveException {
+    public boolean unquarantineFile(QuarantineMetadata metadata) throws UnquarantineFileException,
+            JsonProcessingException, ExecutionException, InterruptedException, MetadataRemoveException {
         final String body = objectMapper.writeValueAsString(new UnquarantineRequest(metadata.keyName()));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.UNQUARANTINE_FILE, body);
 
@@ -118,8 +135,10 @@ public class FileService {
     /**
      * Retrieves metadata for all quarantined files.
      *
-     * @return A list of `QuarantineMetadata` objects representing all quarantined files.
-     * @throws MetadataKeyNameRetrievalException If there is an error retrieving key names for quarantined files.
+     * @return A list of `QuarantineMetadata` objects representing all quarantined
+     *         files.
+     * @throws MetadataKeyNameRetrievalException If there is an error retrieving key
+     *                                           names for quarantined files.
      */
     public List<QuarantineMetadata> getAllQuarantinedFiles() throws MetadataKeyNameRetrievalException {
         final List<Long> quarantinedFileIds = metadataManager.getFileIdsOfAllQuarantinedFiles();
@@ -132,11 +151,29 @@ public class FileService {
     }
 
     /**
+ * Checks if a specific file is quarantined by verifying its ID against
+ * the list of all quarantined files.
+ *
+ * @param fileId The unique identifier of the file to check.
+ * @return {@code true} if the file is quarantined, {@code false} otherwise.
+ */
+public final boolean isFileQuarantined(long fileId) {
+
+    try {
+        return metadataManager.getFileIdsOfAllQuarantinedFiles().contains(fileId);
+    } catch (MetadataKeyNameRetrievalException e) {
+        log.error("Failed to determine if the file is quarantined due to a metadata parsing error");
+        return false;
+    }
+}
+
+    /**
      * Handles the metadata saving process for a quarantined file.
      *
      * @param keyName The unique key name of the quarantined file.
      * @param fileId  The ID of the file that was quarantined.
-     * @throws MetadataSaveException If there is an error saving metadata for the quarantined file.
+     * @throws MetadataSaveException If there is an error saving metadata for the
+     *                               quarantined file.
      */
     private void handleQuarantine(String keyName, Long fileId) throws MetadataSaveException {
         log.debug("Saving metadata for quarantined file. KeyName: {}, FileID: {}", keyName, fileId);
@@ -147,7 +184,8 @@ public class FileService {
      * Handles the metadata removal process for an unquarantined file.
      *
      * @param fileId The ID of the file that was unquarantined.
-     * @throws MetadataRemoveException If there is an error removing metadata for the unquarantined file.
+     * @throws MetadataRemoveException If there is an error removing metadata for
+     *                                 the unquarantined file.
      */
     private void handleUnquarantine(Long fileId) throws MetadataRemoveException {
         log.debug("Removing metadata for unquarantined file. FileID: {}", fileId);
