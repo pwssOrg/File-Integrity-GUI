@@ -25,19 +25,25 @@ public class DiffTableModel extends AbstractTableModel {
             "👮 Quarantine" };
 
     /**
-     * Constructs a new DiffTableModel with the specified list of diffs.
+     * Constructs a new DiffTableModel with the provided list of Diff objects.
+     * Filters the data to ensure only unique entries are included based on the file ID.
      *
-     * @param data the list of Diff objects to be displayed in the table
+     * @param data The list of Diff objects to be displayed in the table.
      */
     public DiffTableModel(List<Diff> data) {
-
         this.data = data.stream()
                 .filter(distinctByKey(diff -> diff.integrityFail().file().id()))
                 .toList();
         this.metadataManager = new MetadataManager();
     }
 
-    // TODO: Add Java Docs
+    /**
+     * Returns a filter that only allows unique elements, based on a property from each item.
+     *
+     * @param <T> The type of items to filter.
+     * @param keyExtractor A function to get the property used for checking uniqueness.
+     * @return A filter that returns true for the first time it sees a property value, false after.
+     */
     private <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Set<Object> seen = ConcurrentHashMap.newKeySet();
         return t -> seen.add(keyExtractor.apply(t));
