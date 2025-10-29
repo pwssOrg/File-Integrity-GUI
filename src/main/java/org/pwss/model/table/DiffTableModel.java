@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.table.AbstractTableModel;
+import org.pwss.metadata.MetadataManager;
 import org.pwss.model.entity.Diff;
 
 /**
@@ -12,6 +13,7 @@ import org.pwss.model.entity.Diff;
  */
 public class DiffTableModel extends AbstractTableModel {
     private final List<Diff> data;
+    private final MetadataManager metadataManager;
     public static final String[] columns = {"\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected", "👮 Quarantine"};
 
     /**
@@ -21,6 +23,7 @@ public class DiffTableModel extends AbstractTableModel {
      */
     public DiffTableModel(List<Diff> data) {
         this.data = data;
+        this.metadataManager = new MetadataManager();
     }
 
     @Override
@@ -48,19 +51,31 @@ public class DiffTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Diff diff = data.get(rowIndex);
+        final Diff diff = data.get(rowIndex);
+        final long fileId = diff.integrityFail().file().id();
+
         return switch (columnIndex) {
             case 0 -> diff.baseline().file().path();
             case 1 -> diff.integrityFail().file().mtime();
             case 2 -> diff.time().created();
-            case 3 -> "\uD83D\uDCE5";
+            // Column 3 (Quarantine) - show ❌ if quarantined, otherwise 📥
+            case 3 -> metadataManager.isFileQuarantined(fileId) ? "❌" : "\uD83D\uDCE5";
             default -> null;
         };
     }
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columnIndex == 3;
+        // Only column 3 is ever editable (Quarantine column)
+        if (columnIndex != 3) {
+            return false;
+        }
+
+        // Get the diff safely and set cell editable only if the file is not already quarantined
+        return getDiffAt(rowIndex)
+                .map(Diff::integrityFail)
+                .map(fail -> !metadataManager.isFileQuarantined(fail.file().id()))
+                .orElse(true);
     }
 
     /**
