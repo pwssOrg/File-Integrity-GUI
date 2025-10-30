@@ -8,7 +8,7 @@ import org.pwss.model.entity.Scan;
 public class ScanTableModel extends AbstractTableModel {
     private final List<Scan> scans;
     private final String[] columnNames = {
-            "\uD83D\uDCC1 Directory", "\uD83D\uDD59 Scan Time", "\uD83D\uDEA6 Status", "\uD83D\uDEA6 Notes"
+            "\uD83D\uDCC1 Directory", "\uD83D\uDD59 Scan Time", "\uD83D\uDEA6 Status"
     };
 
     public ScanTableModel(List<Scan> scans) {
@@ -37,7 +37,6 @@ public class ScanTableModel extends AbstractTableModel {
             case 0 -> scan.monitoredDirectory().path();
             case 1 -> scan.scanTime().created();
             case 2 -> scan.status();
-            case 3 -> scan.notes() != null ? scan.notes().notes() : "";
             default -> null;
         };
     }

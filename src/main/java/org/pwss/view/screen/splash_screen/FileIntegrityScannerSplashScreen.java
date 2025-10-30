@@ -26,8 +26,9 @@ public final class FileIntegrityScannerSplashScreen {
     /**
      * Path to the splash screen picture resource.
      */
-    private static final String SPLASH_SCREEN_PICTURE_PATH = "src" + File.separator + "main" + File.separator
-            + "resources" + File.separator + "file_integrity_scanner_splash_screen_m.JPG";
+    private static final String SPLASH_SCREEN_PICTURE_PATH = "app_storage" + File.separator + "picture" + File.separator
+            + "splashscreen" + File.separator + "file_integrity_scanner_splash_screen_m.JPG";
+
 
     /**
      * Displays the splash screen with a specified image that scales to fit the

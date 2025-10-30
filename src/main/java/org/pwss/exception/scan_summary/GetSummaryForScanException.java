@@ -1,40 +1,35 @@
 package org.pwss.exception.scan_summary;
 
-public final class GetSummaryForScanException extends Exception {
+import java.io.Serial;
+
+import org.pwss.exception.PWSSbaseException;
+
+/**
+ * Exception thrown when an error occurs while retrieving a summary for a scan
+ * operation.
+ * This exception extends PWSSbaseException and is used to indicate specific
+ * issues encountered
+ * during the process of gathering or processing summary data related to scans,
+ * such as invalid input,
+ * failed database queries, or other related problems.
+ */
+public final class GetSummaryForScanException extends PWSSbaseException {
 
     /**
-     * Constructs a `GetSummaryForScanException` with no detail message or cause.
+     * The serial version UID for object serialization. It ensures compatibility
+     * between different versions
+     * of this exception class when deserializing objects.
      */
-    public GetSummaryForScanException() {
-        super();
-    }
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
-     * Constructs a `GetSummaryForScanException` with the specified detail message.
-     * The message is appended with " \nPWSS @Exception".
+     * Constructs a GetSummaryForScanException with the specified detail message.
+     * The message is appended with "\nPWSS @Exception".
      *
      * @param message The detail message to be included in the exception.
      */
     public GetSummaryForScanException(String message) {
-        super(message + " \nPWSS-FE @Exception");
-    }
-
-    /**
-     * Constructs a `GetSummaryForScanException` with the specified cause.
-     *
-     * @param cause The cause of the exception.
-     */
-    public GetSummaryForScanException(Throwable cause) {
-        super(cause);
-    }
-
-    /**
-     * Constructs a `GetSummaryForScanException` with the specified detail message and cause.
-     *
-     * @param message The detail message to be included in the exception.
-     * @param cause   The cause of the exception.
-     */
-    public GetSummaryForScanException(String message, Throwable cause) {
-        super(message, cause);
+        super(message);
     }
 }
