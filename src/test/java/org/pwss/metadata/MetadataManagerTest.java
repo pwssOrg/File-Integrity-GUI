@@ -13,7 +13,7 @@ import org.pwss.exception.metadata.MetadataSaveException;
 public class MetadataManagerTest {
 
     private MetadataManager metadataManager = new MetadataManager();
-    private long mockFileId = 6688;
+    private long mockFileId = Long.MAX_VALUE - 1;
 
     @Order(1)
     @Test

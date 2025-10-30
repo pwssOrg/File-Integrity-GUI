@@ -146,6 +146,22 @@ public final class MetadataManager {
     }
 
     /**
+     * Checks if a specific file is quarantined by verifying its ID against
+     * the list of all quarantined files.
+     *
+     * @param fileId The unique identifier of the file to check.
+     * @return {@code true} if the file is quarantined, {@code false} otherwise.
+     */
+    public final boolean isFileQuarantined(long fileId) {
+        try {
+            return getFileIdsOfAllQuarantinedFiles().contains(fileId);
+        } catch (MetadataKeyNameRetrievalException e) {
+            log.error("Failed to determine if the file is quarantined due to a metadata parsing error");
+            return false;
+        }
+    }
+
+    /**
      * Loads metadata properties from the metadata file.
      *
      * @return The loaded Properties object.
