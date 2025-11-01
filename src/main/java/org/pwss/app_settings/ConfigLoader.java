@@ -29,6 +29,10 @@ final class ConfigLoader {
      * Key in the properties file for license key setting.
      */
     private final String LICENSE_KEY = "frontend.licensekey";
+    /**
+     * Key in the properties file for maximum hash extraction file size setting.
+     */
+    private final String MAX_HASH_EXTRACTION_FILE_SIZE_KEY = "scanner.max_hash_extraction_file_size";
 
     /**
      * Path to the configuration file.
@@ -52,6 +56,10 @@ final class ConfigLoader {
      * License key for the application.
      */
     private final String licenseKey;
+    /**
+     * Maximum hash extraction file size.
+     */
+    private final long maxHashExtractionFileSize;
 
     /**
      * Constructor that loads configuration settings from the properties file and
@@ -67,10 +75,12 @@ final class ConfigLoader {
             this.useSplashScreen = true;
             this.appTheme = 1;
             this.licenseKey = "none";
+            this.maxHashExtractionFileSize = -1;
         } else {
             this.useSplashScreen = getSplashScreenFlagFromConfigString(getSplashScreenProperty());
             this.appTheme = getAppThemeValueFromConfigString(getAppThemeProperty());
             this.licenseKey = getLicenseKeyProperty();
+            this.maxHashExtractionFileSize = getMaxHashExtractionFileSizeFromConfigString(getMaxHashExtractionFileSizeProperty());
         }
 
     }
@@ -79,7 +89,7 @@ final class ConfigLoader {
      * Parses the splash screen flag from a configuration string.
      *
      * @param configFileString The configuration string to be parsed
-     * @return falsee if the string is "false" (case insensitive), otherwise true
+     * @return false if the string is "false" (case insensitive), otherwise true
      */
     private final boolean getSplashScreenFlagFromConfigString(String configFileString) {
 
@@ -122,6 +132,29 @@ final class ConfigLoader {
             return 1;
         }
 
+    }
+
+    /**
+     * Parses the maximum hash extraction file size from a configuration string.
+     *
+     * @return The long value of the maximum hash extraction file size, or -1 if
+     *         parsing fails or the value is invalid
+     */
+    private final long getMaxHashExtractionFileSizeFromConfigString(String configFileString) {
+        try {
+            long maxHashExtractionFileSizeValue = Long.parseLong(configFileString);
+
+            if (maxHashExtractionFileSizeValue >= -1)
+                return maxHashExtractionFileSizeValue;
+            else
+                return -1;
+        }
+
+        catch (Exception exception) {
+            log.debug("Could not parse max hash extraction file size value from app settings", exception);
+            log.error("Could not parse max hash extraction file size value from app settings {}", exception.getMessage());
+            return -1;
+        }
     }
 
     /**
@@ -201,6 +234,23 @@ final class ConfigLoader {
     }
 
     /**
+     * Retrieves the maximum hash extraction file size property value from the
+     * properties file.
+     *
+     * @return The maximum hash extraction file size property value, or "-1" if an
+     *         error occurs
+     */
+    private final String getMaxHashExtractionFileSizeProperty() {
+        try {
+            return properties.getProperty(MAX_HASH_EXTRACTION_FILE_SIZE_KEY);
+        } catch (Exception exception) {
+            log.debug("Max hash extraction file size property could not be fetched", exception);
+            log.error("Max hash extraction file size property could not be fetched {}", exception.getMessage());
+            return "-1";
+        }
+    }
+
+    /**
      * Sets the splash screen flag in the properties file.
      *
      * @param splashScreenFlag The value to set for the splash screen flag
@@ -261,6 +311,27 @@ final class ConfigLoader {
     }
 
     /**
+     * Sets the maximum hash extraction file size value in the properties file.
+     *
+     * @param maxHashExtractionFileSize The value to set for the maximum hash
+     *                                  extraction file size
+     * @return true if setting was successful, otherwise false
+     */
+    final boolean setMaxHashExtractionFileSize(String maxHashExtractionFileSize) {
+
+        properties.setProperty(MAX_HASH_EXTRACTION_FILE_SIZE_KEY, maxHashExtractionFileSize);
+
+        try (FileOutputStream fos = new FileOutputStream(CONFIG_FILE_PATH)) {
+            properties.store(fos, null);
+            return true;
+        } catch (Exception exception) {
+            log.debug("Max hash extraction file size could not be set in app.config file", exception);
+            log.error("Max hash extraction file size could not be set in app.config file", exception.getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Gets the value indicating whether to use splash screen or not.
      *
      * @return true if splash screen is enabled, otherwise false
@@ -285,5 +356,9 @@ final class ConfigLoader {
      */
     final String getLicenseKey() {
         return licenseKey;
+    }
+
+    final long getHashExtractionMaxFileSizeValue() {
+        return maxHashExtractionFileSize;
     }
 }
