@@ -6,6 +6,7 @@ import java.net.http.HttpResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import org.pwss.app_settings.AppConfig;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
 import org.pwss.exception.scan.GetMostRecentScansException;
 import org.pwss.exception.scan.GetScanDiffsException;
@@ -46,8 +47,9 @@ public class ScanService {
      * @throws InterruptedException  If the thread executing the request is interrupted.
      */
     public boolean startScan() throws StartFullScanException, ExecutionException, InterruptedException, JsonProcessingException {
-        // Fake properties read
-        long maxHashExtractionFileSize = 1024 * 1024 * 2047; // 2GB - 1MB
+        // Read max hash extraction file size from config
+        long maxHashExtractionFileSize = AppConfig.MAX_HASH_EXTRACTION_FILE_SIZE;
+
         String body = objectMapper.writeValueAsString(new StartScanAllRequest(maxHashExtractionFileSize));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN, body);
 
@@ -75,8 +77,9 @@ public class ScanService {
      * @throws JsonProcessingException If an error occurs while serializing the start scan request to JSON.
      */
     public boolean startScanById(long id) throws StartScanByIdException, ExecutionException, InterruptedException, JsonProcessingException {
-        // Fake properties read
-        long maxHashExtractionFileSize = 1024 * 1024 * 2047; // 2GB - 1MB
+        // Read max hash extraction file size from config
+        long maxHashExtractionFileSize = AppConfig.MAX_HASH_EXTRACTION_FILE_SIZE;
+
         String body = objectMapper.writeValueAsString(new StartSingleScanRequest(id, maxHashExtractionFileSize));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN_ID, body);
 
