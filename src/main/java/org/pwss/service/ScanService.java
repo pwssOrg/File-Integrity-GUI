@@ -18,6 +18,7 @@ import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.request.scan.GetMostRecentScansRequest;
 import org.pwss.model.request.scan.GetScanDiffsRequest;
+import org.pwss.model.request.scan.StartScanAllRequest;
 import org.pwss.model.request.scan.StartSingleScanRequest;
 import org.pwss.model.response.LiveFeedResponse;
 import org.pwss.service.network.Endpoint;
@@ -44,8 +45,11 @@ public class ScanService {
      * @throws ExecutionException    If an error occurs during the asynchronous execution of the request.
      * @throws InterruptedException  If the thread executing the request is interrupted.
      */
-    public boolean startScan() throws StartFullScanException, ExecutionException, InterruptedException {
-        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN, null);
+    public boolean startScan() throws StartFullScanException, ExecutionException, InterruptedException, JsonProcessingException {
+        // Fake properties read
+        long maxHashExtractionFileSize = 1024 * 1024 * 2047; // 2GB - 1MB
+        String body = objectMapper.writeValueAsString(new StartScanAllRequest(maxHashExtractionFileSize));
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN, body);
 
         return switch (response.statusCode()) {
             case 200 -> true;
@@ -71,7 +75,9 @@ public class ScanService {
      * @throws JsonProcessingException If an error occurs while serializing the start scan request to JSON.
      */
     public boolean startScanById(long id) throws StartScanByIdException, ExecutionException, InterruptedException, JsonProcessingException {
-        String body = objectMapper.writeValueAsString(new StartSingleScanRequest(id));
+        // Fake properties read
+        long maxHashExtractionFileSize = 1024 * 1024 * 2047; // 2GB - 1MB
+        String body = objectMapper.writeValueAsString(new StartSingleScanRequest(id, maxHashExtractionFileSize));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN_ID, body);
 
         return switch (response.statusCode()) {
