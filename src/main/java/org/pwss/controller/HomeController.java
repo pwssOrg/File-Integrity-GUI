@@ -599,15 +599,15 @@ public final class HomeController extends BaseController<HomeScreen> {
                 }));
 
         if (maxFileSizeForHashExtraction != -1L) {
-            screen.getMaxHashExctractionFileSizeUnlimitedCheckbox().setSelected(false);
-            screen.getMaxHashExctractionFileSizeSlider().setEnabled(true);
+            screen.getMaxHashExtractionFileSizeUnlimitedCheckbox().setSelected(false);
+            screen.getMaxHashExtractionFileSizeSlider().setEnabled(true);
 
             final int maxSliderValueMegabytes = Math.toIntExact(ConversionUtils.bytesToMegabytes(maxFileSizeForHashExtraction));
-            screen.getMaxHashExctractionFileSizeSlider().setValue(maxSliderValueMegabytes);
+            screen.getMaxHashExtractionFileSizeSlider().setValue(maxSliderValueMegabytes);
             screen.getMaxHashExtractionFileSizeValueLabel().setText(maxSliderValueMegabytes + " MB");
         } else {
-            screen.getMaxHashExctractionFileSizeUnlimitedCheckbox().setSelected(true);
-            screen.getMaxHashExctractionFileSizeSlider().setEnabled(false);
+            screen.getMaxHashExtractionFileSizeUnlimitedCheckbox().setSelected(true);
+            screen.getMaxHashExtractionFileSizeSlider().setEnabled(false);
             screen.getMaxHashExtractionFileSizeValueLabel().setText("Unlimited");
         }
     }
