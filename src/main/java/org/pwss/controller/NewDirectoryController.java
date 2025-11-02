@@ -5,6 +5,7 @@ import javax.swing.JOptionPane;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.service.MonitoredDirectoryService;
+import org.pwss.utils.OSUtils;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.NewDirectoryScreen;
 
@@ -42,16 +43,23 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
 
     @Override
     void initListeners() {
-        getScreen().getSelectPathButton().addActionListener(e -> openFolderPicker());
-        getScreen().getCancelButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.HOME));
-        getScreen().getCreateButton().addActionListener(e -> createNewDirectory());
+        screen.getSelectPathButton().addActionListener(e -> openFolderPicker());
+        screen.getCancelButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.HOME));
+        screen.getCreateButton().addActionListener(e -> createNewDirectory());
     }
 
     @Override
     void refreshView() {
-        getScreen().getPathLabel()
-                .setText(selectedPath != null ? selectedPath : StringConstants.NEW_DIR_NO_PATH_SELECTED);
-        getScreen().getCreateButton().setEnabled(selectedPath != null && !selectedPath.isEmpty());
+        screen.getPathLabel().setText(selectedPath != null ? selectedPath : StringConstants.NEW_DIR_NO_PATH_SELECTED);
+        screen.getCreateButton().setEnabled(selectedPath != null && !selectedPath.isEmpty());
+
+        // Additional check for Unix-based systems to disable creation for /dev and /proc paths
+        if (OSUtils.isUnix() && selectedPath != null) {
+            if (selectedPath.startsWith("/dev") || selectedPath.startsWith("/proc")) {
+                screen.getCreateButton().setEnabled(false);
+                screen.showError("Cannot monitor directories under /dev or /proc on Unix-based systems.");
+            }
+        }
     }
 
     /**
@@ -74,16 +82,16 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
      * Navigates back to the home screen upon successful creation.
      */
     private void createNewDirectory() {
-        boolean includeSubdirectories = getScreen().getIncludeSubdirectoriesCheckBox().isSelected();
-        boolean makeActive = getScreen().getMakeDirectoryActiveCheckBox().isSelected();
+        boolean includeSubdirectories = screen.getIncludeSubdirectoriesCheckBox().isSelected();
+        boolean makeActive = screen.getMakeDirectoryActiveCheckBox().isSelected();
         if (selectedPath != null && !selectedPath.isEmpty()) {
             try {
                 monitoredDirectoryService.createNewMonitoredDirectory(selectedPath, includeSubdirectories, makeActive);
-                JOptionPane.showMessageDialog(getScreen().getRootPanel(), StringConstants.NEW_DIR_SUCCESS_TEXT,
+                JOptionPane.showMessageDialog(screen.getRootPanel(), StringConstants.NEW_DIR_SUCCESS_TEXT,
                         StringConstants.GENERIC_SUCCESS, JOptionPane.INFORMATION_MESSAGE);
                 NavigationEvents.navigateTo(Screen.HOME);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(getScreen().getRootPanel(),
+                JOptionPane.showMessageDialog(screen.getRootPanel(),
                         StringConstants.NEW_DIR_ERROR_PREFIX + e.getMessage(), StringConstants.GENERIC_ERROR,
                         JOptionPane.ERROR_MESSAGE);
             }

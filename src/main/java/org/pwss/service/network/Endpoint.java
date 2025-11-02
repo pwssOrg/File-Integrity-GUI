@@ -25,7 +25,7 @@ public enum Endpoint {
     /**
      * Endpoint for starting a file integrity scan of all directories.
      */
-    START_SCAN(HTTP_Method.GET, A.BASE_URL + A.SCAN + "start/all"),
+    START_SCAN(HTTP_Method.POST, A.BASE_URL + A.SCAN + "start/all"),
     /**
      * Endpoint for starting a file integrity scan of a specific directory.
      */

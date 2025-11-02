@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import org.pwss.exception.scan_summary.GetMostRecentSummaryException;
 import org.pwss.exception.scan_summary.FileSearchException;
+import org.pwss.exception.scan_summary.GetMostRecentSummaryException;
 import org.pwss.exception.scan_summary.GetSummaryForFileException;
 import org.pwss.exception.scan_summary.GetSummaryForScanException;
 import org.pwss.model.entity.File;
@@ -67,12 +67,12 @@ public class ScanSummaryService {
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), ScanSummary[].class));
+            case 400 ->
+                    throw new GetSummaryForFileException("Get summaries for file failed: The provided file ID is invalid.");
             case 401 ->
                     throw new GetSummaryForFileException("Get summaries for file failed: User not authorized to perform this action.");
             case 404 ->
                     throw new GetSummaryForFileException("Get summaries for file failed: No scan summaries found for the specified file.");
-            case 422 ->
-                    throw new GetSummaryForFileException("Get summaries for file failed: The provided file ID is invalid.");
             case 500 ->
                     throw new GetSummaryForFileException("Get summaries for file failed: An error occurred on the server while attempting to retrieve the scan summaries.");
             default -> null;
@@ -96,11 +96,11 @@ public class ScanSummaryService {
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), File[].class));
+            case 400 ->
+                    throw new FileSearchException("Search files failed: The provided search parameters are invalid.");
             case 401 ->
                     throw new FileSearchException("Search files failed: User not authorized to perform this action.");
             case 404 -> List.of();
-            case 422 ->
-                    throw new FileSearchException("Search files failed: The provided search parameters are invalid.");
             case 500 ->
                     throw new FileSearchException("Search files failed: An error occurred on the server while attempting to search for files.");
             default -> null;
@@ -113,12 +113,12 @@ public class ScanSummaryService {
 
         return switch (response.statusCode()) {
             case 200 -> List.of(objectMapper.readValue(response.body(), ScanSummary[].class));
+            case 400 ->
+                    throw new GetSummaryForScanException("Get summaries for scan failed: The provided scan ID is invalid.");
             case 401 ->
                     throw new GetSummaryForScanException("Get summaries for scan failed: User not authorized to perform this action.");
             case 404 ->
                     throw new GetSummaryForScanException("Get summaries for scan failed: No scan summaries found for the specified file.");
-            case 422 ->
-                    throw new GetSummaryForScanException("Get summaries for scan failed: The provided scan ID is invalid.");
             case 500 ->
                     throw new GetSummaryForScanException("Get summaries for scan failed: An error occurred on the server while attempting to retrieve the scan summaries.");
             default -> null;

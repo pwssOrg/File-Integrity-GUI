@@ -38,8 +38,8 @@ public class NoteService {
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.NOTE_UPDATE, body);
         return switch (response.statusCode()) {
             case 200 -> true;
+            case 400 -> throw new UpdateNoteException("Update notes failed: Invalid note ID or note content.");
             case 401 -> throw new UpdateNoteException("Update notes failed: User not authorized to perform this action.");
-            case 422 -> throw new UpdateNoteException("Update notes failed: Invalid note ID or note content.");
             case 500 -> throw new UpdateNoteException("Update notes failed: An error occurred on the server while attempting to update the notes.");
             default -> false;
         };
@@ -61,9 +61,9 @@ public class NoteService {
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.NOTE_RESTORE, body);
         return switch (response.statusCode()) {
             case 200 -> true;
+            case 400 -> throw new RestoreNoteException("Restore notes failed: Invalid note ID or note content.");
             case 401 ->
                     throw new RestoreNoteException("Restore notes failed: User not authorized to perform this action.");
-            case 422 -> throw new RestoreNoteException("Restore notes failed: Invalid note ID or note content.");
             case 500 ->
                     throw new RestoreNoteException("Restore notes failed: An error occurred on the server while attempting to restore the notes.");
             default -> false;
