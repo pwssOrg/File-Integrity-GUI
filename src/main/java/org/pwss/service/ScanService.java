@@ -41,15 +41,13 @@ public class ScanService {
     /**
      * Starts a scan by sending a request to the START_SCAN endpoint.
      *
+     * @param maxHashExtractionFileSize The maximum file size for hash extraction.
      * @return `true` if the scan start request is successful, otherwise `false`.
      * @throws StartFullScanException If the scan start attempt fails due to various reasons such as invalid credentials, no active monitored directories, scan already running, or server error.
      * @throws ExecutionException    If an error occurs during the asynchronous execution of the request.
      * @throws InterruptedException  If the thread executing the request is interrupted.
      */
-    public boolean startScan() throws StartFullScanException, ExecutionException, InterruptedException, JsonProcessingException {
-        // Read max hash extraction file size from config
-        long maxHashExtractionFileSize = AppConfig.MAX_HASH_EXTRACTION_FILE_SIZE;
-
+    public boolean startScan(long maxHashExtractionFileSize) throws StartFullScanException, ExecutionException, InterruptedException, JsonProcessingException {
         String body = objectMapper.writeValueAsString(new StartScanAllRequest(maxHashExtractionFileSize));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN, body);
 
@@ -70,16 +68,14 @@ public class ScanService {
      * Starts a scan for a specific monitored directory by its ID by sending a request to the START_SCAN_ID endpoint.
      *
      * @param id The ID of the monitored directory to start the scan for.
+     * @param maxHashExtractionFileSize The maximum file size for hash extraction.
      * @return `true` if the scan start request is successful, otherwise `false`.
      * @throws StartScanByIdException  If the scan start attempt fails due to various reasons such as invalid credentials, monitored directory not found, monitored directory inactive, scan already running, or server error.
      * @throws ExecutionException      If an error occurs during the asynchronous execution of the request.
      * @throws InterruptedException    If the thread executing the request is interrupted.
      * @throws JsonProcessingException If an error occurs while serializing the start scan request to JSON.
      */
-    public boolean startScanById(long id) throws StartScanByIdException, ExecutionException, InterruptedException, JsonProcessingException {
-        // Read max hash extraction file size from config
-        long maxHashExtractionFileSize = AppConfig.MAX_HASH_EXTRACTION_FILE_SIZE;
-
+    public boolean startScanById(long id, long maxHashExtractionFileSize) throws StartScanByIdException, ExecutionException, InterruptedException, JsonProcessingException {
         String body = objectMapper.writeValueAsString(new StartSingleScanRequest(id, maxHashExtractionFileSize));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN_ID, body);
 

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
-
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
@@ -61,6 +60,7 @@ import org.pwss.service.NoteService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
 import org.pwss.utils.AppTheme;
+import org.pwss.utils.ConversionUtils;
 import org.pwss.utils.LiveFeedUtils;
 import org.pwss.utils.MonitoredDirectoryUtils;
 import org.pwss.utils.OSUtils;
@@ -71,7 +71,9 @@ import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
 import org.slf4j.LoggerFactory;
 
+
 import static org.pwss.app_settings.AppConfig.APP_THEME;
+import static org.pwss.app_settings.AppConfig.MAX_HASH_EXTRACTION_FILE_SIZE;
 import static org.pwss.app_settings.AppConfig.USE_SPLASH_SCREEN;
 
 // TODO: NEEDS REFACTORING - VERY LARGE CLASS
@@ -168,6 +170,11 @@ public final class HomeController extends BaseController<HomeScreen> {
     private boolean showSplashScreenSetting;
 
     /**
+     * Maximum file size (in bytes) for which hash extraction will be performed.
+     */
+    private long maxFileSizeForHashExtraction;
+
+    /**
      * Constructor to initialize HomeController with a HomeScreen view instance.
      *
      * @param view The home screen view that this controller will manage.
@@ -183,6 +190,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         this.monitoredDirectoryPopupFactory = new MonitoredDirectoryPopupFactory(
                 new MonitoredDirectoryPopupListenerImpl(this, monitoredDirectoryService, noteService));
         this.showSplashScreenSetting = USE_SPLASH_SCREEN;
+        this.maxFileSizeForHashExtraction = MAX_HASH_EXTRACTION_FILE_SIZE;
     }
 
     @Override
@@ -412,10 +420,43 @@ public final class HomeController extends BaseController<HomeScreen> {
             }
         });
         screen.getMaxHashExctractionFileSizeSlider().addChangeListener(l -> {
-            int value = screen.getMaxHashExctractionFileSizeSlider().getValue();
-            log.debug("Setting max hash extraction file size to {} MB", value);
-            screen.getMaxHashExtractionFileSizeValueLabel().setText(value + " MB");
-            // TODO: Update the AppConfig value
+            long valueMegabytes = screen.getMaxHashExctractionFileSizeSlider().getValue();
+            log.debug("Setting max hash extraction file size to {} MB", valueMegabytes);
+            long valueBytes = ConversionUtils.megabytesToBytes(valueMegabytes);
+
+            // Set App config value to size in bytes
+            if (AppConfig.setMaxHashExtractionFileSize(valueBytes)) {
+                screen.getMaxHashExtractionFileSizeValueLabel().setText(valueMegabytes + " MB");
+                maxFileSizeForHashExtraction = ConversionUtils.megabytesToBytes(valueMegabytes);
+            } else {
+                log.error("Failed to update max hash extraction file size in app config.");
+            }
+        });
+        screen.getMaxHashExctractionFileSizeUnlimitedCheckbox().addActionListener(l -> {
+            // If checked set the max size to -1L
+            boolean checked = screen.getMaxHashExctractionFileSizeUnlimitedCheckbox().isSelected();
+            if (checked) {
+                log.debug("Setting max hash extraction file size to unlimited.");
+                if (AppConfig.setMaxHashExtractionFileSize(-1L)) {
+                    maxFileSizeForHashExtraction = -1L;
+                    screen.getMaxHashExtractionFileSizeValueLabel().setText("Unlimited");
+                    screen.getMaxHashExctractionFileSizeSlider().setEnabled(false);
+                } else {
+                    log.error("Failed to update max hash extraction file size in app config.");
+                }
+            } else {
+                // If unchecked set the size to the current slider value
+                long sliderValueMegabytes = screen.getMaxHashExctractionFileSizeSlider().getValue();
+                log.debug("Setting max hash extraction file size to {} MB", sliderValueMegabytes);
+                long sliderValueBytes = ConversionUtils.megabytesToBytes(sliderValueMegabytes);
+                if (AppConfig.setMaxHashExtractionFileSize(sliderValueBytes)) {
+                    maxFileSizeForHashExtraction = sliderValueBytes;
+                    screen.getMaxHashExtractionFileSizeValueLabel().setText(sliderValueMegabytes + " MB");
+                    screen.getMaxHashExctractionFileSizeSlider().setEnabled(true);
+                } else {
+                    log.error("Failed to update max hash extraction file size in app config.");
+                }
+            }
         });
     }
 
@@ -556,6 +597,19 @@ public final class HomeController extends BaseController<HomeScreen> {
                         }
                     });
                 }));
+
+        if (maxFileSizeForHashExtraction != -1L) {
+            screen.getMaxHashExctractionFileSizeUnlimitedCheckbox().setSelected(false);
+            screen.getMaxHashExctractionFileSizeSlider().setEnabled(true);
+
+            final int maxSliderValueMegabytes = Math.toIntExact(ConversionUtils.bytesToMegabytes(maxFileSizeForHashExtraction));
+            screen.getMaxHashExctractionFileSizeSlider().setValue(maxSliderValueMegabytes);
+            screen.getMaxHashExtractionFileSizeValueLabel().setText(maxSliderValueMegabytes + " MB");
+        } else {
+            screen.getMaxHashExctractionFileSizeUnlimitedCheckbox().setSelected(true);
+            screen.getMaxHashExctractionFileSizeSlider().setEnabled(false);
+            screen.getMaxHashExtractionFileSizeValueLabel().setText("Unlimited");
+        }
     }
 
     /**
@@ -601,7 +655,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                     int modelRow = table.convertRowIndexToModel(viewRow);
                     Optional<MonitoredDirectory> dir = model.getDirectoryAt(modelRow);
                     if (dir.isPresent()) {
-                        startScanSuccess = scanService.startScanById(dir.get().id());
+                        startScanSuccess = scanService.startScanById(dir.get().id(), maxFileSizeForHashExtraction);
                         scanningDirs.add(dir.get());
                         baseLineScan = !dir.get().baselineEstablished();
                     } else {
@@ -611,7 +665,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                 }
             } else {
                 baseLineScan = false;
-                startScanSuccess = scanService.startScan();
+                startScanSuccess = scanService.startScan(maxFileSizeForHashExtraction);
                 scanningDirs.addAll(allMonitoredDirectories);
             }
             SwingUtilities.invokeLater(() -> {
