@@ -326,7 +326,7 @@ final class ConfigLoader {
             return true;
         } catch (Exception exception) {
             log.debug("Max hash extraction file size could not be set in app.config file", exception);
-            log.error("Max hash extraction file size could not be set in app.config file", exception.getMessage());
+            log.error("Max hash extraction file size could not be set in app.config file: {}", exception.getMessage());
             return false;
         }
     }
