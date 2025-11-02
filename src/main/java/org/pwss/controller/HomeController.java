@@ -419,8 +419,8 @@ public final class HomeController extends BaseController<HomeScreen> {
 
             }
         });
-        screen.getMaxHashExctractionFileSizeSlider().addChangeListener(l -> {
-            long valueMegabytes = screen.getMaxHashExctractionFileSizeSlider().getValue();
+        screen.getMaxHashExtractionFileSizeSlider().addChangeListener(l -> {
+            long valueMegabytes = screen.getMaxHashExtractionFileSizeSlider().getValue();
             log.debug("Setting max hash extraction file size to {} MB", valueMegabytes);
             long valueBytes = ConversionUtils.megabytesToBytes(valueMegabytes);
 
