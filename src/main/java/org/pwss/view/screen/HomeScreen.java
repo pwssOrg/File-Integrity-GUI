@@ -4,6 +4,9 @@ package org.pwss.view.screen;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
+
+import static org.pwss.app_settings.AppConfig.APP_THEME;
+
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
@@ -216,7 +219,7 @@ public class HomeScreen extends BaseScreen {
     /**
      * Slider for setting the maximum file size for hash extraction.
      */
-    private JSlider maxHashExctractionFileSizeSlider;
+    private JSlider maxHashExtractionFileSizeSlider;
 
     /**
      * Label displaying the value of the maximum file size for hash extraction.
@@ -495,8 +498,8 @@ public class HomeScreen extends BaseScreen {
      *
      * @return JSlider for maximum hash extraction file size.
      */
-    public JSlider getMaxHashExctractionFileSizeSlider() {
-        return maxHashExctractionFileSizeSlider;
+    public JSlider getMaxHashExtractionFileSizeSlider() {
+        return maxHashExtractionFileSizeSlider;
     }
 
     /**
@@ -504,8 +507,8 @@ public class HomeScreen extends BaseScreen {
      *
      * @return JCheckBox representing the "Unlimited" option for max hash extraction file size.
      */
-    public JCheckBox getMaxHashExctractionFileSizeUnlimitedCheckbox() {
-        return maxHashExctractionFileSizeUnlimitedCheckbox;
+    public JCheckBox getMaxHashExtractionFileSizeUnlimitedCheckbox() {
+        return maxHashExtractionFileSizeUnlimitedCheckbox;
     }
 
     {
@@ -564,7 +567,7 @@ public class HomeScreen extends BaseScreen {
         panel2.add(label2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JScrollPane scrollPane2 = new JScrollPane();
         panel2.add(scrollPane2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        monitoredDirectoryList = new JList();
+        monitoredDirectoryList = new JList<MonitoredDirectory>();
         monitoredDirectoryList.setEnabled(true);
         monitoredDirectoryList.setSelectionMode(0);
         monitoredDirectoryList.setToolTipText("Monitored directories list");
@@ -692,7 +695,7 @@ public class HomeScreen extends BaseScreen {
         panel5.add(label7, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer1 = new Spacer();
         panel5.add(spacer1, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
-        themePicker = new JComboBox();
+        themePicker = new JComboBox<AppTheme>();
         panel5.add(themePicker, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         restartButton = new JButton();
         restartButton.setText("Restart");
@@ -715,7 +718,7 @@ public class HomeScreen extends BaseScreen {
         maxHashExtractionFileSizeSlider.setPaintTicks(true);
         maxHashExtractionFileSizeSlider.setPaintTrack(true);
         maxHashExtractionFileSizeSlider.setSnapToTicks(true);
-        panel6.add(maxHashExctractionFileSizeSlider, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        panel6.add(maxHashExtractionFileSizeSlider, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label9 = new JLabel();
         label9.setText("Max hash exctraction file size (MB)");
         panel6.add(label9, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -724,9 +727,9 @@ public class HomeScreen extends BaseScreen {
         maxHashExtractionFileSizeValueLabel = new JLabel();
         maxHashExtractionFileSizeValueLabel.setText("Selected:");
         panel6.add(maxHashExtractionFileSizeValueLabel, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        maxHashExctractionFileSizeUnlimitedCheckbox = new JCheckBox();
-        maxHashExctractionFileSizeUnlimitedCheckbox.setText("Unlimited");
-        panel6.add(maxHashExctractionFileSizeUnlimitedCheckbox, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        maxHashExtractionFileSizeUnlimitedCheckbox = new JCheckBox();
+        maxHashExtractionFileSizeUnlimitedCheckbox.setText("Unlimited");
+        panel6.add(maxHashExtractionFileSizeUnlimitedCheckbox, new GridConstraints(5, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JLabel label10 = new JLabel();
         label10.setText("Theme");
         panel5.add(label10, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));

@@ -432,27 +432,27 @@ public final class HomeController extends BaseController<HomeScreen> {
                 log.error("Failed to update max hash extraction file size in app config.");
             }
         });
-        screen.getMaxHashExctractionFileSizeUnlimitedCheckbox().addActionListener(l -> {
+        screen.getMaxHashExtractionFileSizeUnlimitedCheckbox().addActionListener(l -> {
             // If checked set the max size to -1L
-            boolean checked = screen.getMaxHashExctractionFileSizeUnlimitedCheckbox().isSelected();
+            boolean checked = screen.getMaxHashExtractionFileSizeUnlimitedCheckbox().isSelected();
             if (checked) {
                 log.debug("Setting max hash extraction file size to unlimited.");
                 if (AppConfig.setMaxHashExtractionFileSize(-1L)) {
                     maxFileSizeForHashExtraction = -1L;
                     screen.getMaxHashExtractionFileSizeValueLabel().setText("Unlimited");
-                    screen.getMaxHashExctractionFileSizeSlider().setEnabled(false);
+                    screen.getMaxHashExtractionFileSizeSlider().setEnabled(false);
                 } else {
                     log.error("Failed to update max hash extraction file size in app config.");
                 }
             } else {
                 // If unchecked set the size to the current slider value
-                long sliderValueMegabytes = screen.getMaxHashExctractionFileSizeSlider().getValue();
+                long sliderValueMegabytes = screen.getMaxHashExtractionFileSizeSlider().getValue();
                 log.debug("Setting max hash extraction file size to {} MB", sliderValueMegabytes);
                 long sliderValueBytes = ConversionUtils.megabytesToBytes(sliderValueMegabytes);
                 if (AppConfig.setMaxHashExtractionFileSize(sliderValueBytes)) {
                     maxFileSizeForHashExtraction = sliderValueBytes;
                     screen.getMaxHashExtractionFileSizeValueLabel().setText(sliderValueMegabytes + " MB");
-                    screen.getMaxHashExctractionFileSizeSlider().setEnabled(true);
+                    screen.getMaxHashExtractionFileSizeSlider().setEnabled(true);
                 } else {
                     log.error("Failed to update max hash extraction file size in app config.");
                 }
