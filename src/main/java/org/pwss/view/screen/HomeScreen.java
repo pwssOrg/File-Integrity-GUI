@@ -226,7 +226,7 @@ public class HomeScreen extends BaseScreen {
     /**
      * Checkbox to set the maximum hash extraction file size to unlimited.
      */
-    private JCheckBox maxHashExctractionFileSizeUnlimitedCheckbox;
+    private JCheckBox maxHashExtractionFileSizeUnlimitedCheckbox;
 
     @Override
     protected String getScreenName() {
