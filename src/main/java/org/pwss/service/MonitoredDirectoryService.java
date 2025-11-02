@@ -182,12 +182,11 @@ public class MonitoredDirectoryService {
 
                 return switch (response.statusCode()) {
                         case 200 -> true;
+                        case 400 -> throw new UpdateMonitoredDirectoryException(
+                                "Update monitored directory failed: invalid input data.");
                         case 401 ->
                                 throw new UpdateMonitoredDirectoryException(
                                                 "Update monitored directory failed: User not authorized to perform this action.");
-                        case 422 ->
-                                throw new UpdateMonitoredDirectoryException(
-                                                "Update monitored directory failed: Unprocessable entity - invalid input data.");
                         case 500 ->
                                 throw new UpdateMonitoredDirectoryException(
                                                 "Update monitored directory failed: An error occurred on the server while attempting to update the monitored directory.");
