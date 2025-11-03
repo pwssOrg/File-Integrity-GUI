@@ -10,6 +10,7 @@ import org.pwss.exception.user.UserExistsLookupException;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.service.AuthService;
+import org.pwss.utils.LoginUtils;
 import org.pwss.view.screen.LoginScreen;
 import org.slf4j.LoggerFactory;
 
@@ -144,31 +145,21 @@ public class LoginController extends BaseController<LoginScreen> {
     }
 
     /**
-     * Validates the input fields for username and password.
+     * Validates the user input for username, password, and license key.
      *
-     * @return true if both fields are non-empty, false otherwise.
+     * @return true if input is valid, false otherwise.
      */
     private boolean validateInput() {
         String username = getScreen().getUsername();
         String password = getScreen().getPassword();
         String licenseKey = licenseKeySet ? LICENSE_KEY : getScreen().getLicenseKey();
 
-        if (username == null || username.trim().isEmpty()) {
-            getScreen().showError("Username cannot be empty.");
-            return false;
+        LoginUtils.LoginValidationResult result = LoginUtils.validateInput(username, password, licenseKey, createUserMode);
+        if (!result.isValid()) {
+            getScreen().showError(result.errorMessage());
         }
 
-        if (password == null || password.trim().isEmpty()) {
-            getScreen().showError("Password cannot be empty.");
-            return false;
-        }
-
-        if (licenseKey == null || licenseKey.trim().isEmpty()) {
-            getScreen().showError("License Key cannot be empty.");
-            return false;
-        }
-
-        return true;
+        return result.isValid();
     }
 
     /**
