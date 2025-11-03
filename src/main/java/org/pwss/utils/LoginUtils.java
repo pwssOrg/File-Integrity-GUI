@@ -5,6 +5,10 @@ package org.pwss.utils;
  */
 public final class LoginUtils {
 
+    // Private constructor to prevent instantiation
+    private LoginUtils() {
+        // This constructor is intentionally empty.
+    }
     /**
      * Result of login validation.
      *
