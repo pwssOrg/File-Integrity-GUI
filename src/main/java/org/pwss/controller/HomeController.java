@@ -61,6 +61,7 @@ import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
 import org.pwss.utils.AppTheme;
 import org.pwss.utils.ConversionUtils;
+import org.pwss.utils.ErrorUtils;
 import org.pwss.utils.LiveFeedUtils;
 import org.pwss.utils.MonitoredDirectoryUtils;
 import org.pwss.utils.OSUtils;
@@ -70,7 +71,6 @@ import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
 import org.slf4j.LoggerFactory;
-
 
 import static org.pwss.app_settings.AppConfig.APP_THEME;
 import static org.pwss.app_settings.AppConfig.MAX_HASH_EXTRACTION_FILE_SIZE;
@@ -603,7 +603,8 @@ public final class HomeController extends BaseController<HomeScreen> {
             screen.getMaxHashExtractionFileSizeUnlimitedCheckbox().setSelected(false);
             screen.getMaxHashExtractionFileSizeSlider().setEnabled(true);
 
-            final int maxSliderValueMegabytes = Math.toIntExact(ConversionUtils.bytesToMegabytes(maxFileSizeForHashExtraction));
+            final int maxSliderValueMegabytes = Math
+                    .toIntExact(ConversionUtils.bytesToMegabytes(maxFileSizeForHashExtraction));
             screen.getMaxHashExtractionFileSizeSlider().setValue(maxSliderValueMegabytes);
             screen.getMaxHashExtractionFileSizeValueLabel().setText(maxSliderValueMegabytes + " MB");
         } else {
@@ -686,7 +687,8 @@ public final class HomeController extends BaseController<HomeScreen> {
                 | JsonProcessingException e) {
             log.debug(StringConstants.SCAN_START_ERROR, e);
             log.error(StringConstants.SCAN_START_ERROR + " {}", e.getMessage());
-            SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_START_ERROR));
+            SwingUtilities.invokeLater(() -> screen
+                    .showError(ErrorUtils.formatErrorMessage(StringConstants.SCAN_START_ERROR, e.getMessage())));
         }
     }
 

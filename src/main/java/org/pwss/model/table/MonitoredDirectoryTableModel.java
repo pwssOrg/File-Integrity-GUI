@@ -9,7 +9,7 @@ import org.pwss.model.entity.MonitoredDirectory;
 public class MonitoredDirectoryTableModel extends AbstractTableModel {
     private final List<MonitoredDirectory> directories;
     private final String[] columnNames = {
-            "\uD83D\uDCC1 Path", "\uD83D\uDEA6 Note", "\uD83D\uDD59 Last Scanned", "\uD83D\uDEE1️ Baseline Established", "\uD83D\uDDC2️ Include Subdirectories", "Active"
+            "\uD83D\uDCC1 Path", "\uD83D\uDCDD Note", "\uD83D\uDD59 Last Scanned", "\u2693 Baseline Established", "\uD83D\uDCC2 Include Subdirectories", "\uD83D\uDD0C Active"
     };
 
     public MonitoredDirectoryTableModel(List<MonitoredDirectory> directories) {
