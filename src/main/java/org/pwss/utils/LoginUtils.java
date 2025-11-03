@@ -33,7 +33,7 @@ public final class LoginUtils {
         if (password == null || password.trim().isEmpty()) {
             return new LoginValidationResult(false, "Password cannot be empty.");
         }
-        if (createUserMode && password.length() < 8) {
+        if (createUserMode && password.trim().length() < 8) {
             return new LoginValidationResult(false, "Password must be at least 8 characters long.");
         }
         if (createUserMode && !password.matches(".*[A-Z].*")) {
