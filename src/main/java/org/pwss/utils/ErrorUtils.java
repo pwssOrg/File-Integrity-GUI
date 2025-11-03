@@ -6,10 +6,13 @@ package org.pwss.utils;
 public final class ErrorUtils {
 
     /**
-     * Formats an error message by combining a constant text with a dynamic error message.
+     * Formats an error message by combining a constant text with a dynamic error
+     * message.
      *
-     * @param errorConstantText The constant part of the error message, such as "Error: "
-     * @param errorMessageText The dynamic part of the error message that provides specific details
+     * @param errorConstantText The constant part of the error message, such as
+     *                          "Error: "
+     * @param errorMessageText  The dynamic part of the error message that provides
+     *                          specific details
      * @return A formatted error message string combining both parts
      */
     public static String formatErrorMessage(String errorConstantText, String errorMessageText) {
