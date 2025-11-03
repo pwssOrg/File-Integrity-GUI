@@ -250,8 +250,9 @@ public final class HomeController extends BaseController<HomeScreen> {
             // table
             allMonitoredDirectories = monitoredDirectoryService.getAllDirectories();
 
-            // Only fetch diffs if there are monitored directories present
-            if (!allMonitoredDirectories.isEmpty()) {
+            // Only fetch diffs if there are active monitored directories present
+            final long activeDirCount = allMonitoredDirectories.stream().filter(MonitoredDirectory::isActive).count();
+            if (activeDirCount > 0) {
                 // Fetch recent scans for display in the scan table
                 recentScans = scanService.getMostRecentScansAll();
                 if (recentScans.isEmpty()) {
