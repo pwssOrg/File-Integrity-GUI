@@ -48,7 +48,14 @@ public final class StringConstants {
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR = "Failed to reset baseline.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_INVALID = "Invalid code. Baseline reset cancelled.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_PREFIX = "Error resetting baseline: ";
-    public static final String MON_DIR_POPUP_EDIT_DIR = "Edit this directory";
+    public static final String MON_DIR_TOGGLE_ACTIVE_ENABLE = "Set directory as active";
+    public static final String MON_DIR_TOGGLE_ACTIVE_DISABLE = "Set directory as inactive";
+    public static final String MON_DIR_TOGGLE_ACTIVE_SUCCESS = "Directory status updated successfully.";
+    public static final String MON_DIR_TOGGLE_ACTIVE_ERROR = "Failed to update directory status.";
+    public static final String MON_DIR_TOGGLE_INCLUDE_SUBDIR_ENABLE = "Include subdirectories";
+    public static final String MON_DIR_TOGGLE_INCLUDE_SUBDIR_DISABLE = "Exclude subdirectories";
+    public static final String MON_DIR_TOGGLE_INCLUDE_SUBDIR_SUCCESS = "Subdirectory inclusion status updated successfully.";
+    public static final String MON_DIR_TOGGLE_INCLUDE_SUBDIR_ERROR = "Failed to update subdirectory inclusion status.";
 
     // Show note related strings
     public static final String MON_DIR_POPUP_SHOW_NOTE = "Show note";

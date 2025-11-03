@@ -23,11 +23,18 @@ public interface MonitoredDirectoryPopupListener {
     void onResetBaseline(MonitoredDirectory dir, long endpointCode);
 
     /**
-     * Triggered when a monitored directory is edited.
+     * Triggered when the active status of a monitored directory is toggled.
      *
-     * @param dir The monitored directory to be edited.
+     * @param dir The monitored directory whose active status is being toggled.
      */
-    void onEditDirectory(MonitoredDirectory dir);
+    void onToggleActiveStatus(MonitoredDirectory dir);
+
+    /**
+     * Triggered when the inclusion of subdirectories for a monitored directory is toggled.
+     *
+     * @param dir The monitored directory whose subdirectory inclusion is being toggled.
+     */
+    void onToggleIncludeSubdirectories(MonitoredDirectory dir);
 
     /**
      * Triggered when the notes for a monitored directory are updated.
