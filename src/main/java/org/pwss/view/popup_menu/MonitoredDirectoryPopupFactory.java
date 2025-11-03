@@ -65,7 +65,9 @@ public class MonitoredDirectoryPopupFactory {
         JMenuItem restoreNoteItem = getRestoreNoteItem(dir);
 
         // Assemble menu
-        menu.add(scanItem);
+        if (dir.isActive()) {
+            menu.add(scanItem);
+        }
         menu.add(toggleActiveMenuItem);
         menu.add(toggleIncludeSubDirsItem);
         menu.addSeparator();
