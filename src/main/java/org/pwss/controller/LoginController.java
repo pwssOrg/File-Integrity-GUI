@@ -2,6 +2,7 @@ package org.pwss.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.concurrent.ExecutionException;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.pwss.app_settings.AppConfig;
 import org.pwss.exception.user.CreateUserException;
@@ -11,6 +12,7 @@ import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.service.AuthService;
 import org.pwss.utils.LoginUtils;
+import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.LoginScreen;
 import org.slf4j.LoggerFactory;
 
@@ -141,7 +143,19 @@ public class LoginController extends BaseController<LoginScreen> {
 
         if (createUserMode) {
             // Handle user creation logic here and then login
-            createUserAndLogin();
+            int choice = screen.showOptionDialog(JOptionPane.INFORMATION_MESSAGE,
+                    "Welcome to Integrity Hash!\n\n" +
+                            "You are about to create the first user for this application.\n" +
+                            "Please make sure to remember your credentials as they will be required for future logins.\n\n" +
+                            "Do you want to proceed?",
+                    new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
+                    StringConstants.GENERIC_YES);
+
+            if (choice == 0) {
+                createUserAndLogin();
+            } else {
+                log.debug("User creation cancelled by user.");
+            }
         } else {
             // Handle normal login logic here
             performLogin();
