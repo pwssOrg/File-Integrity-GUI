@@ -67,7 +67,9 @@ public class LoginController extends BaseController<LoginScreen> {
         log.debug("Current LICENSE_KEY: {}", licenseKeySet ? "SET" : "NOT SET");
         log.debug("Create User Mode: {}", createUserMode);
         // Adjust frame size based on create user mode
-        screen.getParentFrame().setSize(450, createUserMode ? 300 : 250);
+        final int frameHeight = createUserMode ? 225 : 200;
+        final int offset = licenseKeySet ? 0 : 50;
+        screen.getParentFrame().setSize(450, frameHeight + offset);
         refreshView();
     }
 
@@ -147,10 +149,13 @@ public class LoginController extends BaseController<LoginScreen> {
         if (createUserMode) {
             // Handle user creation logic here and then login
             int choice = screen.showOptionDialog(JOptionPane.INFORMATION_MESSAGE,
-                    "Welcome to Integrity Hash!\n\n" +
-                            "You are about to create the first user for this application.\n" +
-                            "Please make sure to remember your credentials as they will be required for future logins.\n\n" +
-                            "Do you want to proceed?",
+                    """
+                            Welcome to Integrity Hash!
+                            
+                            You are about to create the first user for this application.
+                            Please make sure to remember your credentials as they will be required for future logins.
+                            
+                            Do you want to proceed?""",
                     new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
                     StringConstants.GENERIC_YES);
 
