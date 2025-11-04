@@ -1,68 +1,110 @@
 package org.pwss.utils;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.pwss.utils.LoginUtils.LoginValidationResult;
 
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LoginUtilsTest {
 
-    @Test
-    void validateInput_returnsValidResult_whenAllInputsAreValid() {
-        var result = LoginUtils.validateInput("validUser", "Valid123!", "LICENSE123", false);
-        assertTrue(result.isValid());
-        assertNull(result.errorMessage());
+    // --- Helper for readable assertions ---
+    private void assertHasError(LoginValidationResult result, String expectedError) {
+        assertFalse(result.isValid(), "Expected validation to fail");
+        assertTrue(result.errors().contains(expectedError),
+                "Expected error message: " + expectedError);
     }
 
     @Test
-    void validateInput_returnsError_whenUsernameIsEmpty() {
-        var result = LoginUtils.validateInput("", "Valid123!", "LICENSE123", false);
+    void testAllFieldsEmpty() {
+        LoginValidationResult result = LoginUtils.validateInput("", "", "", "", false);
         assertFalse(result.isValid());
-        assertEquals("Username cannot be empty.", result.errorMessage());
+        assertEquals(3, result.errors().size());
+        assertHasError(result, "Username cannot be empty.");
+        assertHasError(result, "Password cannot be empty.");
+        assertHasError(result, "License key cannot be empty.");
     }
 
     @Test
-    void validateInput_returnsError_whenPasswordIsEmpty() {
-        var result = LoginUtils.validateInput("validUser", "", "LICENSE123", false);
-        assertFalse(result.isValid());
-        assertEquals("Password cannot be empty.", result.errorMessage());
+    void testNullInputsHandledGracefully() {
+        assertDoesNotThrow(() -> {
+            LoginValidationResult result = LoginUtils.validateInput(null, null, null, null, false);
+            assertFalse(result.isValid());
+            assertTrue(result.errors().contains("Username cannot be empty."));
+        });
+    }
+
+    // --- License key validation ---
+
+    @Test
+    void testMissingLicenseKey() {
+        LoginValidationResult result = LoginUtils.validateInput("user", "password", "", "", false);
+        assertHasError(result, "License key cannot be empty.");
+    }
+
+    // --- Password validation in createUserMode ---
+
+    @Test
+    void testPasswordTooShort() {
+        LoginValidationResult result = LoginUtils.validateInput("user", "Ab1!", "Ab1!", "key123", true);
+        assertHasError(result, "Password must be at least 8 characters long.");
     }
 
     @Test
-    void validateInput_returnsError_whenPasswordTooShortInCreateUserMode() {
-        var result = LoginUtils.validateInput("validUser", "Short1!", "LICENSE123", true);
-        assertFalse(result.isValid());
-        assertEquals("Password must be at least 8 characters long.", result.errorMessage());
+    void testConfirmPasswordMissing() {
+        LoginValidationResult result = LoginUtils.validateInput("user", "Abcd123!", "", "key123", true);
+        assertHasError(result, "Confirm Password cannot be empty.");
     }
 
     @Test
-    void validateInput_returnsError_whenPasswordMissingUppercaseInCreateUserMode() {
-        var result = LoginUtils.validateInput("validUser", "valid123!", "LICENSE123", true);
-        assertFalse(result.isValid());
-        assertEquals("Password must contain at least one uppercase letter.", result.errorMessage());
+    void testPasswordsDoNotMatch() {
+        LoginValidationResult result = LoginUtils.validateInput("user", "Abcd123!", "Abcd1234!", "key123", true);
+        assertHasError(result, "Password and Confirm Password do not match.");
     }
 
     @Test
-    void validateInput_returnsError_whenPasswordMissingDigitInCreateUserMode() {
-        var result = LoginUtils.validateInput("validUser", "ValidPass!", "LICENSE123", true);
-        assertFalse(result.isValid());
-        assertEquals("Password must contain at least one digit.", result.errorMessage());
+    void testPasswordMissingUppercase() {
+        LoginValidationResult result = LoginUtils.validateInput("user", "abcd123!", "abcd123!", "key123", true);
+        assertHasError(result, "Password must contain at least one uppercase letter.");
     }
 
     @Test
-    void validateInput_returnsError_whenPasswordMissingSpecialCharacterInCreateUserMode() {
-        var result = LoginUtils.validateInput("validUser", "Valid1234", "LICENSE123", true);
-        assertFalse(result.isValid());
-        assertEquals("Password must contain at least one special character.", result.errorMessage());
+    void testPasswordMissingDigit() {
+        LoginValidationResult result = LoginUtils.validateInput("user", "Abcdefg!", "Abcdefg!", "key123", true);
+        assertHasError(result, "Password must contain at least one digit.");
     }
 
     @Test
-    void validateInput_returnsError_whenLicenseKeyIsEmpty() {
-        var result = LoginUtils.validateInput("validUser", "Valid123!", "", false);
-        assertFalse(result.isValid());
-        assertEquals("License key cannot be empty.", result.errorMessage());
+    void testPasswordMissingSpecialCharacter() {
+        LoginValidationResult result = LoginUtils.validateInput("user", "Abcdefg1", "Abcdefg1", "key123", true);
+        assertHasError(result, "Password must contain at least one special character.");
+    }
+
+    // --- Valid case ---
+
+    @Test
+    void testValidInputInCreateUserMode() {
+        LoginValidationResult result = LoginUtils.validateInput("user", "Abcd123!", "Abcd123!", "key123", true);
+        assertTrue(result.isValid(), "Expected validation to pass");
+        assertTrue(result.errors().isEmpty(), "Expected no errors");
+    }
+
+    @Test
+    void testValidInputInLoginMode() {
+        LoginValidationResult result = LoginUtils.validateInput("user", "password", "", "key123", false);
+        assertTrue(result.isValid(), "Expected validation to pass in login mode");
+    }
+
+    // --- formatErrors() ---
+
+    @Test
+    void testFormatErrors() {
+        List<String> errors = List.of("Error 1", "Error 2", "Error 3");
+        String formatted = LoginUtils.formatErrors(errors);
+        assertEquals("Error 1\nError 2\nError 3", formatted);
     }
 }
