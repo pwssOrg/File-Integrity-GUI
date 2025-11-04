@@ -36,6 +36,7 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
 
     @Override
     public void onShow() {
+        super.onShow();
         // Reset selected path when the screen is shown
         selectedPath = null;
         refreshView();

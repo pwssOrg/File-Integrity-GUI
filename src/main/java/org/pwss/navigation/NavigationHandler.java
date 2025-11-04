@@ -50,6 +50,7 @@ public class NavigationHandler {
         // Set the navigation context for the controller
         controller.setContext(context);
         BaseScreen baseScreen = controller.getScreen();
+        baseScreen.setParentFrame(frame);
         // Ensure the controller reloads its data when navigating to the screen
         controller.reloadData();
 

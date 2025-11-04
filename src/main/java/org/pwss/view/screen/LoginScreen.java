@@ -35,8 +35,8 @@ public class LoginScreen extends BaseScreen {
     private JLabel confirmPasswordLabel;
 
     @Override
-    protected String getScreenName() {
-        return "Authentication";
+    public String getScreenName() {
+        return "Login";
     }
 
     @Override
@@ -178,53 +178,53 @@ public class LoginScreen extends BaseScreen {
      */
     private void $$$setupUI$$$() {
         rootPanel = new JPanel();
-        rootPanel.setLayout(new GridLayoutManager(6, 3, new Insets(10, 10, 10, 10), -1, -1));
+        rootPanel.setLayout(new GridLayoutManager(7, 3, new Insets(10, 10, 10, 10), -1, -1));
         final JPanel panel1 = new JPanel();
-        panel1.setLayout(new GridLayoutManager(10, 3, new Insets(0, 0, 0, 0), -1, -1));
-        rootPanel.add(panel1, new GridConstraints(0, 0, 6, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, true));
+        panel1.setLayout(new GridLayoutManager(5, 6, new Insets(0, 0, 0, 0), -1, -1));
+        rootPanel.add(panel1, new GridConstraints(0, 0, 6, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        passwordField = new JPasswordField();
+        panel1.add(passwordField, new GridConstraints(2, 1, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        usernameField = new JTextField();
+        usernameField.setText("");
+        panel1.add(usernameField, new GridConstraints(1, 1, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        licenseKeyField = new JTextField();
+        panel1.add(licenseKeyField, new GridConstraints(4, 1, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+        confirmPasswordField = new JPasswordField();
+        panel1.add(confirmPasswordField, new GridConstraints(3, 1, 1, 5, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        messageLabel = new JLabel();
+        Font messageLabelFont = this.$$$getFont$$$(null, Font.BOLD, 12, messageLabel.getFont());
+        if (messageLabelFont != null) messageLabel.setFont(messageLabelFont);
+        messageLabel.setText("hello");
+        panel1.add(messageLabel, new GridConstraints(0, 0, 1, 6, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        usernameLabel = new JLabel();
+        Font usernameLabelFont = this.$$$getFont$$$(null, Font.BOLD, -1, usernameLabel.getFont());
+        if (usernameLabelFont != null) usernameLabel.setFont(usernameLabelFont);
+        usernameLabel.setText("Username");
+        panel1.add(usernameLabel, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        passwordLabel = new JLabel();
+        Font passwordLabelFont = this.$$$getFont$$$(null, Font.BOLD, -1, passwordLabel.getFont());
+        if (passwordLabelFont != null) passwordLabel.setFont(passwordLabelFont);
+        passwordLabel.setText("Password");
+        panel1.add(passwordLabel, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        confirmPasswordLabel = new JLabel();
+        Font confirmPasswordLabelFont = this.$$$getFont$$$(null, Font.BOLD, -1, confirmPasswordLabel.getFont());
+        if (confirmPasswordLabelFont != null) confirmPasswordLabel.setFont(confirmPasswordLabelFont);
+        confirmPasswordLabel.setText("Confirm password");
+        panel1.add(confirmPasswordLabel, new GridConstraints(3, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        licenseLabel = new JLabel();
+        Font licenseLabelFont = this.$$$getFont$$$(null, Font.BOLD, -1, licenseLabel.getFont());
+        if (licenseLabelFont != null) licenseLabel.setFont(licenseLabelFont);
+        licenseLabel.setText("License key");
+        panel1.add(licenseLabel, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridLayoutManager(1, 2, new Insets(10, 0, 0, 0), -1, -1, true, false));
-        panel1.add(panel2, new GridConstraints(9, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, true));
+        rootPanel.add(panel2, new GridConstraints(6, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
         proceedButton = new JButton();
         proceedButton.setText("Button");
         panel2.add(proceedButton, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         cancelButton = new JButton();
         cancelButton.setText("Cancel");
         panel2.add(cancelButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        messageLabel = new JLabel();
-        Font messageLabelFont = this.$$$getFont$$$(null, Font.BOLD, 12, messageLabel.getFont());
-        if (messageLabelFont != null) messageLabel.setFont(messageLabelFont);
-        messageLabel.setText("");
-        panel1.add(messageLabel, new GridConstraints(0, 0, 1, 3, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        passwordField = new JPasswordField();
-        panel1.add(passwordField, new GridConstraints(4, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        usernameField = new JTextField();
-        usernameField.setText("");
-        panel1.add(usernameField, new GridConstraints(2, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        licenseKeyField = new JTextField();
-        panel1.add(licenseKeyField, new GridConstraints(8, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        confirmPasswordField = new JPasswordField();
-        panel1.add(confirmPasswordField, new GridConstraints(6, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        passwordLabel = new JLabel();
-        Font passwordLabelFont = this.$$$getFont$$$(null, Font.BOLD, -1, passwordLabel.getFont());
-        if (passwordLabelFont != null) passwordLabel.setFont(passwordLabelFont);
-        passwordLabel.setText("Password");
-        panel1.add(passwordLabel, new GridConstraints(3, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        confirmPasswordLabel = new JLabel();
-        Font confirmPasswordLabelFont = this.$$$getFont$$$(null, Font.BOLD, -1, confirmPasswordLabel.getFont());
-        if (confirmPasswordLabelFont != null) confirmPasswordLabel.setFont(confirmPasswordLabelFont);
-        confirmPasswordLabel.setText("Confirm password");
-        panel1.add(confirmPasswordLabel, new GridConstraints(5, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        licenseLabel = new JLabel();
-        Font licenseLabelFont = this.$$$getFont$$$(null, Font.BOLD, -1, licenseLabel.getFont());
-        if (licenseLabelFont != null) licenseLabel.setFont(licenseLabelFont);
-        licenseLabel.setText("License key");
-        panel1.add(licenseLabel, new GridConstraints(7, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        usernameLabel = new JLabel();
-        Font usernameLabelFont = this.$$$getFont$$$(null, Font.BOLD, -1, usernameLabel.getFont());
-        if (usernameLabelFont != null) usernameLabel.setFont(usernameLabelFont);
-        usernameLabel.setText("Username");
-        panel1.add(usernameLabel, new GridConstraints(1, 0, 1, 3, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

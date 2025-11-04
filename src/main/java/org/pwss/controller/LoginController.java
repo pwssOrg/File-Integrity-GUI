@@ -61,10 +61,13 @@ public class LoginController extends BaseController<LoginScreen> {
 
     @Override
     public void onShow() {
+        super.onShow();
         screen.getUsernameField().setText("");
         screen.getPasswordField().setText("");
         log.debug("Current LICENSE_KEY: {}", licenseKeySet ? "SET" : "NOT SET");
         log.debug("Create User Mode: {}", createUserMode);
+        // Adjust frame size based on create user mode
+        screen.getParentFrame().setSize(450, createUserMode ? 300 : 250);
         refreshView();
     }
 

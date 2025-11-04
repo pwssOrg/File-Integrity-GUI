@@ -195,6 +195,7 @@ public final class HomeController extends BaseController<HomeScreen> {
 
     @Override
     public void onCreate() {
+        super.onCreate();
         // Update theme picker
         screen.getThemePicker().removeAllItems();
         // Populate the combo box with AppTheme values
@@ -236,6 +237,7 @@ public final class HomeController extends BaseController<HomeScreen> {
 
     @Override
     public void onShow() {
+        super.onShow();
         fetchDataAndRefreshView();
     }
 
@@ -304,6 +306,7 @@ public final class HomeController extends BaseController<HomeScreen> {
 
     @Override
     public void reloadData() {
+        super.reloadData();
         fetchDataAndRefreshView();
     }
 
