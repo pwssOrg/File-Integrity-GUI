@@ -52,8 +52,8 @@ public class ScanDetailsScreen extends BaseScreen {
     }
 
     @Override
-    protected String getScreenName() {
-        return "Scan Details Screen";
+    public String getScreenName() {
+        return "Scan Details";
     }
 
     /**

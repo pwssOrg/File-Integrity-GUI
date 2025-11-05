@@ -105,7 +105,6 @@ public final class OSUtils {
      * @return A warning message string specific to the current OS.
      */
     public static String getQuarantineWarningMessage() {
-        // TODO: Replace with custom, detailed warning messages for each OS.
         return switch (determineOSType()) {
             case WINDOWS ->
                     "Warning: Quarantining or removing Windows system files (drivers, DLLs, registry-related files) can render the system unstable or unbootable. Back up data, ensure you have recovery media and administrator access before proceeding.";

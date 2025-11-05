@@ -153,46 +153,76 @@ public class MonitoredDirectoryService {
         }
 
         /**
-         * Updates an existing monitored directory by sending a request to the
-         * MONITORED_DIRECTORY_UPDATE endpoint.
+         * Toggles the active status of a monitored directory by sending a request to
+         * the MONITORED_DIRECTORY_UPDATE endpoint.
          *
-         * @param id             The ID of the monitored directory to update.
-         * @param isActive       The new active status of the monitored directory.
-         * @param notes          Any notes associated with the monitored directory.
-         * @param includeSubDirs Whether to include subdirectories in monitoring.
+         * @param dir The MonitoredDirectory object representing the directory to be
+         *            updated.
          * @return `true` if the update was successful, otherwise false.
          * @throws UpdateMonitoredDirectoryException If the update attempt fails due to
-         *                                           invalid input, unauthorized access,
-         *                                           or server error.
+         *                                          invalid input, unauthorized access,
+         *                                          or server error.
          * @throws ExecutionException                If an error occurs during the
-         *                                           asynchronous execution of the
-         *                                           request.
+         *                                          asynchronous execution of the request.
          * @throws InterruptedException              If the thread executing the request
-         *                                           is interrupted.
+         *                                          is interrupted.
          * @throws JsonProcessingException           If an error occurs while
-         *                                           serializing the request body.
+         *                                          serializing the request body.
          */
-        public boolean updateMonitoredDirectory(long id, boolean isActive, String notes, boolean includeSubDirs)
-                        throws UpdateMonitoredDirectoryException, JsonProcessingException, ExecutionException,
-                        InterruptedException {
+        public boolean toggleActive(MonitoredDirectory dir) throws UpdateMonitoredDirectoryException, JsonProcessingException, ExecutionException, InterruptedException {
                 String body = objectMapper
-                                .writeValueAsString(new UpdateDirectoryRequest(id, isActive, notes, includeSubDirs));
+                        .writeValueAsString(new UpdateDirectoryRequest(dir.id(), !dir.isActive(), dir.notes().notes(), dir.includeSubdirectories()));
                 HttpResponse<String> response = PwssHttpClient.getInstance()
                                 .request(Endpoint.MONITORED_DIRECTORY_UPDATE, body);
 
                 return switch (response.statusCode()) {
                         case 200 -> true;
-                        case 400 -> throw new UpdateMonitoredDirectoryException(
-                                "Update monitored directory failed: invalid input data.");
+                        case 400 ->
+                                throw new UpdateMonitoredDirectoryException("Update monitored directory failed: invalid input data.");
                         case 401 ->
-                                throw new UpdateMonitoredDirectoryException(
-                                                "Update monitored directory failed: User not authorized to perform this action.");
+                                throw new UpdateMonitoredDirectoryException("Update monitored directory failed: User not authorized to perform this action.");
                         case 500 ->
-                                throw new UpdateMonitoredDirectoryException(
-                                                "Update monitored directory failed: An error occurred on the server while attempting to update the monitored directory.");
+                                throw new UpdateMonitoredDirectoryException("Update monitored directory failed: An error occurred on the server while attempting to update the monitored directory.");
                         default -> false;
                 };
         }
+
+        /**
+         * Toggles the inclusion of subdirectories for a monitored directory by sending
+         * a request to the MONITORED_DIRECTORY_UPDATE endpoint.
+         *
+         * @param dir The MonitoredDirectory object representing the directory to be
+         *            updated.
+         * @return `true` if the update was successful, otherwise false.
+         * @throws UpdateMonitoredDirectoryException If the update attempt fails due to
+         *                                          invalid input, unauthorized access,
+         *                                          or server error.
+         * @throws ExecutionException                If an error occurs during the
+         *                                          asynchronous execution of the request.
+         * @throws InterruptedException              If the thread executing the request
+         *                                          is interrupted.
+         * @throws JsonProcessingException           If an error occurs while
+         *                                          serializing the request body.
+         */
+        public boolean toggleIncludeSubDirectories(MonitoredDirectory dir) throws UpdateMonitoredDirectoryException, JsonProcessingException, ExecutionException, InterruptedException {
+                String body = objectMapper
+                        .writeValueAsString(new UpdateDirectoryRequest(dir.id(), dir.isActive(), dir.notes().notes(), !dir.includeSubdirectories()));
+                HttpResponse<String> response = PwssHttpClient.getInstance()
+                        .request(Endpoint.MONITORED_DIRECTORY_UPDATE, body);
+
+                return switch (response.statusCode()) {
+                        case 200 -> true;
+                        case 400 ->
+                                throw new UpdateMonitoredDirectoryException("Update monitored directory failed: invalid input data.");
+                        case 401 ->
+                                throw new UpdateMonitoredDirectoryException("Update monitored directory failed: User not authorized to perform this action.");
+                        case 500 ->
+                                throw new UpdateMonitoredDirectoryException("Update monitored directory failed: An error occurred on the server while attempting to update the monitored directory.");
+                        default -> false;
+                };
+        }
+
+
 
         /**
          * Creates a new baseline for a monitored directory by sending a request to the

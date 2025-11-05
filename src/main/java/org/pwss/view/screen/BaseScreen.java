@@ -1,5 +1,6 @@
 package org.pwss.view.screen;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -10,13 +11,35 @@ import javax.swing.JPanel;
  * @author PWSS ORG
  */
 public abstract class BaseScreen extends JPanel {
+    /**
+     * The parent JFrame of this screen.
+     */
+    private JFrame parentFrame;
+
+    /**
+     * Set the parent JFrame of this screen.
+     *
+     * @param parentFrame The parent JFrame to set.
+     */
+    public void setParentFrame(JFrame parentFrame) {
+        this.parentFrame = parentFrame;
+    }
+
+    /**
+     * Get the parent JFrame of this screen.
+     *
+     * @return The parent JFrame.
+     */
+    public JFrame getParentFrame() {
+        return parentFrame;
+    }
 
     /**
      * Get the screen name for dialog titles & logging purposes.
      *
      * @return The name of the screen.
      */
-    protected abstract String getScreenName();
+    public abstract String getScreenName();
 
 
     /**

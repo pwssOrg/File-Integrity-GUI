@@ -6,7 +6,6 @@ import java.net.http.HttpResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import org.pwss.app_settings.AppConfig;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
 import org.pwss.exception.scan.GetMostRecentScansException;
 import org.pwss.exception.scan.GetScanDiffsException;
@@ -54,12 +53,12 @@ public class ScanService {
         return switch (response.statusCode()) {
             case 200 -> true;
             case 401 ->
-                    throw new StartFullScanException("Start scan all failed: User not authorized to perform this action.");
+                    throw new StartFullScanException("User not authorized to perform this action.");
             case 412 ->
-                    throw new StartFullScanException("Start scan all failed: No active monitored directories found.");
-            case 425 -> throw new StartFullScanException("Start scan all failed: Scan is already running.");
+                    throw new StartFullScanException("There are no directories being actively monitored.");
+            case 425 -> throw new StartFullScanException("Scan is already running.");
             case 500 ->
-                    throw new StartFullScanException("Start scan all failed: An error occurred on the server while attempting to start the scan.");
+                    throw new StartFullScanException("An error occurred on the server while attempting to start the scan.");
             default -> false;
         };
     }

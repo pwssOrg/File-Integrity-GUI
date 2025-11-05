@@ -54,8 +54,8 @@ public class NewDirectoryScreen extends BaseScreen {
     }
 
     @Override
-    protected String getScreenName() {
-        return "Create New Directory";
+    public String getScreenName() {
+        return "New monitored directory";
     }
 
     @Override

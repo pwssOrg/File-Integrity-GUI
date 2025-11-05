@@ -229,7 +229,7 @@ public class HomeScreen extends BaseScreen {
     private JCheckBox maxHashExtractionFileSizeUnlimitedCheckbox;
 
     @Override
-    protected String getScreenName() {
+    public String getScreenName() {
         return "Home";
     }
 

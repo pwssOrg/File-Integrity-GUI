@@ -27,8 +27,8 @@ public final class StringConstants {
     public static final String SCAN_STOPPED_SUCCESS = "Scan stopped successfully!";
     public static final String SCAN_STARTED_FAILURE = "Failed to start scan.";
     public static final String SCAN_STOPPED_FAILURE = "Failed to stop scan.";
-    public static final String SCAN_START_ERROR = "Error starting scan: ";
-    public static final String SCAN_STOP_ERROR = "Error stopping scan: ";
+    public static final String SCAN_START_ERROR = "An error occurred during scan initiation: ";
+    public static final String SCAN_STOP_ERROR = "An error has occurred while attempting to stop the scan.: ";
     public static final String SCAN_BASELINE_COMPLETED = "Baseline established successfully!\nDo you wish to see the details?";
     public static final String SCAN_COMPLETED_DIFFS = "Scan completed with differences found.\nDo you wish to see the details?\nYou can always view results later in the recent scans table.";
     public static final String SCAN_COMPLETED_NO_DIFFS = "Scan completed with no differences found.\nDo you wish to see the details?\nYou can always view results later in the recent scans table.";
@@ -48,7 +48,14 @@ public final class StringConstants {
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR = "Failed to reset baseline.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_INVALID = "Invalid code. Baseline reset cancelled.";
     public static final String MON_DIR_POPUP_RESET_BASELINE_ERROR_PREFIX = "Error resetting baseline: ";
-    public static final String MON_DIR_POPUP_EDIT_DIR = "Edit this directory";
+    public static final String MON_DIR_TOGGLE_ACTIVE_ENABLE = "Set directory as active";
+    public static final String MON_DIR_TOGGLE_ACTIVE_DISABLE = "Set directory as inactive";
+    public static final String MON_DIR_TOGGLE_ACTIVE_SUCCESS = "Directory status updated successfully.";
+    public static final String MON_DIR_TOGGLE_ACTIVE_ERROR = "Failed to update directory status.";
+    public static final String MON_DIR_TOGGLE_INCLUDE_SUBDIR_ENABLE = "Include subdirectories";
+    public static final String MON_DIR_TOGGLE_INCLUDE_SUBDIR_DISABLE = "Exclude subdirectories";
+    public static final String MON_DIR_TOGGLE_INCLUDE_SUBDIR_SUCCESS = "Subdirectory inclusion status updated successfully.";
+    public static final String MON_DIR_TOGGLE_INCLUDE_SUBDIR_ERROR = "Failed to update subdirectory inclusion status.";
 
     // Show note related strings
     public static final String MON_DIR_POPUP_SHOW_NOTE = "Show note";

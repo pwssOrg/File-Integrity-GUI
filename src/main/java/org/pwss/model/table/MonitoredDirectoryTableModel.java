@@ -9,7 +9,7 @@ import org.pwss.model.entity.MonitoredDirectory;
 public class MonitoredDirectoryTableModel extends AbstractTableModel {
     private final List<MonitoredDirectory> directories;
     private final String[] columnNames = {
-            "\uD83D\uDCC1 Path", "\uD83D\uDEA6 Note", "\uD83D\uDD59 Last Scanned", "\uD83D\uDEE1️ Baseline Established", "\uD83D\uDDC2️ Include Subdirectories"
+            "\uD83D\uDCC1 Path", "\uD83D\uDCDD Note", "\uD83D\uDD59 Last Scanned", "\u2693 Baseline Established", "\uD83D\uDCC2 Include Subdirectories", "\uD83D\uDD0C Active"
     };
 
     public MonitoredDirectoryTableModel(List<MonitoredDirectory> directories) {
@@ -35,7 +35,7 @@ public class MonitoredDirectoryTableModel extends AbstractTableModel {
     public Class<?> getColumnClass(int columnIndex) {
         return switch (columnIndex) {
             case 2 -> Date.class;
-            case 4 -> Boolean.class;
+            case 4, 5 -> Boolean.class;
             default -> super.getColumnClass(columnIndex);
         };
     }
@@ -49,6 +49,7 @@ public class MonitoredDirectoryTableModel extends AbstractTableModel {
             case 2 -> dir.lastScanned();
             case 3 -> dir.baselineEstablished() ? "Yes" : "No";
             case 4 -> dir.includeSubdirectories();
+            case 5 -> dir.isActive();
             default -> null;
         };
     }

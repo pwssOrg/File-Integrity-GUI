@@ -49,8 +49,11 @@ public class MonitoredDirectoryPopupFactory {
         // Reset baseline
         JMenuItem resetBaselineItem = getResetBaselineItem(dir);
 
-        // Edit directory
-        JMenuItem editDirectory = getEditDirectoryItem(dir);
+        // Toggle active state
+        JMenuItem toggleActiveMenuItem = getToggleActiveMenuItem(dir);
+
+        // Toggle include subdirectories
+        JMenuItem toggleIncludeSubDirsItem = getToggleIncludeSubDirsItem(dir);
 
         // Show note
         JMenuItem showNoteItem = getShowNoteItem(dir);
@@ -62,8 +65,11 @@ public class MonitoredDirectoryPopupFactory {
         JMenuItem restoreNoteItem = getRestoreNoteItem(dir);
 
         // Assemble menu
-        menu.add(scanItem);
-        menu.add(editDirectory);
+        if (dir.isActive()) {
+            menu.add(scanItem);
+        }
+        menu.add(toggleActiveMenuItem);
+        menu.add(toggleIncludeSubDirsItem);
         menu.addSeparator();
         menu.add(showNoteItem);
         menu.add(updateNoteItem);
@@ -75,14 +81,26 @@ public class MonitoredDirectoryPopupFactory {
     }
 
     /**
-     * Creates a menu item for editing the details of a monitored directory.
+     * Creates a menu item for toggling the active status of a monitored directory.
      *
      * @param dir the monitored directory for which to create the menu item
-     * @return the JMenuItem for editing the directory
+     * @return the JMenuItem for toggling the active status
      */
-    private JMenuItem getEditDirectoryItem(MonitoredDirectory dir) {
-        JMenuItem editItem = new JMenuItem(StringConstants.MON_DIR_POPUP_EDIT_DIR);
-        editItem.addActionListener(e -> listener.onEditDirectory(dir));
+    private JMenuItem getToggleActiveMenuItem(MonitoredDirectory dir) {
+        JMenuItem editItem = new JMenuItem(dir.isActive() ? StringConstants.MON_DIR_TOGGLE_ACTIVE_DISABLE : StringConstants.MON_DIR_TOGGLE_ACTIVE_ENABLE);
+        editItem.addActionListener(e -> listener.onToggleActiveStatus(dir));
+        return editItem;
+    }
+
+    /**
+     * Creates a menu item for toggling the inclusion of subdirectories in a monitored directory.
+     *
+     * @param dir the monitored directory for which to create the menu item
+     * @return the JMenuItem for toggling the inclusion of subdirectories
+     */
+    private JMenuItem getToggleIncludeSubDirsItem(MonitoredDirectory dir) {
+        JMenuItem editItem = new JMenuItem(dir.includeSubdirectories() ? StringConstants.MON_DIR_TOGGLE_INCLUDE_SUBDIR_DISABLE : StringConstants.MON_DIR_TOGGLE_INCLUDE_SUBDIR_ENABLE);
+        editItem.addActionListener(e -> listener.onToggleIncludeSubdirectories(dir));
         return editItem;
     }
 

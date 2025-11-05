@@ -2,6 +2,7 @@ package org.pwss.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.concurrent.ExecutionException;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.pwss.app_settings.AppConfig;
 import org.pwss.exception.user.CreateUserException;
@@ -10,6 +11,8 @@ import org.pwss.exception.user.UserExistsLookupException;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.service.AuthService;
+import org.pwss.utils.LoginUtils;
+import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.LoginScreen;
 import org.slf4j.LoggerFactory;
 
@@ -58,41 +61,50 @@ public class LoginController extends BaseController<LoginScreen> {
 
     @Override
     public void onShow() {
-        getScreen().getUsernameField().setText("");
-        getScreen().getPasswordField().setText("");
+        super.onShow();
+        screen.getUsernameField().setText("");
+        screen.getPasswordField().setText("");
         log.debug("Current LICENSE_KEY: {}", licenseKeySet ? "SET" : "NOT SET");
         log.debug("Create User Mode: {}", createUserMode);
+        // Adjust frame size based on create user mode
+        final int frameHeight = createUserMode ? 225 : 200;
+        final int offset = licenseKeySet ? 0 : 50;
+        screen.getParentFrame().setSize(450, frameHeight + offset);
         refreshView();
     }
 
     @Override
     protected void initListeners() {
-        getScreen().getPasswordField().addActionListener(e -> proceedAndValidate());
-        getScreen().getProceedButton().addActionListener(e -> proceedAndValidate());
-        getScreen().getCancelButton().addActionListener(e -> System.exit(0));
+        screen.getPasswordField().addActionListener(e -> proceedAndValidate());
+        screen.getProceedButton().addActionListener(e -> proceedAndValidate());
+        screen.getCancelButton().addActionListener(e -> System.exit(0));
     }
 
     @Override
     protected void refreshView() {
         // Only show license key fields if LICENSE_KEY is not set
         if (licenseKeySet) {
-            getScreen().getLicenseLabel().setVisible(false);
-            getScreen().getLicenseKeyField().setVisible(false);
+            screen.getLicenseLabel().setVisible(false);
+            screen.getLicenseKeyField().setVisible(false);
         }
         // Update the view based on whether we are in create user mode
         if (createUserMode) {
             // Notify user that no users exist and they need to create one
-            getScreen().showInfo("No user found.\nCreate one by entering a username and password.");
+            screen.showInfo("No user found.\nCreate one by entering a username and password.");
             // Update message label to indicate user creation
-            getScreen().setMessage("Create a user for the first login.");
+            screen.setMessage("Create a user for the first login.");
             // Change button text to "Register"
-            getScreen().getProceedButton().setText("Register");
+            screen.getProceedButton().setText("Register");
         } else {
             // Update message label to indicate normal login
-            getScreen().setMessage("Login with your username and password.");
+            screen.setMessage("Login with your username and password.");
             // Change button text to "Login"
-            getScreen().getProceedButton().setText("Login");
+            screen.getProceedButton().setText("Login");
         }
+
+        // Show or hide confirm password fields based on create user mode
+        screen.getConfirmPasswordLabel().setVisible(createUserMode);
+        screen.getConfirmPasswordField().setVisible(createUserMode);
     }
 
     /**
@@ -136,7 +148,22 @@ public class LoginController extends BaseController<LoginScreen> {
 
         if (createUserMode) {
             // Handle user creation logic here and then login
-            createUserAndLogin();
+            int choice = screen.showOptionDialog(JOptionPane.INFORMATION_MESSAGE,
+                    """
+                            Welcome to Integrity Hash!
+                            
+                            You are about to create the first user for this application.
+                            Please make sure to remember your credentials as they will be required for future logins.
+                            
+                            Do you want to proceed?""",
+                    new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
+                    StringConstants.GENERIC_YES);
+
+            if (choice == 0) {
+                createUserAndLogin();
+            } else {
+                log.debug("User creation cancelled by user.");
+            }
         } else {
             // Handle normal login logic here
             performLogin();
@@ -144,31 +171,22 @@ public class LoginController extends BaseController<LoginScreen> {
     }
 
     /**
-     * Validates the input fields for username and password.
+     * Validates the user input for username, password, and license key.
      *
-     * @return true if both fields are non-empty, false otherwise.
+     * @return true if input is valid, false otherwise.
      */
     private boolean validateInput() {
-        String username = getScreen().getUsername();
-        String password = getScreen().getPassword();
-        String licenseKey = licenseKeySet ? LICENSE_KEY : getScreen().getLicenseKey();
+        String username = screen.getUsername();
+        String password = screen.getPassword();
+        String confirmPassword = screen.getConfirmPassword();
+        String licenseKey = licenseKeySet ? LICENSE_KEY : screen.getLicenseKey();
 
-        if (username == null || username.trim().isEmpty()) {
-            getScreen().showError("Username cannot be empty.");
-            return false;
+        LoginUtils.LoginValidationResult result = LoginUtils.validateInput(username, password, confirmPassword, licenseKey, createUserMode);
+        if (!result.isValid()) {
+            screen.showError(LoginUtils.formatErrors(result.errors()));
         }
 
-        if (password == null || password.trim().isEmpty()) {
-            getScreen().showError("Password cannot be empty.");
-            return false;
-        }
-
-        if (licenseKey == null || licenseKey.trim().isEmpty()) {
-            getScreen().showError("License Key cannot be empty.");
-            return false;
-        }
-
-        return true;
+        return result.isValid();
     }
 
     /**
@@ -186,9 +204,9 @@ public class LoginController extends BaseController<LoginScreen> {
      * @return true if user creation is successful, false otherwise.
      */
     private boolean createUser() {
-        String username = getScreen().getUsername();
-        String password = getScreen().getPassword();
-        String licenseKey = licenseKeySet ? LICENSE_KEY : getScreen().getLicenseKey();
+        String username = screen.getUsername();
+        String password = screen.getPassword();
+        String licenseKey = licenseKeySet ? LICENSE_KEY : screen.getLicenseKey();
 
         try {
             final boolean createSuccess = authService.createUser(username, password, licenseKey);
@@ -224,9 +242,9 @@ public class LoginController extends BaseController<LoginScreen> {
      * Displays success or error messages based on the outcome.
      */
     private void performLogin() {
-        String username = getScreen().getUsername();
-        String password = getScreen().getPassword();
-        String licenseKey = licenseKeySet ? LICENSE_KEY : getScreen().getLicenseKey();
+        String username = screen.getUsername();
+        String password = screen.getPassword();
+        String licenseKey = licenseKeySet ? LICENSE_KEY : screen.getLicenseKey();
 
         try {
             final boolean loginSuccess = authService.login(username, password, licenseKey);

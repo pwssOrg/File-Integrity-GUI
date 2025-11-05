@@ -68,10 +68,33 @@ public class MonitoredDirectoryPopupListenerImpl implements MonitoredDirectoryPo
     }
 
     @Override
-    public void onEditDirectory(MonitoredDirectory dir) {
-        // TODO: Implement edit directory functionality
+    public void onToggleActiveStatus(MonitoredDirectory dir) {
+        try {
+            if (directoryService.toggleActive(dir)) {
+                showSuccess(StringConstants.MON_DIR_TOGGLE_ACTIVE_SUCCESS);
+                controller.reloadData();
+            } else {
+                showError(StringConstants.MON_DIR_TOGGLE_ACTIVE_ERROR);
+            }
+        } catch (Exception e) {
+            log.error("Error toggling active status for directory {}: {}", dir.path(), e.getMessage());
+            showError(e.getMessage());
+        }
+    }
 
-        // We need to be able to update and save notes. Maybe here? :) / Pwgit-Create
+    @Override
+    public void onToggleIncludeSubdirectories(MonitoredDirectory dir) {
+        try {
+            if (directoryService.toggleIncludeSubDirectories(dir)) {
+                showSuccess(StringConstants.MON_DIR_TOGGLE_INCLUDE_SUBDIR_SUCCESS);
+                controller.reloadData();
+            } else {
+                showError(StringConstants.MON_DIR_TOGGLE_INCLUDE_SUBDIR_ERROR);
+            }
+        } catch (Exception e) {
+            log.error("Error toggling include subdirectories for directory {}: {}", dir.path(), e.getMessage());
+            showError(e.getMessage());
+        }
     }
 
     @Override

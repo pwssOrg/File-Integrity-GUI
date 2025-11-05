@@ -66,6 +66,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
 
     @Override
     public void onShow() {
+        super.onShow();
         if (scanSummaries != null && !scanSummaries.isEmpty()) {
             // Clear existing data
             scanSummaries = List.of();
