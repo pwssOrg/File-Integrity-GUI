@@ -1,5 +1,8 @@
 package org.pwss.controller;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import org.pwss.controller.util.NavigationContext;
 import org.pwss.view.screen.BaseScreen;
 
@@ -21,9 +24,14 @@ public abstract class BaseController<Screen extends BaseScreen> {
      */
     private NavigationContext context;
     /**
+     * List of SubControllers managed by this BaseController.
+     */
+    private final List<SubController<?, ? extends BaseController<?>>> subControllers;
+    /**
      * Logger instance for logging purposes.
      */
     private final org.slf4j.Logger log;
+
     /**
      * Constructs a `BaseController` with the specified view.
      * Initializes the view and sets up event listeners.
@@ -33,6 +41,7 @@ public abstract class BaseController<Screen extends BaseScreen> {
     public BaseController(Screen screen) {
         this.screen = screen;
         this.log = org.slf4j.LoggerFactory.getLogger(BaseController.class);
+        this.subControllers = new ArrayList<>();
         // Run onCreate lifecycle method
         onCreate();
         // Initialize event listeners
@@ -55,6 +64,19 @@ public abstract class BaseController<Screen extends BaseScreen> {
         this.context = context;
     }
     /**
+     * Adds a subcontroller to this controller.
+     *
+     * @param subController The subcontroller to add.
+     */
+    public void addSubController(SubController<?, ? extends BaseController<?>> subController) {
+        if (subController == null) {
+            log.warn("Attempted to add a null subcontroller to {}", getClass().getSimpleName());
+            return;
+        }
+        subControllers.add(subController);
+        log.debug("Added SubController: {} to {}", subController.getClass().getSimpleName(), getClass().getSimpleName());
+    }
+    /**
      * Abstract method to initialize event listeners for the Screen.
      * Subclasses must provide an implementation for this method.
      */
@@ -70,8 +92,8 @@ public abstract class BaseController<Screen extends BaseScreen> {
      */
     public void reloadData() {
         log.debug("reloadData called for {}", screen.getScreenName());
+        subControllers.forEach(SubController::reloadData);
     }
-
     /**
      * Retrieves the view managed by this controller.
      *
@@ -86,13 +108,12 @@ public abstract class BaseController<Screen extends BaseScreen> {
      */
     public void onShow() {
         log.debug("onShow called for {}", screen.getScreenName());
+        subControllers.forEach(SubController::onShow);
     }
 
     /**
-     * Method called when the view is created.
-     * Subclasses can override this method to perform actions during the creation of the view.
+     * Method called when the controller is created.
+     * Subclasses can override this method to perform setup logic.
      */
-    public void onCreate() {
-        log.debug("onCreate called for {}", screen.getScreenName());
-    }
+    abstract void onCreate();
 }
