@@ -253,7 +253,7 @@ public class LoginController extends BaseController<LoginScreen> {
                     if (createUserMode) {
                         screen.showInfo("User created and logged in successfully!");
                     } else {
-                        screen.showInfo("Logged in successfully!");
+                      log.info("Logged in successfully!");
                     }
                     AppConfig.setLicenseKey(licenseKey);
                     NavigationEvents.navigateTo(Screen.HOME);

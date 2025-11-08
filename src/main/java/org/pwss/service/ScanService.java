@@ -208,7 +208,7 @@ public class ScanService {
             case 200 -> List.of(objectMapper.readValue(response.body(), Diff[].class));
             case 401 ->
                     throw new GetScanDiffsException("Failed to fetch scan diffs: User not authorized to perform this action.");
-            case 500 -> throw new GetScanDiffsException("Failed to fetch scan diffs: Server error");
+            case 500 -> throw new GetScanDiffsException("Failed to fetch scan diffs");
             default -> Collections.emptyList();
         };
     }
