@@ -19,11 +19,17 @@ import org.pwss.utils.OSUtils;
 import org.pwss.utils.ReportUtils;
 import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.ScanDetailsScreen;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controller class that handles operations related to the scan details screen.
  */
 public class ScanDetailsController extends BaseController<ScanDetailsScreen> implements CellButtonListener {
+
+    /**
+     * Logger for logging messages within this controller.
+     */
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(LoginController.class);
 
     /**
      * Service responsible for managing scan summaries.
@@ -140,7 +146,8 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
         screen.getDiffTable().setModel(diffTableModel);
 
         screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
-        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("\uD83D\uDCE5", this));
+        screen.getDiffTable().getColumn(DiffTableModel.columns[3])
+                .setCellEditor(new ButtonEditor("\uD83D\uDCE5", this));
     }
 
     @Override
@@ -152,21 +159,28 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
             int choice = screen.showOptionDialog(
                     JOptionPane.WARNING_MESSAGE,
                     OSUtils.getQuarantineWarningMessage(),
-                    new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
-                    StringConstants.GENERIC_NO
-            );
+                    new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
+                    StringConstants.GENERIC_NO);
             if (choice == 0) {
                 try {
                     boolean success = fileService.quarantineFile(d.integrityFail().file().id());
                     if (success) {
-                        screen.showInfo("File quarantined successfully.");
+                        log.info("File quarantined successfully.");
                         screen.getDiffTable().getColumn(d).setCellRenderer(new ButtonRenderer());
                         screen.getDiffTable().getColumn(d).setCellEditor(new ButtonEditor("🗿", this));
                     } else {
                         screen.showError("Failed to quarantine the file.");
                     }
-                } catch (Exception e) {
-                    screen.showError(e.getMessage());
+
+                }
+
+                catch (IllegalArgumentException iae) {
+                    log.debug("Illegal argument exception {}",iae);
+                }
+
+                catch (Exception e) {
+                    log.debug("Exception thrown {} ", e);
+                    log.error("Error code 455 : {}",e.getMessage());
                 }
             }
         });
