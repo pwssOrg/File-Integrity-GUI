@@ -316,7 +316,7 @@ public final class HomeController extends BaseController<HomeScreen> {
      */
     private List<Diff> safeGetDiffs(long scanId) {
         try {
-            return scanService.getDiffs(scanId, 1000, null, false);
+            return scanService.getDiffs(scanId, (Integer.MAX_VALUE -1), null, false);
         } catch (GetScanDiffsException | ExecutionException | InterruptedException | JsonProcessingException e) {
             return List.of();
         }
