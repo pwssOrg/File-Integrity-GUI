@@ -60,7 +60,7 @@
     <!-- Project dependencies -->
     <dependencies>
         <!-- Jackson Databind dependency for JSON processing -->
-        <!--https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.20.0-->
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind/2.20.1 -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -90,7 +90,7 @@
         </dependency>
 
         <!-- FlatLaf dependency for modern UI look and feel -->
-        <!--https://mvnrepository.com/artifact/com.formdev/flatlaf/3.6.1-->
+        <!-- https://mvnrepository.com/artifact/com.formdev/flatlaf -->
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
@@ -103,7 +103,7 @@
         <plugins>
             <!-- Plugin to execute Java classes from Maven -->
             <plugin>
-            <!--https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin/3.5.1-->
+            <!-- https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.6.2</version>
@@ -114,7 +114,7 @@
 
             <!-- Plugin to configure Java compiler settings -->
             <plugin>
-            <!--https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin/3.14.0-->
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin/3.14.1 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.14.1</version>
@@ -126,7 +126,7 @@
 
             <!-- Plugin to create a JAR with dependencies -->
             <plugin>
-            <!--https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin/3.7.1-->
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin/3.7.1 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.7.1</version>

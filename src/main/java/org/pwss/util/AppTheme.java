@@ -1,4 +1,4 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 /**
  * Enum representing different application themes.

@@ -1,4 +1,4 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 /**
  * A utility class that holds various string constants used throughout the application.
@@ -30,7 +30,6 @@ public final class StringConstants {
     public static final String SCAN_START_ERROR = "An error occurred during scan initiation: ";
     public static final String SCAN_STOP_ERROR = "An error has occurred while attempting to stop the scan.: ";
     public static final String SCAN_BASELINE_COMPLETED = "Baseline established successfully!\nDo you wish to see the details?";
-    public static final String SCAN_COMPLETED_DIFFS = "Scan completed with differences found.\nDo you wish to see the details?\nYou can always view results later in the recent scans table.";
     public static final String SCAN_COMPLETED_NO_DIFFS = "Scan completed with no differences found.\nDo you wish to see the details?\nYou can always view results later in the recent scans table.";
     public static final String SCAN_NOT_COMPLETED = "Scan not completed.";
     public static final String SCAN_ESTABLISHING_BASELINE = "Establishing baseline for directory: ";
@@ -63,7 +62,7 @@ public final class StringConstants {
 
     // Update note related strings
     public static final String MON_DIR_POPUP_UPDATE_NOTE = "Update note";
-    public static final String MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX = "Update note for: ";
+    public static final String MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX = "Update Note -";
     public static final String MON_DIR_POPUP_UPDATE_NOTE_SUCCESS = "Note updated successfully.";
     public static final String MON_DIR_POPUP_UPDATE_NOTE_ERROR = "Failed to update note.";
 

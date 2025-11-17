@@ -1,13 +1,13 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 /**
  * Utility class for operating system detection and information.
  * Provides methods to determine the current OS type and related functionalities.
  */
-public final class OSUtils {
+public final class OSUtil {
 
     // Private constructor to prevent instantiation
-    private OSUtils() {
+    private OSUtil() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 

@@ -1,6 +1,7 @@
 package org.pwss.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
@@ -24,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.pwss.app_settings.AppConfig;
 import org.pwss.controller.util.NavigationContext;
+import org.pwss.data_structure.RingBuffer;
 import org.pwss.exception.metadata.MetadataKeyNameRetrievalException;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
@@ -59,14 +61,15 @@ import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.service.NoteService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
-import org.pwss.utils.AppTheme;
-import org.pwss.utils.ConversionUtils;
-import org.pwss.utils.ErrorUtils;
-import org.pwss.utils.LiveFeedUtils;
-import org.pwss.utils.MonitoredDirectoryUtils;
-import org.pwss.utils.OSUtils;
-import org.pwss.utils.ReportUtils;
-import org.pwss.utils.StringConstants;
+import org.pwss.util.AppTheme;
+import org.pwss.util.ConversionUtil;
+import org.pwss.util.ErrorUtil;
+import org.pwss.util.LiveFeedUtil;
+import org.pwss.util.MonitoredDirectoryUtil;
+import org.pwss.util.OSUtil;
+import org.pwss.util.ReportUtil;
+import org.pwss.util.ScanUtil;
+import org.pwss.util.StringConstants;
 import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
@@ -76,7 +79,6 @@ import static org.pwss.app_settings.AppConfig.APP_THEME;
 import static org.pwss.app_settings.AppConfig.MAX_HASH_EXTRACTION_FILE_SIZE;
 import static org.pwss.app_settings.AppConfig.USE_SPLASH_SCREEN;
 
-// TODO: NEEDS REFACTORING - VERY LARGE CLASS
 public final class HomeController extends BaseController<HomeScreen> {
 
     /**
@@ -250,7 +252,8 @@ public final class HomeController extends BaseController<HomeScreen> {
         try {
             // Fetch all monitored directories for display in the monitored directories
             // table
-            allMonitoredDirectories = monitoredDirectoryService.getAllDirectories();
+            allMonitoredDirectories = MonitoredDirectoryUtil
+                    .filterMonitoredDirectoriesOnConfirmedPath(monitoredDirectoryService.getAllDirectories());
 
             // Only fetch diffs if there are active monitored directories present
             final long activeDirCount = allMonitoredDirectories.stream().filter(MonitoredDirectory::isActive).count();
@@ -371,7 +374,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                 DiffTableModel model = (DiffTableModel) screen.getDiffTable().getModel();
                 Optional<Diff> diff = model.getDiffAt(modelRow);
 
-                diff.ifPresent(d -> screen.getDiffDetails().setText(ReportUtils.formatDiff(d)));
+                diff.ifPresent(d -> screen.getDiffDetails().setText(ReportUtil.formatDiff(d)));
             } else {
                 screen.getDiffDetails().setText("");
             }
@@ -395,7 +398,7 @@ public final class HomeController extends BaseController<HomeScreen> {
             int selectedRow = screen.getFileScanSummaryTable().getSelectedRow();
             if (selectedRow >= 0 && selectedRow < fileSummaries.size()) {
                 ScanSummary selectedSummary = fileSummaries.get(selectedRow);
-                screen.getScanSummaryDetails().setText(ReportUtils.formatSummary(selectedSummary));
+                screen.getScanSummaryDetails().setText(ReportUtil.formatSummary(selectedSummary));
             } else {
                 screen.getScanSummaryDetails().setText("");
             }
@@ -426,12 +429,12 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getMaxHashExtractionFileSizeSlider().addChangeListener(l -> {
             long valueMegabytes = screen.getMaxHashExtractionFileSizeSlider().getValue();
             log.debug("Setting max hash extraction file size to {} MB", valueMegabytes);
-            long valueBytes = ConversionUtils.megabytesToBytes(valueMegabytes);
+            long valueBytes = ConversionUtil.megabytesToBytes(valueMegabytes);
 
             // Set App config value to size in bytes
             if (AppConfig.setMaxHashExtractionFileSize(valueBytes)) {
                 screen.getMaxHashExtractionFileSizeValueLabel().setText(valueMegabytes + " MB");
-                maxFileSizeForHashExtraction = ConversionUtils.megabytesToBytes(valueMegabytes);
+                maxFileSizeForHashExtraction = ConversionUtil.megabytesToBytes(valueMegabytes);
             } else {
                 log.error("Failed to update max hash extraction file size in app config.");
             }
@@ -452,7 +455,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                 // If unchecked set the size to the current slider value
                 long sliderValueMegabytes = screen.getMaxHashExtractionFileSizeSlider().getValue();
                 log.debug("Setting max hash extraction file size to {} MB", sliderValueMegabytes);
-                long sliderValueBytes = ConversionUtils.megabytesToBytes(sliderValueMegabytes);
+                long sliderValueBytes = ConversionUtil.megabytesToBytes(sliderValueMegabytes);
                 if (AppConfig.setMaxHashExtractionFileSize(sliderValueBytes)) {
                     maxFileSizeForHashExtraction = sliderValueBytes;
                     screen.getMaxHashExtractionFileSizeValueLabel().setText(sliderValueMegabytes + " MB");
@@ -469,7 +472,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         // Update UI components based on the current state
         screen.getScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
 
-        String notifications = MonitoredDirectoryUtils
+        String notifications = MonitoredDirectoryUtil
                 .getMonitoredDirectoryNotificationMessage(allMonitoredDirectories);
         boolean hasNotifications = !notifications.isEmpty();
 
@@ -515,7 +518,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                     if (!dir.baselineEstablished()) {
                         setForeground(Color.YELLOW);
                         setToolTipText(StringConstants.TOOLTIP_BASELINE_NOT_ESTABLISHED);
-                    } else if (MonitoredDirectoryUtils.isScanOlderThanAWeek(dir)) {
+                    } else if (MonitoredDirectoryUtil.isScanOlderThanAWeek(dir)) {
                         setForeground(Color.ORANGE);
                         setToolTipText(StringConstants.TOOLTIP_OLD_SCAN);
                     } else {
@@ -543,7 +546,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                     diff.ifPresent(d -> {
                         int choice = screen.showOptionDialog(
                                 JOptionPane.WARNING_MESSAGE,
-                                OSUtils.getQuarantineWarningMessage(),
+                                OSUtil.getQuarantineWarningMessage(),
                                 new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                                 StringConstants.GENERIC_NO);
                         if (choice == 0) {
@@ -607,7 +610,7 @@ public final class HomeController extends BaseController<HomeScreen> {
             screen.getMaxHashExtractionFileSizeSlider().setEnabled(true);
 
             final int maxSliderValueMegabytes = Math
-                    .toIntExact(ConversionUtils.bytesToMegabytes(maxFileSizeForHashExtraction));
+                    .toIntExact(ConversionUtil.bytesToMegabytes(maxFileSizeForHashExtraction));
             screen.getMaxHashExtractionFileSizeSlider().setValue(maxSliderValueMegabytes);
             screen.getMaxHashExtractionFileSizeValueLabel().setText(maxSliderValueMegabytes + " MB");
         } else {
@@ -691,7 +694,7 @@ public final class HomeController extends BaseController<HomeScreen> {
             log.debug(StringConstants.SCAN_START_ERROR, e);
             log.error(StringConstants.SCAN_START_ERROR + " {}", e.getMessage());
             SwingUtilities.invokeLater(() -> screen
-                    .showError(ErrorUtils.formatErrorMessage(StringConstants.SCAN_START_ERROR, e.getMessage())));
+                    .showError(ErrorUtil.formatErrorMessage(StringConstants.SCAN_START_ERROR, e.getMessage())));
         }
     }
 
@@ -723,7 +726,8 @@ public final class HomeController extends BaseController<HomeScreen> {
             int choice;
             // Prompt the user to view scan results based on whether differences were found
             if (totalDiffCount.get() > 0) {
-                choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE, StringConstants.SCAN_COMPLETED_DIFFS,
+                choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE,
+                        ScanUtil.constructDiffMessageString(totalDiffCount.get()),
                         new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                         StringConstants.GENERIC_YES);
             } else {
@@ -772,7 +776,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                     if (totalDiffCount.get() > 0) {
                         // If full scan, and we have diffs, navigate to the diffs tab to show all
                         // differences.
-                        screen.getTabbedPane().setSelectedIndex(2);
+                        screen.getTabbedPane().setSelectedIndex(3);
                     } else {
                         // If no diffs, navigate to the recent scans tab to show the most recent scan.
                         screen.getTabbedPane().setSelectedIndex(0);
@@ -824,42 +828,70 @@ public final class HomeController extends BaseController<HomeScreen> {
             }
         }
 
+        // Create a ring buffer with a capacity to hold the last 100 updates
+        RingBuffer<String> liveFeedBuffer = new RingBuffer<>(100);
+
+        // Create and start a polling timer
         scanStatusTimer = new Timer(1000, e -> {
             try {
-                // Retrieve live feed updates
+                // Get live feed from backend
                 LiveFeedResponse liveFeed = scanService.getLiveFeed();
 
-                String currentLiveFeedText = screen.getLiveFeedText().getText();
-                String newEntry = LiveFeedUtils.formatLiveFeedEntry(liveFeed.livefeed());
-                String updatedLiveFeedText = currentLiveFeedText + newEntry;
-                screen.getLiveFeedText().setText(updatedLiveFeedText);
+                // Format the new update from the backend
+                String newEntry = LiveFeedUtil.formatLiveFeedEntry(liveFeed.livefeed());
 
-                // Update the total difference count based on new warnings
-                totalDiffCount.addAndGet(LiveFeedUtils.countWarnings(liveFeed.livefeed()));
+                // Add the new update to the ring buffer
+                liveFeedBuffer.add(newEntry);
+
+                // Build the text for the live feed based on the latest updates in the buffer
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < liveFeedBuffer.size(); i++) {
+                    sb.append(liveFeedBuffer.get(i));
+                }
+
+                // Update UI with the latest text
+                screen.getLiveFeedText().setText(sb.toString());
+
+                // Update the diff counter
+                totalDiffCount.addAndGet(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
                 screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
 
-                // Update scanRunning state and refresh the UI if necessary
+                // Update scan status and UI as needed
                 if (liveFeed.isScanRunning() != scanRunning) {
                     scanRunning = liveFeed.isScanRunning();
                     refreshView();
                 }
+
+                // When the scan is complete, do a final pull
                 if (!liveFeed.isScanRunning()) {
+                    log.debug("Scan completed, making final pull...");
 
-                    scanStatusTimer.stop(); // Terminate polling when the scan completes
+                    // Do a final pull without time pressure
+                    liveFeed = scanService.getLiveFeed(); // The last pull to get any final updates
 
-                    liveFeed = scanService.getLiveFeed();
+                    // Add the last update to the buffer
+                    newEntry = LiveFeedUtil.formatLiveFeedEntry(liveFeed.livefeed());
+                    if (!org.pwss.util.StringUtil.isEmpty(newEntry)) {
+                        liveFeedBuffer.add(newEntry); // Add the last pull to the buffer
 
-                    totalDiffCount.getAndAdd(LiveFeedUtils.countWarnings(liveFeed.livefeed()));
-                    screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
+                        // Update UI with the last text
+                        sb.setLength(0); // Rensa StringBuilder
+                        for (int i = 0; i < liveFeedBuffer.size(); i++) {
+                            sb.append(liveFeedBuffer.get(i)); // Add all updates to the buffer
+                        }
+                        screen.getLiveFeedText().setText(sb.toString());
+                    }
 
-                    onFinishScan(true, singleDirectory);
+                    // Stop polling and end the process
+                    scanStatusTimer.stop();
+                    onFinishScan(true, singleDirectory); // Complete the scan
                 }
             } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
-                log.error(StringConstants.SCAN_LIVE_FEED_ERROR_PREFIX + " {}", ex.getMessage());
-                log.debug("Debug Live Feed Exception", ex);
-                SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_LIVE_FEED_ERROR_PREFIX));
+                log.error("Error fetching live feed: {}", ex.getMessage());
+                log.debug("Live Feed Exception", ex);
+                SwingUtilities.invokeLater(() -> screen.showError("Live feed error"));
                 scanStatusTimer.stop(); // Stop polling on error
-                onFinishScan(false, singleDirectory);
+                onFinishScan(false, singleDirectory); // Handling errors
             }
         });
         scanStatusTimer.start();

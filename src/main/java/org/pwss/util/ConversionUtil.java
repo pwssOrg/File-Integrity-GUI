@@ -1,4 +1,4 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 /**
  * Utility class providing methods to convert between different units of data
@@ -13,7 +13,7 @@ package org.pwss.utils;
  * comprehension or processing.
  * </p>
  */
-public class ConversionUtils {
+public class ConversionUtil {
     private static final long MEGABYTE = 1024L * 1024L;
     private static final long GIGABYTE = MEGABYTE * 1024L;
 
