@@ -2,7 +2,6 @@ package org.pwss.view.screen;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.intellij.uiDesigner.core.Spacer;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;

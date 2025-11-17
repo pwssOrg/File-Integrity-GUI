@@ -679,7 +679,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                     if (baseLineScan) {
                         screen.showSuccess(StringConstants.SCAN_STARTED_BASELINE_SUCCESS);
                     } else {
-                        screen.showSuccess(StringConstants.SCAN_STARTED_SUCCESS);
+                        log.info(StringConstants.SCAN_STARTED_SUCCESS);
                     }
                     startPollingScanLiveFeed(singleDirectory, scanningDirs);
                 } else {

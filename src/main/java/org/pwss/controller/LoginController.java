@@ -152,7 +152,7 @@ public class LoginController extends BaseController<LoginScreen> {
                     """
                             Welcome to Integrity Hash!
                             
-                            You are about to create the first user for this application.
+                            You are about to create a user for this application.
                             Please make sure to remember your credentials as they will be required for future logins.
                             
                             Do you want to proceed?""",
@@ -253,7 +253,7 @@ public class LoginController extends BaseController<LoginScreen> {
                     if (createUserMode) {
                         screen.showInfo("User created and logged in successfully!");
                     } else {
-                        screen.showInfo("Logged in successfully!");
+                      log.info("Logged in successfully!");
                     }
                     AppConfig.setLicenseKey(licenseKey);
                     NavigationEvents.navigateTo(Screen.HOME);
