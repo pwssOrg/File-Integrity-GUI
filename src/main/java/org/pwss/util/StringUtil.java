@@ -114,7 +114,7 @@ public final class StringUtil {
      * @param str the string to check, can be null
      * @return true if the string is null or has length 0, false otherwise
      */
-    private static boolean isEmpty(String str) {
+    public static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }
 }

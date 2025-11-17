@@ -682,7 +682,7 @@ public class HomeScreen extends BaseScreen {
                         GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         filesTab = new JPanel();
         filesTab.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
-        tabbedPane.addTab("\uD83D\uDDC4\uFE0F Files", filesTab);
+        tabbedPane.addTab("📁 Files", filesTab);
         final JSplitPane splitPane2 = new JSplitPane();
         filesTab.add(splitPane2,
                 new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH,

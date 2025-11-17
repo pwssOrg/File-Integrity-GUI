@@ -1,6 +1,7 @@
 package org.pwss.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
@@ -66,6 +67,7 @@ import org.pwss.util.LiveFeedUtil;
 import org.pwss.util.MonitoredDirectoryUtil;
 import org.pwss.util.OSUtil;
 import org.pwss.util.ReportUtil;
+import org.pwss.util.ScanUtil;
 import org.pwss.util.StringConstants;
 import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
@@ -723,7 +725,8 @@ public final class HomeController extends BaseController<HomeScreen> {
             int choice;
             // Prompt the user to view scan results based on whether differences were found
             if (totalDiffCount.get() > 0) {
-                choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE, StringConstants.SCAN_COMPLETED_DIFFS,
+                choice = screen.showOptionDialog(JOptionPane.WARNING_MESSAGE,
+                        ScanUtil.constructDiffMessageString(totalDiffCount.get()),
                         new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                         StringConstants.GENERIC_YES);
             } else {
@@ -772,7 +775,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                     if (totalDiffCount.get() > 0) {
                         // If full scan, and we have diffs, navigate to the diffs tab to show all
                         // differences.
-                        screen.getTabbedPane().setSelectedIndex(2);
+                        screen.getTabbedPane().setSelectedIndex(3);
                     } else {
                         // If no diffs, navigate to the recent scans tab to show the most recent scan.
                         screen.getTabbedPane().setSelectedIndex(0);
@@ -845,12 +848,21 @@ public final class HomeController extends BaseController<HomeScreen> {
                 }
                 if (!liveFeed.isScanRunning()) {
 
+                    log.debug("Stopped pulling the live feed due to completion.");
                     scanStatusTimer.stop(); // Terminate polling when the scan completes
 
+                    log.debug("Retrieve the live feed one last time after receiving the final update from the server.");
                     liveFeed = scanService.getLiveFeed();
 
                     totalDiffCount.getAndAdd(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
                     screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
+
+                    newEntry = LiveFeedUtil.formatLiveFeedEntry(liveFeed.livefeed());
+                    if (!org.pwss.util.StringUtil.isEmpty(newEntry)) {
+                        currentLiveFeedText = screen.getLiveFeedText().getText();
+                        updatedLiveFeedText = currentLiveFeedText + newEntry;
+                        screen.getLiveFeedText().setText(updatedLiveFeedText);
+                    }
 
                     onFinishScan(true, singleDirectory);
                 }
