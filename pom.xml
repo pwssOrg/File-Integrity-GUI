@@ -126,7 +126,7 @@
 
             <!-- Plugin to create a JAR with dependencies -->
             <plugin>
-            <!--https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin/3.7.1 -->
+            <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin/3.7.1 -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>3.7.1</version>
