@@ -1,16 +1,16 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 /**
  * A utility class for string manipulation operations.
  * This class contains static methods to perform various string manipulations.
  */
-public final class StringUtils {
+public final class StringUtil {
 
     /**
      * 
      * Private constructor to prevent instantiation
      **/
-    private StringUtils() {
+    private StringUtil() {
     }
 
     /**

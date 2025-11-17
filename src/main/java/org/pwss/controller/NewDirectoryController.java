@@ -5,8 +5,8 @@ import javax.swing.JOptionPane;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.service.MonitoredDirectoryService;
-import org.pwss.utils.OSUtils;
-import org.pwss.utils.StringConstants;
+import org.pwss.util.OSUtil;
+import org.pwss.util.StringConstants;
 import org.pwss.view.screen.NewDirectoryScreen;
 
 /**
@@ -55,7 +55,7 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
         screen.getCreateButton().setEnabled(selectedPath != null && !selectedPath.isEmpty());
 
         // Additional check for Unix-based systems to disable creation for /dev and /proc paths
-        if (OSUtils.isUnix() && selectedPath != null) {
+        if (OSUtil.isUnix() && selectedPath != null) {
             if (selectedPath.startsWith("/dev") || selectedPath.startsWith("/proc")) {
                 screen.getCreateButton().setEnabled(false);
                 screen.showError("Cannot monitor directories under /dev or /proc on Unix-based systems.");

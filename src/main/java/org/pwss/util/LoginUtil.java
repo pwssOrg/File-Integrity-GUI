@@ -1,4 +1,4 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -7,10 +7,10 @@ import java.util.List;
 /**
  * Utility class for validating login inputs.
  */
-public final class LoginUtils {
+public final class LoginUtil {
 
     // Private constructor to prevent instantiation
-    private LoginUtils() {
+    private LoginUtil() {
         // This constructor is intentionally empty.
     }
 

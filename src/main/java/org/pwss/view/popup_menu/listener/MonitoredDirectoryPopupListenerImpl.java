@@ -6,7 +6,7 @@ import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.request.notes.RestoreNoteType;
 import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.service.NoteService;
-import org.pwss.utils.StringConstants;
+import org.pwss.util.StringConstants;
 import org.slf4j.LoggerFactory;
 
 /**

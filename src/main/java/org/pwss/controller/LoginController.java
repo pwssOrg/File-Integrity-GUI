@@ -11,8 +11,8 @@ import org.pwss.exception.user.UserExistsLookupException;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.Screen;
 import org.pwss.service.AuthService;
-import org.pwss.utils.LoginUtils;
-import org.pwss.utils.StringConstants;
+import org.pwss.util.LoginUtil;
+import org.pwss.util.StringConstants;
 import org.pwss.view.screen.LoginScreen;
 import org.slf4j.LoggerFactory;
 
@@ -180,10 +180,10 @@ public class LoginController extends BaseController<LoginScreen> {
         String confirmPassword = screen.getConfirmPassword();
         String licenseKey = licenseKeySet ? LICENSE_KEY : screen.getLicenseKey();
 
-        LoginUtils.LoginValidationResult result = LoginUtils.validateInput(username, password, confirmPassword,
+        LoginUtil.LoginValidationResult result = LoginUtil.validateInput(username, password, confirmPassword,
                 licenseKey, createUserMode);
         if (!result.isValid()) {
-            screen.showError(LoginUtils.formatErrors(result.errors()));
+            screen.showError(LoginUtil.formatErrors(result.errors()));
         }
 
         return result.isValid();

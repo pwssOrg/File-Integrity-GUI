@@ -15,9 +15,9 @@ import org.pwss.navigation.Screen;
 import org.pwss.service.FileService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
-import org.pwss.utils.OSUtils;
-import org.pwss.utils.ReportUtils;
-import org.pwss.utils.StringConstants;
+import org.pwss.util.OSUtil;
+import org.pwss.util.ReportUtil;
+import org.pwss.util.StringConstants;
 import org.pwss.view.screen.ScanDetailsScreen;
 import org.slf4j.LoggerFactory;
 
@@ -114,7 +114,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
             int selectedRow = screen.getScanSummaryTable().getSelectedRow();
             if (selectedRow >= 0 && selectedRow < scanSummaries.size()) {
                 ScanSummary selectedSummary = scanSummaries.get(selectedRow);
-                screen.getScanSummaryDetails().setText(ReportUtils.formatSummary(selectedSummary));
+                screen.getScanSummaryDetails().setText(ReportUtil.formatSummary(selectedSummary));
             } else {
                 screen.getScanSummaryDetails().setText("");
                 screen.getDiffDetails().setText("");
@@ -125,7 +125,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
             int selectedRow = screen.getDiffTable().getSelectedRow();
             if (selectedRow >= 0 && selectedRow < diffs.size()) {
                 Diff selectedDiff = diffs.get(selectedRow);
-                screen.getDiffDetails().setText(ReportUtils.formatDiff(selectedDiff));
+                screen.getDiffDetails().setText(ReportUtil.formatDiff(selectedDiff));
             } else {
                 screen.getDiffDetails().setText("");
             }
@@ -158,7 +158,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
         diff.ifPresent(d -> {
             int choice = screen.showOptionDialog(
                     JOptionPane.WARNING_MESSAGE,
-                    OSUtils.getQuarantineWarningMessage(),
+                    OSUtil.getQuarantineWarningMessage(),
                     new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                     StringConstants.GENERIC_NO);
             if (choice == 0) {

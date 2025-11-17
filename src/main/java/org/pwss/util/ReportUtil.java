@@ -1,4 +1,4 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,7 +8,7 @@ import org.pwss.model.entity.File;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.entity.ScanSummary;
 
-public class ReportUtils {
+public class ReportUtil {
 
     /**
      * Formats a ScanSummary into a human-readable string.

@@ -1,9 +1,9 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 /**
  * Utility class for processing live feed entries.
  */
-public final class LiveFeedUtils {
+public final class LiveFeedUtil {
 
     /**
      * A white check mark emoji used in live feed entries.

@@ -1,4 +1,4 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 /**
  * A utility class that holds various string constants used throughout the application.

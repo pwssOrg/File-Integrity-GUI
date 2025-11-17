@@ -59,14 +59,14 @@ import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.service.NoteService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
-import org.pwss.utils.AppTheme;
-import org.pwss.utils.ConversionUtils;
-import org.pwss.utils.ErrorUtils;
-import org.pwss.utils.LiveFeedUtils;
-import org.pwss.utils.MonitoredDirectoryUtils;
-import org.pwss.utils.OSUtils;
-import org.pwss.utils.ReportUtils;
-import org.pwss.utils.StringConstants;
+import org.pwss.util.AppTheme;
+import org.pwss.util.ConversionUtil;
+import org.pwss.util.ErrorUtil;
+import org.pwss.util.LiveFeedUtil;
+import org.pwss.util.MonitoredDirectoryUtil;
+import org.pwss.util.OSUtil;
+import org.pwss.util.ReportUtil;
+import org.pwss.util.StringConstants;
 import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
@@ -76,7 +76,6 @@ import static org.pwss.app_settings.AppConfig.APP_THEME;
 import static org.pwss.app_settings.AppConfig.MAX_HASH_EXTRACTION_FILE_SIZE;
 import static org.pwss.app_settings.AppConfig.USE_SPLASH_SCREEN;
 
-// TODO: NEEDS REFACTORING - VERY LARGE CLASS
 public final class HomeController extends BaseController<HomeScreen> {
 
     /**
@@ -250,7 +249,8 @@ public final class HomeController extends BaseController<HomeScreen> {
         try {
             // Fetch all monitored directories for display in the monitored directories
             // table
-            allMonitoredDirectories = monitoredDirectoryService.getAllDirectories();
+            allMonitoredDirectories = MonitoredDirectoryUtil
+                    .filterMonitoredDirectoriesOnConfirmedPath(monitoredDirectoryService.getAllDirectories());
 
             // Only fetch diffs if there are active monitored directories present
             final long activeDirCount = allMonitoredDirectories.stream().filter(MonitoredDirectory::isActive).count();
@@ -371,7 +371,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                 DiffTableModel model = (DiffTableModel) screen.getDiffTable().getModel();
                 Optional<Diff> diff = model.getDiffAt(modelRow);
 
-                diff.ifPresent(d -> screen.getDiffDetails().setText(ReportUtils.formatDiff(d)));
+                diff.ifPresent(d -> screen.getDiffDetails().setText(ReportUtil.formatDiff(d)));
             } else {
                 screen.getDiffDetails().setText("");
             }
@@ -395,7 +395,7 @@ public final class HomeController extends BaseController<HomeScreen> {
             int selectedRow = screen.getFileScanSummaryTable().getSelectedRow();
             if (selectedRow >= 0 && selectedRow < fileSummaries.size()) {
                 ScanSummary selectedSummary = fileSummaries.get(selectedRow);
-                screen.getScanSummaryDetails().setText(ReportUtils.formatSummary(selectedSummary));
+                screen.getScanSummaryDetails().setText(ReportUtil.formatSummary(selectedSummary));
             } else {
                 screen.getScanSummaryDetails().setText("");
             }
@@ -426,12 +426,12 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getMaxHashExtractionFileSizeSlider().addChangeListener(l -> {
             long valueMegabytes = screen.getMaxHashExtractionFileSizeSlider().getValue();
             log.debug("Setting max hash extraction file size to {} MB", valueMegabytes);
-            long valueBytes = ConversionUtils.megabytesToBytes(valueMegabytes);
+            long valueBytes = ConversionUtil.megabytesToBytes(valueMegabytes);
 
             // Set App config value to size in bytes
             if (AppConfig.setMaxHashExtractionFileSize(valueBytes)) {
                 screen.getMaxHashExtractionFileSizeValueLabel().setText(valueMegabytes + " MB");
-                maxFileSizeForHashExtraction = ConversionUtils.megabytesToBytes(valueMegabytes);
+                maxFileSizeForHashExtraction = ConversionUtil.megabytesToBytes(valueMegabytes);
             } else {
                 log.error("Failed to update max hash extraction file size in app config.");
             }
@@ -452,7 +452,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                 // If unchecked set the size to the current slider value
                 long sliderValueMegabytes = screen.getMaxHashExtractionFileSizeSlider().getValue();
                 log.debug("Setting max hash extraction file size to {} MB", sliderValueMegabytes);
-                long sliderValueBytes = ConversionUtils.megabytesToBytes(sliderValueMegabytes);
+                long sliderValueBytes = ConversionUtil.megabytesToBytes(sliderValueMegabytes);
                 if (AppConfig.setMaxHashExtractionFileSize(sliderValueBytes)) {
                     maxFileSizeForHashExtraction = sliderValueBytes;
                     screen.getMaxHashExtractionFileSizeValueLabel().setText(sliderValueMegabytes + " MB");
@@ -469,7 +469,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         // Update UI components based on the current state
         screen.getScanButton().setText(scanRunning ? StringConstants.SCAN_STOP : StringConstants.SCAN_FULL);
 
-        String notifications = MonitoredDirectoryUtils
+        String notifications = MonitoredDirectoryUtil
                 .getMonitoredDirectoryNotificationMessage(allMonitoredDirectories);
         boolean hasNotifications = !notifications.isEmpty();
 
@@ -515,7 +515,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                     if (!dir.baselineEstablished()) {
                         setForeground(Color.YELLOW);
                         setToolTipText(StringConstants.TOOLTIP_BASELINE_NOT_ESTABLISHED);
-                    } else if (MonitoredDirectoryUtils.isScanOlderThanAWeek(dir)) {
+                    } else if (MonitoredDirectoryUtil.isScanOlderThanAWeek(dir)) {
                         setForeground(Color.ORANGE);
                         setToolTipText(StringConstants.TOOLTIP_OLD_SCAN);
                     } else {
@@ -543,7 +543,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                     diff.ifPresent(d -> {
                         int choice = screen.showOptionDialog(
                                 JOptionPane.WARNING_MESSAGE,
-                                OSUtils.getQuarantineWarningMessage(),
+                                OSUtil.getQuarantineWarningMessage(),
                                 new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                                 StringConstants.GENERIC_NO);
                         if (choice == 0) {
@@ -607,7 +607,7 @@ public final class HomeController extends BaseController<HomeScreen> {
             screen.getMaxHashExtractionFileSizeSlider().setEnabled(true);
 
             final int maxSliderValueMegabytes = Math
-                    .toIntExact(ConversionUtils.bytesToMegabytes(maxFileSizeForHashExtraction));
+                    .toIntExact(ConversionUtil.bytesToMegabytes(maxFileSizeForHashExtraction));
             screen.getMaxHashExtractionFileSizeSlider().setValue(maxSliderValueMegabytes);
             screen.getMaxHashExtractionFileSizeValueLabel().setText(maxSliderValueMegabytes + " MB");
         } else {
@@ -691,7 +691,7 @@ public final class HomeController extends BaseController<HomeScreen> {
             log.debug(StringConstants.SCAN_START_ERROR, e);
             log.error(StringConstants.SCAN_START_ERROR + " {}", e.getMessage());
             SwingUtilities.invokeLater(() -> screen
-                    .showError(ErrorUtils.formatErrorMessage(StringConstants.SCAN_START_ERROR, e.getMessage())));
+                    .showError(ErrorUtil.formatErrorMessage(StringConstants.SCAN_START_ERROR, e.getMessage())));
         }
     }
 
@@ -830,12 +830,12 @@ public final class HomeController extends BaseController<HomeScreen> {
                 LiveFeedResponse liveFeed = scanService.getLiveFeed();
 
                 String currentLiveFeedText = screen.getLiveFeedText().getText();
-                String newEntry = LiveFeedUtils.formatLiveFeedEntry(liveFeed.livefeed());
+                String newEntry = LiveFeedUtil.formatLiveFeedEntry(liveFeed.livefeed());
                 String updatedLiveFeedText = currentLiveFeedText + newEntry;
                 screen.getLiveFeedText().setText(updatedLiveFeedText);
 
                 // Update the total difference count based on new warnings
-                totalDiffCount.addAndGet(LiveFeedUtils.countWarnings(liveFeed.livefeed()));
+                totalDiffCount.addAndGet(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
                 screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
 
                 // Update scanRunning state and refresh the UI if necessary
@@ -849,7 +849,7 @@ public final class HomeController extends BaseController<HomeScreen> {
 
                     liveFeed = scanService.getLiveFeed();
 
-                    totalDiffCount.getAndAdd(LiveFeedUtils.countWarnings(liveFeed.livefeed()));
+                    totalDiffCount.getAndAdd(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
                     screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
 
                     onFinishScan(true, singleDirectory);

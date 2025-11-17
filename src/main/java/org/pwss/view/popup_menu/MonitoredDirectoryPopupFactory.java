@@ -18,8 +18,8 @@ import javax.swing.JTextArea;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.request.notes.RestoreNoteType;
 import org.pwss.model.table.MonitoredDirectoryTableModel;
-import org.pwss.utils.StringConstants;
-import org.pwss.utils.StringUtils;
+import org.pwss.util.StringConstants;
+import org.pwss.util.StringUtil;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListener;
 
 /**
@@ -146,7 +146,7 @@ public class MonitoredDirectoryPopupFactory {
         updateNoteItem.addActionListener(e -> {
             // Label for directory path
             JLabel label = new JLabel(
-                    StringConstants.MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX + StringUtils.prependSpace(dir.path()));
+                    StringConstants.MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX + StringUtil.prependSpace(dir.path()));
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             // Text area for note input

@@ -28,7 +28,7 @@ import javax.swing.JTextPane;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import org.pwss.model.entity.MonitoredDirectory;
-import org.pwss.utils.AppTheme;
+import org.pwss.util.AppTheme;
 
 /**
  * The HomeScreen class represents the main screen of the application.

@@ -1,9 +1,9 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 /**
  * Utility class for handling and formatting error messages.
  */
-public final class ErrorUtils {
+public final class ErrorUtil {
 
     /**
      * Formats an error message by combining a constant text with a dynamic error
