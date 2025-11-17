@@ -108,7 +108,6 @@ public final class StringUtils {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    // Assuming isEmpty method exists as referred in the code
     private static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }
