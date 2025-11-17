@@ -63,7 +63,7 @@ public final class StringConstants {
 
     // Update note related strings
     public static final String MON_DIR_POPUP_UPDATE_NOTE = "Update note";
-    public static final String MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX = "Update note for: ";
+    public static final String MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX = "Update Note -";
     public static final String MON_DIR_POPUP_UPDATE_NOTE_SUCCESS = "Note updated successfully.";
     public static final String MON_DIR_POPUP_UPDATE_NOTE_ERROR = "Failed to update note.";
 

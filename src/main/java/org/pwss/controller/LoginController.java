@@ -16,7 +16,6 @@ import org.pwss.utils.StringConstants;
 import org.pwss.view.screen.LoginScreen;
 import org.slf4j.LoggerFactory;
 
-
 import static org.pwss.app_settings.AppConfig.LICENSE_KEY;
 
 /**
@@ -151,12 +150,12 @@ public class LoginController extends BaseController<LoginScreen> {
             int choice = screen.showOptionDialog(JOptionPane.INFORMATION_MESSAGE,
                     """
                             Welcome to Integrity Hash!
-                            
-                            You are about to create a user for this application.
-                            Please make sure to remember your credentials as they will be required for future logins.
-                            
-                            Do you want to proceed?""",
-                    new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
+
+                            You are about to set up access to this application. Please make sure to remember your credentials as they will be required for future logins.
+
+                            Do you want to proceed?
+                            """,
+                    new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
                     StringConstants.GENERIC_YES);
 
             if (choice == 0) {
@@ -181,7 +180,8 @@ public class LoginController extends BaseController<LoginScreen> {
         String confirmPassword = screen.getConfirmPassword();
         String licenseKey = licenseKeySet ? LICENSE_KEY : screen.getLicenseKey();
 
-        LoginUtils.LoginValidationResult result = LoginUtils.validateInput(username, password, confirmPassword, licenseKey, createUserMode);
+        LoginUtils.LoginValidationResult result = LoginUtils.validateInput(username, password, confirmPassword,
+                licenseKey, createUserMode);
         if (!result.isValid()) {
             screen.showError(LoginUtils.formatErrors(result.errors()));
         }
@@ -253,7 +253,7 @@ public class LoginController extends BaseController<LoginScreen> {
                     if (createUserMode) {
                         screen.showInfo("User created and logged in successfully!");
                     } else {
-                      log.info("Logged in successfully!");
+                        log.info("Logged in successfully!");
                     }
                     AppConfig.setLicenseKey(licenseKey);
                     NavigationEvents.navigateTo(Screen.HOME);
