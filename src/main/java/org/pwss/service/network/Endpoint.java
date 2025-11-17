@@ -54,6 +54,10 @@ public enum Endpoint {
      * Endpoint for retrieving diffs for a given scan.
      */
     SCAN_DIFFS(HTTP_Method.POST, A.BASE_URL + A.SCAN + "diff"),
+    /**
+     * Endpoint for retrieving the count of diffs for a given scan.
+     */
+    DIFF_COUNT(HTTP_Method.POST, A.BASE_URL + A.SCAN + "diff/count"),
 
 
     // Directory Endpoints

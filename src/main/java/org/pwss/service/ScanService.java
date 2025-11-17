@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
+import org.pwss.exception.scan.GetDiffCountException;
 import org.pwss.exception.scan.GetMostRecentScansException;
 import org.pwss.exception.scan.GetScanDiffsException;
 import org.pwss.exception.scan.LiveFeedException;
@@ -18,6 +19,7 @@ import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.request.scan.GetMostRecentScansRequest;
 import org.pwss.model.request.scan.GetScanDiffsRequest;
+import org.pwss.model.request.scan.ScanDiffsCountRequest;
 import org.pwss.model.request.scan.StartScanAllRequest;
 import org.pwss.model.request.scan.StartSingleScanRequest;
 import org.pwss.model.response.LiveFeedResponse;
@@ -200,6 +202,19 @@ public class ScanService {
         };
     }
 
+    /**
+     * Retrieves the diffs for a specific scan by sending a request to the SCAN_DIFFS endpoint.
+     *
+     * @param scanId    The ID of the scan to retrieve diffs for.
+     * @param limit     The maximum number of diffs to retrieve.
+     * @param sortField The field by which to sort the diffs.
+     * @param ascending Whether to sort the diffs in ascending order.
+     * @return A list of Diff objects if the request is successful.
+     * @throws GetScanDiffsException If the attempt to retrieve the scan diffs fails due to various reasons such as invalid credentials or server error.
+     * @throws ExecutionException   If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException If the thread executing the request is interrupted.
+     * @throws JsonProcessingException If an error occurs while processing JSON data.
+     */
     public List<Diff> getDiffs(long scanId, long limit, String sortField, boolean ascending) throws GetScanDiffsException, ExecutionException, InterruptedException, JsonProcessingException {
         String body = objectMapper.writeValueAsString(new GetScanDiffsRequest(scanId, limit, sortField, ascending));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.SCAN_DIFFS, body);
@@ -211,5 +226,29 @@ public class ScanService {
             case 500 -> throw new GetScanDiffsException("Failed to fetch scan diffs");
             default -> Collections.emptyList();
         };
+    }
+
+    /**
+     * Retrieves the count of diffs for a specific scan by sending a request to the DIFF_COUNT endpoint.
+     *
+     * @param scanId The ID of the scan to retrieve the diff count for.
+     * @return The count of diffs for the specified scan if the request is successful.
+     * @throws GetDiffCountException If the attempt to retrieve the scan diffs count fails due to various reasons such as invalid credentials, scan not found, or server error.
+     * @throws ExecutionException   If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException If the thread executing the request is interrupted.
+     * @throws JsonProcessingException If an error occurs while processing JSON data.
+     */
+    public Integer getScanDiffsCount(long scanId) throws JsonProcessingException, ExecutionException, InterruptedException, GetDiffCountException {
+      String body = objectMapper.writeValueAsString(new ScanDiffsCountRequest(scanId));
+      HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.DIFF_COUNT, body);
+
+      return switch (response.statusCode()) {
+          case 200 -> Integer.parseInt(response.body());
+          case 400 -> throw new GetDiffCountException("Get scan diffs count failed: Bad request.");
+          case 401 -> throw new GetDiffCountException("Get scan diffs count failed: User not authorized to perform this action.");
+          case 404 -> throw new GetDiffCountException("Get scan diffs count failed: Scan with the given ID not found.");
+          case 500 -> throw new GetDiffCountException("Get scan diffs count failed: An error occurred on the server while attempting to get the diff count.");
+          default -> null;
+      };
     }
 }

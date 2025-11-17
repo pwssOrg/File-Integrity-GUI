@@ -29,6 +29,7 @@ import org.pwss.data_structure.RingBuffer;
 import org.pwss.exception.metadata.MetadataKeyNameRetrievalException;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
+import org.pwss.exception.scan.GetDiffCountException;
 import org.pwss.exception.scan.GetMostRecentScansException;
 import org.pwss.exception.scan.GetScanDiffsException;
 import org.pwss.exception.scan.LiveFeedException;
@@ -130,6 +131,11 @@ public final class HomeController extends BaseController<HomeScreen> {
      * List of recent scans performed.
      */
     private List<Scan> recentScans;
+
+    /**
+     * Count of differences found in recent scans.
+     */
+    private int recentDiffsCount;
 
     /**
      * List of most recent differences detected in the scans.
@@ -263,8 +269,17 @@ public final class HomeController extends BaseController<HomeScreen> {
                 if (recentScans.isEmpty()) {
                     recentDiffs = List.of();
                 } else {
+                    List<Scan> distinctRecentScans = ScanUtil.getScansDistinctByDirectory(recentScans);
+
+                    // Calculate diff count for the recent scans
+                    recentDiffsCount = 0;
+                    for (Scan scan : distinctRecentScans) {
+                        int count = scanService.getScanDiffsCount(scan.id());
+                        recentDiffsCount += count;
+                    }
+
                     // Fetch diffs for the most recent scan to show in the diffs table
-                    recentDiffs = recentScans.stream()
+                    recentDiffs = distinctRecentScans.stream()
                             .flatMap(scan -> safeGetDiffs(scan.id()).stream())
                             .toList();
                 }
@@ -282,8 +297,8 @@ public final class HomeController extends BaseController<HomeScreen> {
                 scanRunning = true;
                 startPollingScanLiveFeed(false, Collections.emptyList());
             }
-        } catch (MonitoredDirectoryGetAllException | ExecutionException | InterruptedException | JsonProcessingException
-                | GetAllMostRecentScansException | ScanStatusException e) {
+        } catch (MonitoredDirectoryGetAllException | ExecutionException | InterruptedException |
+                 JsonProcessingException | GetAllMostRecentScansException | ScanStatusException | GetDiffCountException e) {
             log.error("Error getting data: {}", e.getMessage());
             SwingUtilities.invokeLater(() -> screen.showError("Error getting data"));
         }
@@ -535,8 +550,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getMonitoredDirectoriesTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // Update diffs count label
-        // TODO: Update with count from endpoint when available
-        screen.getDiffsCountLabel().setText("Diffs found: " + (recentDiffs != null ? recentDiffs.size() : 0));
+        screen.getDiffsCountLabel().setText("Diffs found: " + recentDiffsCount);
 
         DiffTableModel diffTableModel = new DiffTableModel(recentDiffs != null ? recentDiffs : List.of());
         screen.getDiffTable().setModel(diffTableModel);
@@ -879,7 +893,7 @@ public final class HomeController extends BaseController<HomeScreen> {
                         liveFeedBuffer.add(newEntry); // Add the last pull to the buffer
 
                         // Update UI with the last text
-                        sb.setLength(0); // Rensa StringBuilder
+                        sb.setLength(0); // Clear StringBuilder
                         for (int i = 0; i < liveFeedBuffer.size(); i++) {
                             sb.append(liveFeedBuffer.get(i)); // Add all updates to the buffer
                         }

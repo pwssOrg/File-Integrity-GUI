@@ -1,5 +1,12 @@
 package org.pwss.util;
 
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import org.pwss.model.entity.Scan;
+
 /**
  * Utility class for constructing scan-related messages.
  */
@@ -33,5 +40,24 @@ public final class ScanUtil {
      */
     public static String constructDiffMessageString(long diffNumber) {
         return SCAN_COMPLETED_DIFFS_PREFIX + diffNumber + SCAN_COMPLETED_DIFFS_SUFFIX;
+    }
+
+    /**
+     * Filters the provided list of scans to return a list containing only distinct
+     * scans based on their monitored directory IDs.
+     *
+     * @param scans The list of scans to filter.
+     * @return A list of scans with distinct monitored directory IDs.
+     */
+    public static List<Scan> getScansDistinctByDirectory(List<Scan> scans) {
+        return scans.stream()
+                .filter(distinctByKey(scan -> scan.monitoredDirectory().id()))
+                .toList();
+    }
+
+    // Helper method to create a predicate for distinct filtering based on a key extractor
+    private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(keyExtractor.apply(t));
     }
 }
