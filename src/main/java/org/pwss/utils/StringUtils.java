@@ -108,6 +108,12 @@ public final class StringUtils {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
+    /**
+     * Checks if a given string is empty or null.
+     *
+     * @param str the string to check, can be null
+     * @return true if the string is null or has length 0, false otherwise
+     */
     private static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
     }
