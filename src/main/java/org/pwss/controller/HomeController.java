@@ -25,6 +25,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.pwss.app_settings.AppConfig;
 import org.pwss.controller.util.NavigationContext;
+import org.pwss.data_structure.RingBuffer;
 import org.pwss.exception.metadata.MetadataKeyNameRetrievalException;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
@@ -827,51 +828,70 @@ public final class HomeController extends BaseController<HomeScreen> {
             }
         }
 
+        // Create a ring buffer with a capacity to hold the last 100 updates
+        RingBuffer<String> liveFeedBuffer = new RingBuffer<>(100);
+
+        // Create and start a polling timer
         scanStatusTimer = new Timer(1000, e -> {
             try {
-                // Retrieve live feed updates
+                // Get live feed from backend
                 LiveFeedResponse liveFeed = scanService.getLiveFeed();
 
-                String currentLiveFeedText = screen.getLiveFeedText().getText();
+                // Format the new update from the backend
                 String newEntry = LiveFeedUtil.formatLiveFeedEntry(liveFeed.livefeed());
-                String updatedLiveFeedText = currentLiveFeedText + newEntry;
-                screen.getLiveFeedText().setText(updatedLiveFeedText);
 
-                // Update the total difference count based on new warnings
+                // Add the new update to the ring buffer
+                liveFeedBuffer.add(newEntry);
+
+                // Build the text for the live feed based on the latest updates in the buffer
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < liveFeedBuffer.size(); i++) {
+                    sb.append(liveFeedBuffer.get(i));
+                }
+
+                // Update UI with the latest text
+                screen.getLiveFeedText().setText(sb.toString());
+
+                // Update the diff counter
                 totalDiffCount.addAndGet(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
                 screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
 
-                // Update scanRunning state and refresh the UI if necessary
+                // Update scan status and UI as needed
                 if (liveFeed.isScanRunning() != scanRunning) {
                     scanRunning = liveFeed.isScanRunning();
                     refreshView();
                 }
+
+                // When the scan is complete, do a final pull
                 if (!liveFeed.isScanRunning()) {
+                    log.debug("Scan completed, making final pull...");
 
-                    log.debug("Stopped pulling the live feed due to completion.");
-                    scanStatusTimer.stop(); // Terminate polling when the scan completes
+                    // Do a final pull without time pressure
+                    liveFeed = scanService.getLiveFeed(); // The last pull to get any final updates
 
-                    log.debug("Retrieve the live feed one last time after receiving the final update from the server.");
-                    liveFeed = scanService.getLiveFeed();
-
-                    totalDiffCount.getAndAdd(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
-                    screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
-
+                    // Add the last update to the buffer
                     newEntry = LiveFeedUtil.formatLiveFeedEntry(liveFeed.livefeed());
                     if (!org.pwss.util.StringUtil.isEmpty(newEntry)) {
-                        currentLiveFeedText = screen.getLiveFeedText().getText();
-                        updatedLiveFeedText = currentLiveFeedText + newEntry;
-                        screen.getLiveFeedText().setText(updatedLiveFeedText);
+                        liveFeedBuffer.add(newEntry); // Add the last pull to the buffer
+
+                        // Update UI with the last text
+                        sb.setLength(0); // Rensa StringBuilder
+                        for (int i = 0; i < liveFeedBuffer.size(); i++) {
+                            sb.append(liveFeedBuffer.get(i)); // Add all updates to the buffer
+                        }
+                        screen.getLiveFeedText().setText(sb.toString());
                     }
 
-                    onFinishScan(true, singleDirectory);
+                    // Stop polling and end the process
+                    scanStatusTimer.stop();
+                    onFinishScan(true, singleDirectory); // Complete the scan
                 }
             } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
-                log.error(StringConstants.SCAN_LIVE_FEED_ERROR_PREFIX + " {}", ex.getMessage());
-                log.debug("Debug Live Feed Exception", ex);
-                SwingUtilities.invokeLater(() -> screen.showError(StringConstants.SCAN_LIVE_FEED_ERROR_PREFIX));
+                log.error("Error fetching live feed: {}", ex.getMessage());
+                log.debug("Live Feed Exception", ex);
+                SwingUtilities.invokeLater(() -> screen.showError("Live feed error"));
                 scanStatusTimer.stop(); // Stop polling on error
-                onFinishScan(false, singleDirectory);
+                onFinishScan(false, singleDirectory); // Handling errors
             }
         });
         scanStatusTimer.start();
