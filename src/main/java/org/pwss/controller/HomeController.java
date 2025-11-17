@@ -534,6 +534,10 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
         screen.getMonitoredDirectoriesTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+        // Update diffs count label
+        // TODO: Update with count from endpoint when available
+        screen.getDiffsCountLabel().setText("Diffs found: " + (recentDiffs != null ? recentDiffs.size() : 0));
+
         DiffTableModel diffTableModel = new DiffTableModel(recentDiffs != null ? recentDiffs : List.of());
         screen.getDiffTable().setModel(diffTableModel);
         screen.getDiffTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);

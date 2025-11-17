@@ -141,6 +141,10 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
         SimpleSummaryTableModel simpleSummaryTableModel = new SimpleSummaryTableModel(scanSummaries);
         screen.getScanSummaryTable().setModel(simpleSummaryTableModel);
 
+        // Update diffs count label
+        // TODO: Update with count from endpoint when available
+        screen.getDiffsCountLabel().setText("Diffs found: " + diffs.size());
+
         // Populate diffs table
         DiffTableModel diffTableModel = new DiffTableModel(diffs);
         screen.getDiffTable().setModel(diffTableModel);
