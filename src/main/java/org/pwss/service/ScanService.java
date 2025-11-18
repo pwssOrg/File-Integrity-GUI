@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
+import org.pwss.exception.scan.GetDiffCountException;
 import org.pwss.exception.scan.GetMostRecentScansException;
 import org.pwss.exception.scan.GetScanDiffsException;
 import org.pwss.exception.scan.LiveFeedException;
@@ -18,6 +19,8 @@ import org.pwss.model.entity.Diff;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.request.scan.GetMostRecentScansRequest;
 import org.pwss.model.request.scan.GetScanDiffsRequest;
+import org.pwss.model.request.scan.ScanDiffsCountRequest;
+import org.pwss.model.request.scan.StartScanAllRequest;
 import org.pwss.model.request.scan.StartSingleScanRequest;
 import org.pwss.model.response.LiveFeedResponse;
 import org.pwss.service.network.Endpoint;
@@ -39,23 +42,25 @@ public class ScanService {
     /**
      * Starts a scan by sending a request to the START_SCAN endpoint.
      *
+     * @param maxHashExtractionFileSize The maximum file size for hash extraction.
      * @return `true` if the scan start request is successful, otherwise `false`.
      * @throws StartFullScanException If the scan start attempt fails due to various reasons such as invalid credentials, no active monitored directories, scan already running, or server error.
      * @throws ExecutionException    If an error occurs during the asynchronous execution of the request.
      * @throws InterruptedException  If the thread executing the request is interrupted.
      */
-    public boolean startScan() throws StartFullScanException, ExecutionException, InterruptedException {
-        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN, null);
+    public boolean startScan(long maxHashExtractionFileSize) throws StartFullScanException, ExecutionException, InterruptedException, JsonProcessingException {
+        String body = objectMapper.writeValueAsString(new StartScanAllRequest(maxHashExtractionFileSize));
+        HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN, body);
 
         return switch (response.statusCode()) {
             case 200 -> true;
             case 401 ->
-                    throw new StartFullScanException("Start scan all failed: User not authorized to perform this action.");
+                    throw new StartFullScanException("User not authorized to perform this action.");
             case 412 ->
-                    throw new StartFullScanException("Start scan all failed: No active monitored directories found.");
-            case 425 -> throw new StartFullScanException("Start scan all failed: Scan is already running.");
+                    throw new StartFullScanException("There are no directories being actively monitored.");
+            case 425 -> throw new StartFullScanException("Scan is already running.");
             case 500 ->
-                    throw new StartFullScanException("Start scan all failed: An error occurred on the server while attempting to start the scan.");
+                    throw new StartFullScanException("An error occurred on the server while attempting to start the scan.");
             default -> false;
         };
     }
@@ -64,14 +69,15 @@ public class ScanService {
      * Starts a scan for a specific monitored directory by its ID by sending a request to the START_SCAN_ID endpoint.
      *
      * @param id The ID of the monitored directory to start the scan for.
+     * @param maxHashExtractionFileSize The maximum file size for hash extraction.
      * @return `true` if the scan start request is successful, otherwise `false`.
      * @throws StartScanByIdException  If the scan start attempt fails due to various reasons such as invalid credentials, monitored directory not found, monitored directory inactive, scan already running, or server error.
      * @throws ExecutionException      If an error occurs during the asynchronous execution of the request.
      * @throws InterruptedException    If the thread executing the request is interrupted.
      * @throws JsonProcessingException If an error occurs while serializing the start scan request to JSON.
      */
-    public boolean startScanById(long id) throws StartScanByIdException, ExecutionException, InterruptedException, JsonProcessingException {
-        String body = objectMapper.writeValueAsString(new StartSingleScanRequest(id));
+    public boolean startScanById(long id, long maxHashExtractionFileSize) throws StartScanByIdException, ExecutionException, InterruptedException, JsonProcessingException {
+        String body = objectMapper.writeValueAsString(new StartSingleScanRequest(id, maxHashExtractionFileSize));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.START_SCAN_ID, body);
 
         return switch (response.statusCode()) {
@@ -196,6 +202,19 @@ public class ScanService {
         };
     }
 
+    /**
+     * Retrieves the diffs for a specific scan by sending a request to the SCAN_DIFFS endpoint.
+     *
+     * @param scanId    The ID of the scan to retrieve diffs for.
+     * @param limit     The maximum number of diffs to retrieve.
+     * @param sortField The field by which to sort the diffs.
+     * @param ascending Whether to sort the diffs in ascending order.
+     * @return A list of Diff objects if the request is successful.
+     * @throws GetScanDiffsException If the attempt to retrieve the scan diffs fails due to various reasons such as invalid credentials or server error.
+     * @throws ExecutionException   If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException If the thread executing the request is interrupted.
+     * @throws JsonProcessingException If an error occurs while processing JSON data.
+     */
     public List<Diff> getDiffs(long scanId, long limit, String sortField, boolean ascending) throws GetScanDiffsException, ExecutionException, InterruptedException, JsonProcessingException {
         String body = objectMapper.writeValueAsString(new GetScanDiffsRequest(scanId, limit, sortField, ascending));
         HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.SCAN_DIFFS, body);
@@ -204,8 +223,32 @@ public class ScanService {
             case 200 -> List.of(objectMapper.readValue(response.body(), Diff[].class));
             case 401 ->
                     throw new GetScanDiffsException("Failed to fetch scan diffs: User not authorized to perform this action.");
-            case 500 -> throw new GetScanDiffsException("Failed to fetch scan diffs: Server error");
+            case 500 -> throw new GetScanDiffsException("Failed to fetch scan diffs");
             default -> Collections.emptyList();
         };
+    }
+
+    /**
+     * Retrieves the count of diffs for a specific scan by sending a request to the DIFF_COUNT endpoint.
+     *
+     * @param scanId The ID of the scan to retrieve the diff count for.
+     * @return The count of diffs for the specified scan if the request is successful.
+     * @throws GetDiffCountException If the attempt to retrieve the scan diffs count fails due to various reasons such as invalid credentials, scan not found, or server error.
+     * @throws ExecutionException   If an error occurs during the asynchronous execution of the request.
+     * @throws InterruptedException If the thread executing the request is interrupted.
+     * @throws JsonProcessingException If an error occurs while processing JSON data.
+     */
+    public Integer getScanDiffsCount(long scanId) throws JsonProcessingException, ExecutionException, InterruptedException, GetDiffCountException {
+      String body = objectMapper.writeValueAsString(new ScanDiffsCountRequest(scanId));
+      HttpResponse<String> response = PwssHttpClient.getInstance().request(Endpoint.DIFF_COUNT, body);
+
+      return switch (response.statusCode()) {
+          case 200 -> Integer.parseInt(response.body());
+          case 400 -> throw new GetDiffCountException("Get scan diffs count failed: Bad request.");
+          case 401 -> throw new GetDiffCountException("Get scan diffs count failed: User not authorized to perform this action.");
+          case 404 -> throw new GetDiffCountException("Get scan diffs count failed: Scan with the given ID not found.");
+          case 500 -> throw new GetDiffCountException("Get scan diffs count failed: An error occurred on the server while attempting to get the diff count.");
+          default -> null;
+      };
     }
 }

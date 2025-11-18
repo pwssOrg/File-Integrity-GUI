@@ -7,7 +7,7 @@ public enum Screen {
     /**
      * The login screen where users can authenticate.
      */
-    LOGIN(400, 200),
+    LOGIN(450, 250),
 
     /**
      * The home screen displayed after successful login.

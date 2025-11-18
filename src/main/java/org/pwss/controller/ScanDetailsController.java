@@ -15,15 +15,21 @@ import org.pwss.navigation.Screen;
 import org.pwss.service.FileService;
 import org.pwss.service.ScanService;
 import org.pwss.service.ScanSummaryService;
-import org.pwss.utils.OSUtils;
-import org.pwss.utils.ReportUtils;
-import org.pwss.utils.StringConstants;
+import org.pwss.util.OSUtil;
+import org.pwss.util.ReportUtil;
+import org.pwss.util.StringConstants;
 import org.pwss.view.screen.ScanDetailsScreen;
+import org.slf4j.LoggerFactory;
 
 /**
  * Controller class that handles operations related to the scan details screen.
  */
 public class ScanDetailsController extends BaseController<ScanDetailsScreen> implements CellButtonListener {
+
+    /**
+     * Logger for logging messages within this controller.
+     */
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(ScanDetailsController.class);
 
     /**
      * Service responsible for managing scan summaries.
@@ -43,11 +49,17 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
      * List of scan summaries. This can be empty if no summaries are available.
      */
     private List<ScanSummary> scanSummaries;
+
     /**
      * List of differences (diffs) between scans. This can be empty if no diffs are
      * available.
      */
     private List<Diff> diffs;
+
+    /**
+     * Count of differences found. This can be null if the count is not available.
+     */
+    private Integer diffCount = 0;
 
     /**
      * Constructs a ScanDetailsController with the given screen and initializes
@@ -66,6 +78,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
 
     @Override
     public void onShow() {
+        super.onShow();
         if (scanSummaries != null && !scanSummaries.isEmpty()) {
             // Clear existing data
             scanSummaries = List.of();
@@ -90,6 +103,8 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
             if (scanId != null) {
                 // Fetch scan summaries for the scan
                 scanSummaries = scanSummaryService.getScanSummaryForScan(scanId);
+                // Fetch diff count for the scan
+                diffCount = scanService.getScanDiffsCount(scanId);
                 // Fetch diffs for the scan
                 diffs = scanService.getDiffs(scanId, 1000, null, true);
             }
@@ -107,7 +122,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
             int selectedRow = screen.getScanSummaryTable().getSelectedRow();
             if (selectedRow >= 0 && selectedRow < scanSummaries.size()) {
                 ScanSummary selectedSummary = scanSummaries.get(selectedRow);
-                screen.getScanSummaryDetails().setText(ReportUtils.formatSummary(selectedSummary));
+                screen.getScanSummaryDetails().setText(ReportUtil.formatSummary(selectedSummary));
             } else {
                 screen.getScanSummaryDetails().setText("");
                 screen.getDiffDetails().setText("");
@@ -118,7 +133,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
             int selectedRow = screen.getDiffTable().getSelectedRow();
             if (selectedRow >= 0 && selectedRow < diffs.size()) {
                 Diff selectedDiff = diffs.get(selectedRow);
-                screen.getDiffDetails().setText(ReportUtils.formatDiff(selectedDiff));
+                screen.getDiffDetails().setText(ReportUtil.formatDiff(selectedDiff));
             } else {
                 screen.getDiffDetails().setText("");
             }
@@ -134,12 +149,16 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
         SimpleSummaryTableModel simpleSummaryTableModel = new SimpleSummaryTableModel(scanSummaries);
         screen.getScanSummaryTable().setModel(simpleSummaryTableModel);
 
+        // Update diffs count label
+        screen.getDiffsCountLabel().setText("Diffs found: " + diffCount);
+
         // Populate diffs table
         DiffTableModel diffTableModel = new DiffTableModel(diffs);
         screen.getDiffTable().setModel(diffTableModel);
 
         screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
-        screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellEditor(new ButtonEditor("\uD83D\uDCE5", this));
+        screen.getDiffTable().getColumn(DiffTableModel.columns[3])
+                .setCellEditor(new ButtonEditor("\uD83D\uDCE5", this));
     }
 
     @Override
@@ -150,22 +169,29 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
         diff.ifPresent(d -> {
             int choice = screen.showOptionDialog(
                     JOptionPane.WARNING_MESSAGE,
-                    OSUtils.getQuarantineWarningMessage(),
-                    new String[]{StringConstants.GENERIC_YES, StringConstants.GENERIC_NO},
-                    StringConstants.GENERIC_NO
-            );
+                    OSUtil.getQuarantineWarningMessage(),
+                    new String[] { StringConstants.GENERIC_YES, StringConstants.GENERIC_NO },
+                    StringConstants.GENERIC_NO);
             if (choice == 0) {
                 try {
                     boolean success = fileService.quarantineFile(d.integrityFail().file().id());
                     if (success) {
-                        screen.showInfo("File quarantined successfully.");
+                        log.info("File quarantined successfully.");
                         screen.getDiffTable().getColumn(d).setCellRenderer(new ButtonRenderer());
                         screen.getDiffTable().getColumn(d).setCellEditor(new ButtonEditor("🗿", this));
                     } else {
                         screen.showError("Failed to quarantine the file.");
                     }
-                } catch (Exception e) {
-                    screen.showError(e.getMessage());
+
+                }
+
+                catch (IllegalArgumentException iae) {
+                    log.debug("Illegal argument exception {}",iae);
+                }
+
+                catch (Exception e) {
+                    log.debug("Exception thrown {} ", e);
+                    log.error("Error code 455 : {}",e.getMessage());
                 }
             }
         });

@@ -16,12 +16,14 @@ public abstract class BaseController<Screen extends BaseScreen> {
      * Represents the UI component associated with this controller.
      */
     protected Screen screen;
-
     /**
      * The navigation context for passing data between different parts of the application during navigation.
      */
     private NavigationContext context;
-
+    /**
+     * Logger instance for logging purposes.
+     */
+    private final org.slf4j.Logger log;
     /**
      * Constructs a `BaseController` with the specified view.
      * Initializes the view and sets up event listeners.
@@ -30,12 +32,12 @@ public abstract class BaseController<Screen extends BaseScreen> {
      */
     public BaseController(Screen screen) {
         this.screen = screen;
+        this.log = org.slf4j.LoggerFactory.getLogger(BaseController.class);
         // Run onCreate lifecycle method
         onCreate();
         // Initialize event listeners
         initListeners();
     }
-
     /**
      * Retrieves the current navigation context.
      *
@@ -44,7 +46,6 @@ public abstract class BaseController<Screen extends BaseScreen> {
     protected NavigationContext getContext() {
         return context;
     }
-
     /**
      * Sets the navigation context for the controller.
      *
@@ -53,26 +54,22 @@ public abstract class BaseController<Screen extends BaseScreen> {
     public void setContext(NavigationContext context) {
         this.context = context;
     }
-
     /**
      * Abstract method to initialize event listeners for the Screen.
      * Subclasses must provide an implementation for this method.
      */
     abstract void initListeners();
-
     /**
      * Abstract method to refresh or update the view.
      * Subclasses must provide an implementation for this method.
      */
     abstract void refreshView();
-
     /**
      * Method to reload or refresh data displayed in the view.
      * Subclasses can override this method to provide specific data reloading logic.
-     * The default implementation does nothing.
      */
     public void reloadData() {
-        // Default implementation does nothing
+        log.debug("reloadData called for {}", screen.getScreenName());
     }
 
     /**
@@ -83,22 +80,19 @@ public abstract class BaseController<Screen extends BaseScreen> {
     public Screen getScreen() {
         return screen;
     }
-
     /**
      * Method called when the view is shown.
      * Subclasses can override this method to perform actions when the view becomes visible.
-     * The default implementation does nothing.
      */
     public void onShow() {
-        // Default implementation does nothing
+        log.debug("onShow called for {}", screen.getScreenName());
     }
 
     /**
      * Method called when the view is created.
      * Subclasses can override this method to perform actions during the creation of the view.
-     * The default implementation does nothing.
      */
     public void onCreate() {
-        // Default implementation does nothing
+        log.debug("onCreate called for {}", screen.getScreenName());
     }
 }

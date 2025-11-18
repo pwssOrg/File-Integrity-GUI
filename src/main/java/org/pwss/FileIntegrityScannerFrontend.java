@@ -16,7 +16,7 @@ import org.pwss.exception.start.FailedToLaunchAppException;
 import org.pwss.navigation.NavigationEvents;
 import org.pwss.navigation.NavigationHandler;
 import org.pwss.navigation.Screen;
-import org.pwss.utils.OSUtils;
+import org.pwss.util.OSUtil;
 import org.pwss.view.screen.splash_screen.FileIntegrityScannerSplashScreen;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,7 @@ class FileIntegrityScannerFrontend {
     final static void StartApplication() throws FailedToLaunchAppException {
         final org.slf4j.Logger log = LoggerFactory.getLogger(FileIntegrityScannerFrontend.class);
         log.debug("Starting File-Integrity Scanner Frontend Application");
-        log.debug("OS Name: {}", OSUtils.getOSName());
+        log.debug("OS Name: {}", OSUtil.getOSName());
         try {
             if (AppConfig.USE_SPLASH_SCREEN) {
                 FileIntegrityScannerSplashScreen.showSplash();

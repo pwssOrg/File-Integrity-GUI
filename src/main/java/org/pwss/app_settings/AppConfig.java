@@ -27,6 +27,12 @@ public final class AppConfig {
      * when the class is initialized.
      */
     public final static String LICENSE_KEY;
+    /**
+     * Maximum file size (in bytes) for hash extraction. This value is loaded from
+     * the configuration file
+     * when the class is initialized.
+     */
+    public final static long MAX_HASH_EXTRACTION_FILE_SIZE;
 
     /**
      * ConfigLoader instance used to load and manage configuration values.
@@ -41,6 +47,7 @@ public final class AppConfig {
         USE_SPLASH_SCREEN = configLoader.isUseSplashScreen();
         APP_THEME = configLoader.getAppTheme();
         LICENSE_KEY = configLoader.getLicenseKey();
+        MAX_HASH_EXTRACTION_FILE_SIZE = configLoader.getHashExtractionMaxFileSizeValue();
     }
 
     /**
@@ -78,6 +85,18 @@ public final class AppConfig {
      */
     public static final boolean setLicenseKey(String licenseKey) {
         return configLoader.setLicenseKey(licenseKey);
+    }
+
+    /**
+     * Sets the maximum file size for hash extraction in the configuration file.
+     * This change will take effect only after
+     * the frontend application is restarted.
+     *
+     * @param maxFileSize The value to set for the maximum file size (in bytes)
+     * @return true if setting was successful, otherwise false
+     */
+    public static final boolean setMaxHashExtractionFileSize(long maxFileSize) {
+        return configLoader.setMaxHashExtractionFileSize(String.valueOf(maxFileSize));
     }
 
 }

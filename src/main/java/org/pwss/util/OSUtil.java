@@ -1,13 +1,13 @@
-package org.pwss.utils;
+package org.pwss.util;
 
 /**
  * Utility class for operating system detection and information.
  * Provides methods to determine the current OS type and related functionalities.
  */
-public final class OSUtils {
+public final class OSUtil {
 
     // Private constructor to prevent instantiation
-    private OSUtils() {
+    private OSUtil() {
         throw new UnsupportedOperationException("Utility class cannot be instantiated");
     }
 
@@ -105,7 +105,6 @@ public final class OSUtils {
      * @return A warning message string specific to the current OS.
      */
     public static String getQuarantineWarningMessage() {
-        // TODO: Replace with custom, detailed warning messages for each OS.
         return switch (determineOSType()) {
             case WINDOWS ->
                     "Warning: Quarantining or removing Windows system files (drivers, DLLs, registry-related files) can render the system unstable or unbootable. Back up data, ensure you have recovery media and administrator access before proceeding.";

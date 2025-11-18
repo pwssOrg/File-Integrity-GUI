@@ -18,12 +18,15 @@ import javax.swing.JTextArea;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.request.notes.RestoreNoteType;
 import org.pwss.model.table.MonitoredDirectoryTableModel;
-import org.pwss.utils.StringConstants;
+import org.pwss.util.StringConstants;
+import org.pwss.util.StringUtil;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListener;
 
 /**
- * Factory class to create a context menu (popup menu) for monitored directories in a JTable.
- * The menu provides options to scan the directory, reset its baseline, and edit its details.
+ * Factory class to create a context menu (popup menu) for monitored directories
+ * in a JTable.
+ * The menu provides options to scan the directory, reset its baseline, and edit
+ * its details.
  */
 public class MonitoredDirectoryPopupFactory {
     private final MonitoredDirectoryPopupListener listener;
@@ -39,18 +42,23 @@ public class MonitoredDirectoryPopupFactory {
         MonitoredDirectoryTableModel model = (MonitoredDirectoryTableModel) table.getModel();
         Optional<MonitoredDirectory> dirOpt = model.getDirectoryAt(modelRow);
 
-        if (dirOpt.isEmpty()) return menu;
+        if (dirOpt.isEmpty())
+            return menu;
         MonitoredDirectory dir = dirOpt.get();
 
         // Scan this directory
-        JMenuItem scanItem = new JMenuItem(dir.baselineEstablished() ? StringConstants.MON_DIR_POPUP_START_SCAN : StringConstants.MON_DIR_POPUP_ESTABLISH_BASELINE);
+        JMenuItem scanItem = new JMenuItem(dir.baselineEstablished() ? StringConstants.MON_DIR_POPUP_START_SCAN
+                : StringConstants.MON_DIR_POPUP_ESTABLISH_BASELINE);
         scanItem.addActionListener(e -> listener.onStartScan());
 
         // Reset baseline
         JMenuItem resetBaselineItem = getResetBaselineItem(dir);
 
-        // Edit directory
-        JMenuItem editDirectory = getEditDirectoryItem(dir);
+        // Toggle active state
+        JMenuItem toggleActiveMenuItem = getToggleActiveMenuItem(dir);
+
+        // Toggle include subdirectories
+        JMenuItem toggleIncludeSubDirsItem = getToggleIncludeSubDirsItem(dir);
 
         // Show note
         JMenuItem showNoteItem = getShowNoteItem(dir);
@@ -62,8 +70,11 @@ public class MonitoredDirectoryPopupFactory {
         JMenuItem restoreNoteItem = getRestoreNoteItem(dir);
 
         // Assemble menu
-        menu.add(scanItem);
-        menu.add(editDirectory);
+        if (dir.isActive()) {
+            menu.add(scanItem);
+        }
+        menu.add(toggleActiveMenuItem);
+        menu.add(toggleIncludeSubDirsItem);
         menu.addSeparator();
         menu.add(showNoteItem);
         menu.add(updateNoteItem);
@@ -75,14 +86,30 @@ public class MonitoredDirectoryPopupFactory {
     }
 
     /**
-     * Creates a menu item for editing the details of a monitored directory.
+     * Creates a menu item for toggling the active status of a monitored directory.
      *
      * @param dir the monitored directory for which to create the menu item
-     * @return the JMenuItem for editing the directory
+     * @return the JMenuItem for toggling the active status
      */
-    private JMenuItem getEditDirectoryItem(MonitoredDirectory dir) {
-        JMenuItem editItem = new JMenuItem(StringConstants.MON_DIR_POPUP_EDIT_DIR);
-        editItem.addActionListener(e -> listener.onEditDirectory(dir));
+    private JMenuItem getToggleActiveMenuItem(MonitoredDirectory dir) {
+        JMenuItem editItem = new JMenuItem(dir.isActive() ? StringConstants.MON_DIR_TOGGLE_ACTIVE_DISABLE
+                : StringConstants.MON_DIR_TOGGLE_ACTIVE_ENABLE);
+        editItem.addActionListener(e -> listener.onToggleActiveStatus(dir));
+        return editItem;
+    }
+
+    /**
+     * Creates a menu item for toggling the inclusion of subdirectories in a
+     * monitored directory.
+     *
+     * @param dir the monitored directory for which to create the menu item
+     * @return the JMenuItem for toggling the inclusion of subdirectories
+     */
+    private JMenuItem getToggleIncludeSubDirsItem(MonitoredDirectory dir) {
+        JMenuItem editItem = new JMenuItem(
+                dir.includeSubdirectories() ? StringConstants.MON_DIR_TOGGLE_INCLUDE_SUBDIR_DISABLE
+                        : StringConstants.MON_DIR_TOGGLE_INCLUDE_SUBDIR_ENABLE);
+        editItem.addActionListener(e -> listener.onToggleIncludeSubdirectories(dir));
         return editItem;
     }
 
@@ -103,8 +130,7 @@ public class MonitoredDirectoryPopupFactory {
                     listener.getParentComponent(),
                     note,
                     StringConstants.MON_DIR_POPUP_SHOW_NOTE,
-                    JOptionPane.INFORMATION_MESSAGE
-            );
+                    JOptionPane.INFORMATION_MESSAGE);
         });
         return showNoteItem;
     }
@@ -119,7 +145,8 @@ public class MonitoredDirectoryPopupFactory {
         JMenuItem updateNoteItem = new JMenuItem(StringConstants.MON_DIR_POPUP_UPDATE_NOTE);
         updateNoteItem.addActionListener(e -> {
             // Label for directory path
-            JLabel label = new JLabel(StringConstants.MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX + dir.path());
+            JLabel label = new JLabel(
+                    StringConstants.MON_DIR_POPUP_UPDATE_NOTE_POPUP_PREFIX + StringUtil.prependSpace(dir.path()));
             label.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             // Text area for note input
@@ -146,8 +173,7 @@ public class MonitoredDirectoryPopupFactory {
                     panel,
                     StringConstants.MON_DIR_POPUP_UPDATE_NOTE,
                     JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.PLAIN_MESSAGE
-            );
+                    JOptionPane.PLAIN_MESSAGE);
 
             // User cancelled
             if (result != JOptionPane.OK_OPTION)
@@ -182,8 +208,7 @@ public class MonitoredDirectoryPopupFactory {
                         listener.getParentComponent(),
                         StringConstants.MON_DIR_POPUP_RESTORE_NO_NOTE_FALLBACK + dir.path(),
                         StringConstants.MON_DIR_POPUP_RESTORE_NOTE,
-                        JOptionPane.INFORMATION_MESSAGE
-                );
+                        JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
 
@@ -223,8 +248,7 @@ public class MonitoredDirectoryPopupFactory {
                     JOptionPane.PLAIN_MESSAGE,
                     null,
                     options.toArray(),
-                    options.get(0)
-            );
+                    options.get(0));
 
             // Handle result
             if (choice == JOptionPane.CLOSED_OPTION || choice == options.size() - 1) {
@@ -255,8 +279,7 @@ public class MonitoredDirectoryPopupFactory {
                     listener.getParentComponent(),
                     StringConstants.MON_DIR_POPUP_RESET_BASELINE_POPUP_MESSAGE + dir.path(),
                     StringConstants.MON_DIR_POPUP_RESET_BASELINE_POPUP_TITLE,
-                    JOptionPane.WARNING_MESSAGE
-            );
+                    JOptionPane.WARNING_MESSAGE);
 
             try {
                 // User cancelled
@@ -272,4 +295,3 @@ public class MonitoredDirectoryPopupFactory {
         return resetBaselineItem;
     }
 }
-

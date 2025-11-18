@@ -57,7 +57,7 @@ public class FileService {
      * @return true if the file was successfully quarantined; false otherwise.
      * @throws QuarantineFileException If the file cannot be quarantined due to
      *                                 various reasons such as
-     *                                 unauthorized access, unprocessable entity, or
+     *                                 unauthorized access, bad request, or
      *                                 server errors.
      * @throws JsonProcessingException If there is an error during JSON
      *                                 serialization or deserialization.
@@ -84,8 +84,8 @@ public class FileService {
 
         return switch (response.statusCode()) {
             case 200 -> parsed.map(QuarantineResponse::successful).orElse(false);
+            case 400 -> throw new QuarantineFileException("File cannot be quarantined: " + fileId);
             case 401 -> throw new QuarantineFileException("Unauthorized: Invalid credentials for file quarantine");
-            case 422 -> throw new QuarantineFileException("File cannot be quarantined: " + fileId);
             case 500 -> throw new QuarantineFileException("Server error during file quarantine");
             default -> throw new QuarantineFileException("File quarantine failed: Unexpected status code ");
         };
@@ -99,7 +99,7 @@ public class FileService {
      * @return A `QuarantineResponse` object containing the response details.
      * @throws UnquarantineFileException If the file cannot be unquarantined due to
      *                                   various reasons such as
-     *                                   unauthorized access, unprocessable entity,
+     *                                   unauthorized access, bad request,
      *                                   or server errors.
      * @throws JsonProcessingException   If there is an error during JSON
      *                                   serialization or deserialization.
@@ -125,8 +125,8 @@ public class FileService {
 
         return switch (response.statusCode()) {
             case 200 -> true;
+            case 400 -> throw new UnquarantineFileException("File cannot be unquarantined: " + metadata.keyName());
             case 401 -> throw new UnquarantineFileException("Unauthorized: Invalid credentials for file unquarantine");
-            case 422 -> throw new UnquarantineFileException("File cannot be unquarantined: " + metadata.keyName());
             case 500 -> throw new UnquarantineFileException("Server error during file unquarantine");
             default -> throw new UnquarantineFileException("File unquarantine failed: Unexpected status code ");
         };

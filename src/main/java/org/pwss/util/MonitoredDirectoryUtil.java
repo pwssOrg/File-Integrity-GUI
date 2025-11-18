@@ -1,7 +1,10 @@
-package org.pwss.utils;
+package org.pwss.util;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedList;
 import java.util.List;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.slf4j.Logger;
@@ -9,17 +12,17 @@ import org.slf4j.Logger;
 /**
  * Utility class for handling operations related to monitored directories.
  */
-public final class MonitoredDirectoryUtils {
+public final class MonitoredDirectoryUtil {
 
     /**
      * Logger instance for logging purposes
      */
-    private final static Logger log = org.slf4j.LoggerFactory.getLogger(MonitoredDirectoryUtils.class);
+    private final static Logger log = org.slf4j.LoggerFactory.getLogger(MonitoredDirectoryUtil.class);
 
     /**
      * Private constructor to prevent instantiation
      */
-    private MonitoredDirectoryUtils() {
+    private MonitoredDirectoryUtil() {
     }
 
     /**
@@ -97,5 +100,26 @@ public final class MonitoredDirectoryUtils {
         Instant oneMinuteAgo = Instant.now().minus(Duration.ofMinutes(1));
 
         return lastScan.isBefore(oneMinuteAgo);
+    }
+
+    /**
+     * Filters a list of monitored directories based on whether their paths exist in
+     * the filesystem.
+     *
+     * @param inputList The list of monitored directories to be filtered.
+     * @return A new list containing only the directories from the input list that
+     *         have valid, confirmed paths.
+     */
+    public static List<MonitoredDirectory> filterMonitoredDirectoriesOnConfirmedPath(
+            List<MonitoredDirectory> inputList) {
+
+        List<MonitoredDirectory> mDirectories = new LinkedList<>();
+
+        for (MonitoredDirectory m : inputList) {
+            if (Files.exists(Path.of(m.path()))) {
+                mDirectories.add(m);
+            }
+        }
+        return mDirectories;
     }
 }
