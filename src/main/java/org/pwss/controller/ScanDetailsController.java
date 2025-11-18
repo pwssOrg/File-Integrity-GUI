@@ -29,7 +29,7 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
     /**
      * Logger for logging messages within this controller.
      */
-    private final org.slf4j.Logger log = LoggerFactory.getLogger(LoginController.class);
+    private final org.slf4j.Logger log = LoggerFactory.getLogger(ScanDetailsController.class);
 
     /**
      * Service responsible for managing scan summaries.
@@ -49,11 +49,17 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
      * List of scan summaries. This can be empty if no summaries are available.
      */
     private List<ScanSummary> scanSummaries;
+
     /**
      * List of differences (diffs) between scans. This can be empty if no diffs are
      * available.
      */
     private List<Diff> diffs;
+
+    /**
+     * Count of differences found. This can be null if the count is not available.
+     */
+    private Integer diffCount = 0;
 
     /**
      * Constructs a ScanDetailsController with the given screen and initializes
@@ -97,6 +103,8 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
             if (scanId != null) {
                 // Fetch scan summaries for the scan
                 scanSummaries = scanSummaryService.getScanSummaryForScan(scanId);
+                // Fetch diff count for the scan
+                diffCount = scanService.getScanDiffsCount(scanId);
                 // Fetch diffs for the scan
                 diffs = scanService.getDiffs(scanId, 1000, null, true);
             }
@@ -140,6 +148,9 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
         // Populate scan summary table
         SimpleSummaryTableModel simpleSummaryTableModel = new SimpleSummaryTableModel(scanSummaries);
         screen.getScanSummaryTable().setModel(simpleSummaryTableModel);
+
+        // Update diffs count label
+        screen.getDiffsCountLabel().setText("Diffs found: " + diffCount);
 
         // Populate diffs table
         DiffTableModel diffTableModel = new DiffTableModel(diffs);
