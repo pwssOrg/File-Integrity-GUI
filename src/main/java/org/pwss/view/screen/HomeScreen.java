@@ -634,7 +634,7 @@ public class HomeScreen extends BaseScreen {
         scanTab.add(clearFeedButton, new GridConstraints(0, 3, 1, 1, GridConstraints.ANCHOR_EAST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         filesTab = new JPanel();
         filesTab.setLayout(new GridLayoutManager(2, 1, new Insets(10, 10, 10, 10), -1, -1));
-        tabbedPane.addTab("\uD83D\uDDC4\uFE0F Files", filesTab);
+        tabbedPane.addTab("\uD83D\uDCC1 Files", filesTab);
         final JSplitPane splitPane2 = new JSplitPane();
         filesTab.add(splitPane2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
         final JScrollPane scrollPane4 = new JScrollPane();
