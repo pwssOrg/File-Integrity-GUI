@@ -243,7 +243,7 @@
           <grid id="64f52" binding="filesTab" layout-manager="GridLayoutManager" row-count="2" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="10" left="10" bottom="10" right="10"/>
             <constraints>
-              <tabbedpane title="🗄️ Files"/>
+              <tabbedpane title="📁 Files"/>
             </constraints>
             <properties/>
             <border type="none"/>
