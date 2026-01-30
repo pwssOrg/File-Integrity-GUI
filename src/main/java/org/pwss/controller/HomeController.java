@@ -67,6 +67,7 @@ import org.pwss.util.ConversionUtil;
 import org.pwss.util.ErrorUtil;
 import org.pwss.util.LiveFeedUtil;
 import org.pwss.util.MonitoredDirectoryUtil;
+import org.pwss.util.MonitoredDirectoryUtil.DirNotificationStatus;
 import org.pwss.util.OSUtil;
 import org.pwss.util.ReportUtil;
 import org.pwss.util.ScanUtil;
@@ -530,15 +531,9 @@ public final class HomeController extends BaseController<HomeScreen> {
 
                 if (value instanceof MonitoredDirectory dir) {
                     setText(dir.path());
-                    if (!dir.baselineEstablished()) {
-                        setForeground(Color.YELLOW);
-                        setToolTipText(StringConstants.TOOLTIP_BASELINE_NOT_ESTABLISHED);
-                    } else if (MonitoredDirectoryUtil.isScanOlderThanAWeek(dir)) {
-                        setForeground(Color.ORANGE);
-                        setToolTipText(StringConstants.TOOLTIP_OLD_SCAN);
-                    } else {
-                        setToolTipText(dir.path());
-                    }
+                    DirNotificationStatus status = MonitoredDirectoryUtil.getDirNotificationStatus(dir);
+                    setForeground(status.getForegroundColor());
+                    setToolTipText(status.getTooltipText());
                 }
                 return this;
             }
