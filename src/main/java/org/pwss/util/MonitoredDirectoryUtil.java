@@ -1,5 +1,6 @@
 package org.pwss.util;
 
+import java.awt.Color;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -18,6 +19,50 @@ public final class MonitoredDirectoryUtil {
      * Logger instance for logging purposes
      */
     private final static Logger log = org.slf4j.LoggerFactory.getLogger(MonitoredDirectoryUtil.class);
+
+    /**
+     * Enumeration representing the notification status of a monitored directory
+     * based on its last scan time.
+     */
+    public enum DirNotificationStatus {
+        UP_TO_DATE,
+        NEVER_SCANNED,
+        NO_BASELINE,
+        WEEK_OLD,
+        TWO_WEEKS_OLD,
+        MONTH_OLD,
+        YEAR_OLD;
+
+        /**
+         * Gets the color associated with the notification status.
+         *
+         * @return Color representing the notification status
+         */
+        public Color getForegroundColor() {
+            return switch (this) {
+                case UP_TO_DATE -> Color.GREEN;
+                case WEEK_OLD, TWO_WEEKS_OLD -> Color.ORANGE;
+                case NEVER_SCANNED, NO_BASELINE, YEAR_OLD, MONTH_OLD -> Color.RED;
+            };
+        }
+
+        /**
+         * Gets the tooltip text associated with the notification status.
+         *
+         * @return String containing the tooltip text
+         */
+        public String getTooltipText() {
+            return switch (this) {
+                case UP_TO_DATE -> "Directory is up to date.";
+                case NEVER_SCANNED -> "Directory has never been scanned.";
+                case NO_BASELINE -> "Directory has no established baseline.";
+                case WEEK_OLD -> "Directory was last scanned over a week ago.";
+                case TWO_WEEKS_OLD -> "Directory was last scanned over two weeks ago.";
+                case MONTH_OLD -> "Directory was last scanned over a month ago.";
+                case YEAR_OLD -> "Directory was last scanned over a year ago.";
+            };
+        }
+    }
 
     /**
      * Private constructor to prevent instantiation
@@ -41,65 +86,57 @@ public final class MonitoredDirectoryUtil {
 
         StringBuilder message = new StringBuilder();
         for (MonitoredDirectory dir : dirs) {
-            if (!dir.baselineEstablished()) {
-                message.append(StringConstants.NOTIFICATION_NO_BASELINE).append(dir.path()).append("\n");
-            } else if (isScanOlderThanAWeek(dir)) {
-                message.append(StringConstants.NOTIFICATION_OLD_SCAN).append(dir.path()).append("\n");
+            switch (getDirNotificationStatus(dir)) {
+                case DirNotificationStatus.NEVER_SCANNED -> message.append(
+                        "Directory '").append(dir.path()).append("' has never been scanned.\n");
+                case DirNotificationStatus.NO_BASELINE -> message.append(
+                        "Directory '").append(dir.path()).append("' has no established baseline.\n");
+                case DirNotificationStatus.WEEK_OLD -> message.append(
+                        "Directory '").append(dir.path()).append("' was last scanned over a week ago.\n");
+                case DirNotificationStatus.TWO_WEEKS_OLD -> message.append(
+                        "Directory '").append(dir.path()).append("' was last scanned over two weeks ago.\n");
+                case DirNotificationStatus.MONTH_OLD -> message.append(
+                        "Directory '").append(dir.path()).append("' was last scanned over a month ago.\n");
+                case DirNotificationStatus.YEAR_OLD -> message.append(
+                        "Directory '").append(dir.path()).append("' was last scanned over a year ago.\n");
+                case DirNotificationStatus.UP_TO_DATE -> {
+                    // No notification needed for up-to-date directories
+                }
             }
         }
         return message.toString();
     }
-
+    
     /**
-     * Checks if the time since the last scan of the given directory
-     * is more than one week (7 days).
+     * Determines the scan age status of a monitored directory based on the time
+     * since its last scan.
      *
      * @param dir the MonitoredDirectory to check
-     * @return true if more than 7 days have passed since last scan, false otherwise
+     * @return the ScanAgeStatus representing the age of the last scan
      */
-    public static boolean isScanOlderThanAWeek(MonitoredDirectory dir) {
-        if (dir == null) {
-            log.error("Can not check if scan is older than a week due to a null error");
-            log.debug("Monitored Directory is null in method: isScanOlderThanAWeek");
-            return false;
-        }
-
-        if (dir.lastScanned() == null) {
-            log.debug("Monitored Directory with id {} has not been scanned for 7 days", dir.id());
-            return true; // treat null as "needs scan"
+    public static DirNotificationStatus getDirNotificationStatus(MonitoredDirectory dir) {
+        if (!dir.baselineEstablished()) {
+            return DirNotificationStatus.NO_BASELINE;
+        } else if (dir.lastScanned() == null) {
+            return DirNotificationStatus.NEVER_SCANNED;
         }
 
         Instant lastScan = dir.lastScanned().toInstant();
-        Instant oneWeekAgo = Instant.now().minus(Duration.ofDays(7));
+        Instant now = Instant.now();
 
-        return lastScan.isBefore(oneWeekAgo);
-    }
+        long daysSinceLastScan = Duration.between(lastScan, now).toDays();
 
-    /**
-     * NOTE: FOR TESTING PURPOSES ONLY
-     * Checks if the time since the last scan of the given directory
-     * is more than one minute.
-     *
-     * @param dir the MonitoredDirectory to check
-     * @return true if more than 1 minute has passed since last scan, false
-     *         otherwise
-     */
-    public static boolean isScanOlderThan1Minute(MonitoredDirectory dir) {
-        if (dir == null) {
-            log.error("Can not check if scan is older than a minute due to a null error");
-            log.debug("Monitored Directory is null in method: isScanOlderThan1Minute");
-            return false;
+        if (daysSinceLastScan > 365) {
+            return DirNotificationStatus.YEAR_OLD;
+        } else if (daysSinceLastScan > 30) {
+            return DirNotificationStatus.MONTH_OLD;
+        } else if (daysSinceLastScan > 14) {
+            return DirNotificationStatus.TWO_WEEKS_OLD;
+        } else if (daysSinceLastScan > 7) {
+            return DirNotificationStatus.WEEK_OLD;
+        } else {
+            return DirNotificationStatus.UP_TO_DATE;
         }
-
-        if (dir.lastScanned() == null) {
-            log.debug("Monitored Directory with id {} has not been scanned for 1 minute", dir.id());
-            return true; // treat null as "needs scan"
-        }
-
-        Instant lastScan = dir.lastScanned().toInstant();
-        Instant oneMinuteAgo = Instant.now().minus(Duration.ofMinutes(1));
-
-        return lastScan.isBefore(oneMinuteAgo);
     }
 
     /**
