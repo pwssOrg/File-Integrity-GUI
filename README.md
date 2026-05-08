@@ -55,7 +55,6 @@ The Swing-based frontend is a **desktop companion application** that allows user
 - **Java 21+**  
 - **Maven 4.0.0+**  
 - **Local Backend Server**: Ensure the local backend server is running to use the Integrity Hash GUI App.
-- **License**: We kindly ask you to purchase one from PWSS Org.
 
 ## Security 
 
