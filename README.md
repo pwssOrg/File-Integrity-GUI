@@ -103,3 +103,21 @@ For any questions or support, please reach out to:
   </a>
 
 
+## System Architecture
+
+The system is split into backend services, a GUI client, shared PWSS libraries, and an end-user distribution package. This modular architecture enables independent development of core security logic, user interface components, and deployment tooling for both technical and non-technical users. Each component can be developed and deployed independently while maintaining a shared security and hashing standard through the PWSS libraries.
+
+### Components
+
+- **[Core Backend (FIM Engine)](https://github.com/pwssOrg/File-Integrity-Scanner)** – Handles hashing, integrity verification, and monitoring logic
+- **[GUI Application](https://github.com/pwssOrg/File-Integrity-GUI)** – User interface for managing scans and viewing results
+- **PWSS Libraries** – Shared components used across all PWSS projects
+- **[PWSS Release Repository](https://github.com/pwssOrg/PWSS-Release-File-Integrity-Scanner)** – End-user distribution for Windows and Linux
+
+This repository represents the **GUI (frontend)** layer of the File Integrity Scanner system.
+
+```
+GUI → Local Backend → PostgreSQL
+          ↓
+   PWSS Libraries (dependency)
+```
