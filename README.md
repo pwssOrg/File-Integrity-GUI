@@ -105,14 +105,14 @@ For any questions or support, please reach out to:
 
 ## System Architecture
 
-The system is split into backend services, a GUI client, shared PWSS libraries, and an end-user distribution package. This modular architecture enables independent development of core security logic, user interface components, and deployment tooling for both technical and non-technical users. Each component can be developed and deployed independently while maintaining a shared security and hashing standard through the PWSS libraries.
+The system is split into backend services, a GUI client, shared PWSS libraries, and a user-ready distribution package. This modular architecture enables independent development of core security logic, user interface components, and deployment tooling for both technical and non-technical users. Each component can be developed and deployed independently while maintaining a shared security and hashing standard through the PWSS libraries.
 
 ### Components
 
-- **[Core Backend (FIM Engine)](https://github.com/pwssOrg/File-Integrity-Scanner)** – Handles hashing, integrity verification, and monitoring logic
-- **[GUI Application](https://github.com/pwssOrg/File-Integrity-GUI)** – User interface for managing scans and viewing results
-- **PWSS Libraries** – Shared components used across all PWSS projects
-- **[PWSS Release Repository](https://github.com/pwssOrg/PWSS-Release-File-Integrity-Scanner)** – End-user distribution for Windows and Linux
+- **[Core Backend (FIM Engine)](https://github.com/pwssOrg/File-Integrity-Scanner#file-integrity-scanner-backend-fim-engine)** – Handles hashing, integrity verification, and monitoring logic
+- **[GUI Application](https://github.com/pwssOrg/File-Integrity-GUI#system-architecture)** – User interface for managing scans and viewing results
+- **[PWSS Libraries](https://github.com/search?q=topic:pwss-library+org:pwssOrg&type=repositories)** – Shared components used across all PWSS projects  
+- **[Database Layer](https://github.com/pwssOrg/File-Integrity-Database#database-repository)** – PostgreSQL database schemas and audit infrastructure
 
 This repository represents the **GUI (frontend)** layer of the File Integrity Scanner system.
 
