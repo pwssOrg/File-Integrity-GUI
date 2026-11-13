@@ -2,7 +2,6 @@ package org.pwss.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
@@ -75,6 +74,8 @@ import org.pwss.util.StringConstants;
 import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
+import org.pwss.view.theme.AppIcons;
+import org.pwss.view.theme.UiStyle;
 import org.slf4j.LoggerFactory;
 
 import static org.pwss.app_settings.AppConfig.APP_THEME;
@@ -532,7 +533,9 @@ public final class HomeController extends BaseController<HomeScreen> {
                 if (value instanceof MonitoredDirectory dir) {
                     setText(dir.path());
                     DirNotificationStatus status = MonitoredDirectoryUtil.getDirNotificationStatus(dir);
-                    setForeground(status.getForegroundColor());
+                    // A coloured dot carries the status; the path itself stays readable
+                    setIcon(AppIcons.dot(status.getForegroundColor()));
+                    setIconTextGap(10);
                     setToolTipText(status.getTooltipText());
                 }
                 return this;
@@ -542,6 +545,9 @@ public final class HomeController extends BaseController<HomeScreen> {
         MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(
                 allMonitoredDirectories != null ? allMonitoredDirectories : List.of());
         screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
+        // Give the path and the note the room; the remaining columns hold short values
+        screen.getMonitoredDirectoriesTable().getColumnModel().getColumn(0).setPreferredWidth(320);
+        screen.getMonitoredDirectoriesTable().getColumnModel().getColumn(1).setPreferredWidth(180);
         screen.getMonitoredDirectoriesTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // Update diffs count label
@@ -550,9 +556,12 @@ public final class HomeController extends BaseController<HomeScreen> {
         DiffTableModel diffTableModel = new DiffTableModel(recentDiffs != null ? recentDiffs : List.of());
         screen.getDiffTable().setModel(diffTableModel);
         screen.getDiffTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        UiStyle.fixColumnWidth(screen.getDiffTable(), DiffTableModel.columns[3], ButtonRenderer.COLUMN_WIDTH);
+        // The file path gets the room; the dates next to it are short
+        screen.getDiffTable().getColumnModel().getColumn(0).setPreferredWidth(420);
         screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
         screen.getDiffTable().getColumn(DiffTableModel.columns[3])
-                .setCellEditor(new ButtonEditor("\uD83D\uDCE5", (row, column) -> {
+                .setCellEditor(new ButtonEditor(DiffTableModel.ACTION_QUARANTINE, (row, column) -> {
                     DiffTableModel model = (DiffTableModel) screen.getDiffTable().getModel();
                     Optional<Diff> diff = model.getDiffAt(row);
 
@@ -590,9 +599,11 @@ public final class HomeController extends BaseController<HomeScreen> {
         QuarantineTableModel quarantineTableModel = new QuarantineTableModel(quarantinedFiles);
         screen.getQuarantineTable().setModel(quarantineTableModel);
         screen.getQuarantineTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        UiStyle.fixColumnWidth(screen.getQuarantineTable(), QuarantineTableModel.columns[2],
+                ButtonRenderer.COLUMN_WIDTH);
         screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2]).setCellRenderer(new ButtonRenderer());
         screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2])
-                .setCellEditor(new ButtonEditor("\uD83D\uDCE4", (row, column) -> {
+                .setCellEditor(new ButtonEditor(QuarantineTableModel.ACTION_RESTORE, (row, column) -> {
                     QuarantineTableModel model = (QuarantineTableModel) screen.getQuarantineTable().getModel();
                     Optional<QuarantineMetadata> optMetadata = model.getMetadataAt(row);
 

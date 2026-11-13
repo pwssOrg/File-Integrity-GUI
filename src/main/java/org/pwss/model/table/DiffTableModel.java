@@ -21,8 +21,17 @@ import org.pwss.model.entity.Diff;
 public class DiffTableModel extends AbstractTableModel {
     private final List<Diff> data;
     private final MetadataManager metadataManager;
-    public static final String[] columns = { "\uD83D\uDDCE File Path", "\uD83D\uDD8A️ Modified", "⚠️ Detected",
-            "👮 Quarantine" };
+    public static final String[] columns = { "File path", "Modified", "Detected", "Quarantine" };
+
+    /**
+     * Label of the action cell for a file that can be quarantined.
+     */
+    public static final String ACTION_QUARANTINE = "Quarantine";
+
+    /**
+     * Label of the action cell for a file that is already quarantined.
+     */
+    public static final String ACTION_QUARANTINED = "Quarantined";
 
     /**
      * Constructs a new DiffTableModel with the provided list of Diff objects.
@@ -81,8 +90,8 @@ public class DiffTableModel extends AbstractTableModel {
             case 0 -> diff.baseline().file().path();
             case 1 -> diff.integrityFail().file().mtime();
             case 2 -> diff.time().created();
-            // Column 3 (Quarantine) - show ❌ if quarantined, otherwise 📥
-            case 3 -> metadataManager.isFileQuarantined(fileId) ? "❌" : "\uD83D\uDCE5";
+            // Column 3 (Quarantine) - the action label, depending on the quarantine state
+            case 3 -> metadataManager.isFileQuarantined(fileId) ? ACTION_QUARANTINED : ACTION_QUARANTINE;
             default -> null;
         };
     }

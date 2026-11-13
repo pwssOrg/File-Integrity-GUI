@@ -7,7 +7,7 @@ import org.pwss.model.entity.ScanSummary;
 
 public class SimpleSummaryTableModel extends AbstractTableModel {
     private final List<ScanSummary> data;
-    private final String[] columns = {"\uD83D\uDEA6 File Name"};
+    private final String[] columns = {"File name"};
 
     public SimpleSummaryTableModel(List<ScanSummary> data) {
         this.data = data;

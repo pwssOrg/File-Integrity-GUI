@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.util.Locale;
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -25,10 +26,16 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.util.AppTheme;
+import org.pwss.util.StringConstants;
+import org.pwss.view.theme.AppIcons;
+import org.pwss.view.theme.UiStyle;
+
+import com.formdev.flatlaf.FlatClientProperties;
 
 /**
  * The HomeScreen class represents the main screen of the application.
@@ -522,6 +529,119 @@ public class HomeScreen extends BaseScreen {
      */
     public JLabel getDiffsCountLabel() {
         return diffsCountLabel;
+    }
+
+    /**
+     * Creates the home screen and applies the application styling on top of the
+     * designer generated layout.
+     */
+    public HomeScreen() {
+        applyStyle();
+    }
+
+    /**
+     * Turns the designer layout into the final look: a navigation rail on the
+     * left, a header with the main action on every page and themed components.
+     */
+    private void applyStyle() {
+        UiStyle.polish(rootPanel);
+
+        // ---- Navigation rail ----
+        tabbedPane.setTabPlacement(JTabbedPane.LEFT);
+        tabbedPane.putClientProperty(FlatClientProperties.TABBED_PANE_TAB_ALIGNMENT, SwingConstants.LEADING);
+        tabbedPane.putClientProperty(FlatClientProperties.TABBED_PANE_MINIMUM_TAB_WIDTH, 208);
+        tabbedPane.putClientProperty(FlatClientProperties.TABBED_PANE_TAB_HEIGHT, 44);
+        tabbedPane.putClientProperty(FlatClientProperties.TABBED_PANE_TAB_INSETS, new Insets(6, 22, 6, 22));
+        tabbedPane.putClientProperty(FlatClientProperties.TABBED_PANE_TAB_AREA_INSETS, new Insets(0, 0, 12, 0));
+        tabbedPane.putClientProperty(FlatClientProperties.TABBED_PANE_SHOW_CONTENT_SEPARATOR, true);
+        tabbedPane.putClientProperty(FlatClientProperties.STYLE,
+                "tabSelectionHeight: 0; tabArc: 10; selectedInsets: 10,3,10,3;"
+                        + " selectedBackground: $App.navSelectedBackground; hoverColor: $App.navHoverBackground");
+
+        JLabel brand = new JLabel("Integrity Hash", AppIcons.logo(30), SwingConstants.LEADING);
+        brand.setFont(UiStyle.font("h3.font"));
+        brand.setIconTextGap(12);
+        brand.setBorder(BorderFactory.createEmptyBorder(20, 20, 18, 20));
+        tabbedPane.putClientProperty(FlatClientProperties.TABBED_PANE_LEADING_COMPONENT, brand);
+
+        // ---- Pages ----
+        setUpPage(homeTab, "Home", AppIcons.Glyph.HOME,
+                "Recent activity and the state of your monitored directories.", newDirectoryButton);
+        setUpPage(scanTab, "Scan", AppIcons.Glyph.SCAN,
+                "Run integrity scans and follow their progress live.", scanButton);
+        setUpPage(filesTab, "Files", AppIcons.Glyph.FILES,
+                "Search scanned files and review their scan history.");
+        setUpPage(recentDiffsTab, "Recent diffs", AppIcons.Glyph.WARNING,
+                "Files whose contents no longer match their baseline.");
+        setUpPage(settingsTab, "Settings", AppIcons.Glyph.SETTINGS,
+                "Appearance, scan limits and quarantined files.");
+
+        // The page headers replace these in-page headings
+        UiStyle.findLabel(recentDiffsTab, "Most recently detected diffs").ifPresent(l -> l.setVisible(false));
+        UiStyle.findLabel(settingsTab, "Settings").ifPresent(l -> l.setText("Preferences"));
+
+        // ---- Actions ----
+        newDirectoryButton.setIcon(AppIcons.of(AppIcons.Glyph.PLUS));
+        UiStyle.styleClass(newDirectoryButton, UiStyle.PRIMARY);
+        styleScanButton();
+        scanButton.addPropertyChangeListener("text", e -> styleScanButton());
+        clearFeedButton.setIcon(AppIcons.of(AppIcons.Glyph.TRASH));
+        restartButton.setIcon(AppIcons.of(AppIcons.Glyph.RESTART));
+
+        // ---- Notifications banner ----
+        UiStyle.styleClass(notificationPanel, "banner");
+        notificationPanel.setBorder(BorderFactory.createEmptyBorder(10, 16, 2, 16));
+        notificationTextArea.setOpaque(false);
+        notificationTextArea.setMargin(new Insets(0, 2, 0, 2));
+        UiStyle.findLabel(notificationPanel, "Notifications")
+                .ifPresent(l -> l.setIcon(AppIcons.of(AppIcons.Glyph.WARNING, 18, null)));
+
+        // ---- Fields ----
+        fileSearchField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
+                "Type a file name and press Enter");
+        fileSearchField.putClientProperty(FlatClientProperties.TEXT_FIELD_LEADING_ICON,
+                AppIcons.of(AppIcons.Glyph.SCAN));
+        fileSearchField.putClientProperty(FlatClientProperties.TEXT_FIELD_SHOW_CLEAR_BUTTON, true);
+        UiStyle.styleClass(searchResultCount, UiStyle.MUTED);
+        UiStyle.styleClass(diffsCountLabel, UiStyle.MUTED);
+        UiStyle.styleClass(liveFeedDiffCount, UiStyle.MUTED);
+        UiStyle.styleClass(maxHashExtractionFileSizeValueLabel, UiStyle.MUTED);
+        UiStyle.findLabel(settingsTab, "© 2025 PWSS ORG").ifPresent(l -> UiStyle.styleClass(l, UiStyle.MUTED));
+
+        scanProgressContainer.setBorder(BorderFactory.createEmptyBorder(2, 14, 2, 14));
+    }
+
+    /**
+     * Gives a tab its icon and plain title, and wraps its content in a page with
+     * a header.
+     *
+     * @param tab      the designer panel holding the tab content
+     * @param title    the tab and page title
+     * @param glyph    the tab icon
+     * @param subtitle a one-line description of the page
+     * @param actions  the main actions of the page, shown in its header
+     */
+    private void setUpPage(JPanel tab, String title, AppIcons.Glyph glyph, String subtitle, JComponent... actions) {
+        int index = tabbedPane.indexOfComponent(tab);
+        if (index < 0) {
+            return;
+        }
+        // Swap in an empty page first: moving the tab content to a new parent
+        // while it still belongs to the tabbed pane would remove the whole tab.
+        JPanel page = new JPanel();
+        tabbedPane.setComponentAt(index, page);
+        UiStyle.fillPage(page, title, subtitle, tab, null, actions);
+        tabbedPane.setTitleAt(index, title);
+        tabbedPane.setIconAt(index, AppIcons.of(glyph, 18, null));
+    }
+
+    /**
+     * Keeps the look of the scan button in sync with what it currently does.
+     */
+    private void styleScanButton() {
+        boolean stop = StringConstants.SCAN_STOP.equals(scanButton.getText());
+        scanButton.setIcon(AppIcons.of(stop ? AppIcons.Glyph.STOP : AppIcons.Glyph.PLAY));
+        UiStyle.styleClass(scanButton, stop ? UiStyle.DANGER : UiStyle.PRIMARY);
     }
 
     {

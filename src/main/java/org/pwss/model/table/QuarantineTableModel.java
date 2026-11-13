@@ -11,7 +11,12 @@ import org.pwss.util.OSUtil;
  */
 public class QuarantineTableModel extends AbstractTableModel {
     private final List<QuarantineMetadata> data;
-    public static final String[] columns = {"Quarantined file id", "Quarantined file path", "👮 Unquarantine"};
+    public static final String[] columns = {"File id", "Quarantined file path", "Unquarantine"};
+
+    /**
+     * Label of the action cell that restores a quarantined file.
+     */
+    public static final String ACTION_RESTORE = "Restore";
 
     /**
      * Constructs a QuarantineTableModel with the specified data.
@@ -42,7 +47,7 @@ public class QuarantineTableModel extends AbstractTableModel {
         return switch (columnIndex) {
             case 0 -> metadata.fileId();
             case 1 -> OSUtil.formatQuarantinePath(metadata.keyName());
-            case 2 -> "\uD83D\uDCE4";
+            case 2 -> ACTION_RESTORE;
             default -> null;
         };
     }

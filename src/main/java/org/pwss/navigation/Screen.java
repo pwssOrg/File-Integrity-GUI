@@ -7,7 +7,7 @@ public enum Screen {
     /**
      * The login screen where users can authenticate.
      */
-    LOGIN(450, 250),
+    LOGIN(440, 560),
 
     /**
      * The home screen displayed after successful login.
@@ -17,7 +17,7 @@ public enum Screen {
     /**
      * The screen for creating a new monitored directory.
      */
-    NEW_DIRECTORY(400, 200),
+    NEW_DIRECTORY(640, 460),
 
     /**
      * The screen for viewing scan summaries.

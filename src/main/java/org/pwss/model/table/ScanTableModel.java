@@ -8,7 +8,7 @@ import org.pwss.model.entity.Scan;
 public class ScanTableModel extends AbstractTableModel {
     private final List<Scan> scans;
     private final String[] columnNames = {
-            "\uD83D\uDCC1 Directory", "\uD83D\uDD59 Scan Time", "⌛ Status"
+            "Directory", "Scan time", "Status"
     };
 
     public ScanTableModel(List<Scan> scans) {

@@ -1,9 +1,10 @@
 package org.pwss.model.table.cell;
 
 import java.awt.Component;
-import java.awt.Insets;
+import java.awt.GridBagLayout;
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 
@@ -16,6 +17,10 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
      * The button component used as the editor in the table cell.
      */
     private final JButton button;
+    /**
+     * The panel that centres the button inside the table cell.
+     */
+    private final JPanel cell;
     /**
      * The JTable instance that is being edited.
      */
@@ -35,13 +40,10 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
      * @param text the text to display on the button
      */
     public ButtonEditor(String text, CellButtonListener listener) {
-        button = new JButton(text);
-        button.setOpaque(true);
-        button.setFocusable(false);
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setContentAreaFilled(true);
-        button.setMargin(new Insets(0, 0, 0, 0));
+        // Same compact button as the renderer, so the cell does not change when clicked
+        button = ButtonRenderer.createCellButton(text);
+        cell = new JPanel(new GridBagLayout());
+        cell.add(button);
 
         this.listener = listener;
 
@@ -54,7 +56,8 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
                                                  boolean isSelected, int row, int column) {
         this.table = table;
         clicked = true;
-        return button;
+        cell.setBackground(table.getSelectionBackground());
+        return cell;
     }
 
     @Override

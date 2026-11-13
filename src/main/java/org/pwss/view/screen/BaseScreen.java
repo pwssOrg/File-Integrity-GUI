@@ -55,7 +55,7 @@ public abstract class BaseScreen extends JPanel {
      * @param message The message to display.
      */
     public void showSuccess(String message) {
-        JOptionPane.showMessageDialog(this, message, getScreenName(), JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(getRootPanel(), message, getScreenName(), JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -64,7 +64,7 @@ public abstract class BaseScreen extends JPanel {
      * @param message The warning message to display.
      */
     public void showWarning(String message) {
-        JOptionPane.showMessageDialog(this, message, getScreenName(), JOptionPane.WARNING_MESSAGE);
+        JOptionPane.showMessageDialog(getRootPanel(), message, getScreenName(), JOptionPane.WARNING_MESSAGE);
     }
 
     /**
@@ -73,7 +73,7 @@ public abstract class BaseScreen extends JPanel {
      * @param message The error message to display.
      */
     public void showError(String message) {
-        JOptionPane.showMessageDialog(this, message, getScreenName(), JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(getRootPanel(), message, getScreenName(), JOptionPane.ERROR_MESSAGE);
     }
 
     /**
@@ -82,7 +82,7 @@ public abstract class BaseScreen extends JPanel {
      * @param message The message to display.
      */
     public void showInfo(String message) {
-        JOptionPane.showMessageDialog(this, message, getScreenName(), JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(getRootPanel(), message, getScreenName(), JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -96,7 +96,7 @@ public abstract class BaseScreen extends JPanel {
      */
     public int showOptionDialog(int dialogType, String message, String[] options, String defaultOption) {
         return JOptionPane.showOptionDialog(
-                this,
+                getRootPanel(),
                 message,
                 getScreenName(),
                 JOptionPane.DEFAULT_OPTION,

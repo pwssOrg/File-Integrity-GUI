@@ -3,17 +3,27 @@ package org.pwss.view.screen;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.Locale;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
+import org.pwss.view.theme.AppIcons;
+import org.pwss.view.theme.UiStyle;
+
+import com.formdev.flatlaf.FlatClientProperties;
 
 /**
  * Login screen UI component for user authentication.
@@ -33,6 +43,24 @@ public class LoginScreen extends BaseScreen {
     private JPasswordField confirmPasswordField;
     private JLabel confirmPasswordLabel;
 
+    /**
+     * The panel shown in the application window: the sign-in form, centred.
+     */
+    private JPanel container;
+
+    /**
+     * Width of the sign-in form, in pixels.
+     */
+    private static final int FORM_WIDTH = 320;
+
+    /**
+     * Creates the login screen and arranges the designer components into the
+     * sign-in form.
+     */
+    public LoginScreen() {
+        applyStyle();
+    }
+
     @Override
     public String getScreenName() {
         return "Login";
@@ -40,7 +68,73 @@ public class LoginScreen extends BaseScreen {
 
     @Override
     public JPanel getRootPanel() {
-        return rootPanel;
+        return container;
+    }
+
+    /**
+     * Arranges the components created by the designer into a single centred
+     * column: logo, title, the fields with their labels above them and the
+     * actions at the bottom.
+     */
+    private void applyStyle() {
+        JPanel form = new JPanel(new GridBagLayout());
+        form.setBorder(BorderFactory.createEmptyBorder(36, 44, 32, 44));
+
+        JLabel logo = new JLabel(AppIcons.logo(64));
+        JLabel title = new JLabel("Integrity Hash", SwingConstants.CENTER);
+        title.setFont(UiStyle.font("h1.font"));
+        messageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        messageLabel.setFont(UiStyle.font("Label.font"));
+        UiStyle.styleClass(messageLabel, UiStyle.MUTED);
+
+        usernameField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Enter your username");
+        passwordField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Enter your password");
+        confirmPasswordField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Repeat your password");
+        licenseKeyField.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Paste your license key");
+        passwordField.putClientProperty(FlatClientProperties.STYLE, "showRevealButton: true");
+        confirmPasswordField.putClientProperty(FlatClientProperties.STYLE, "showRevealButton: true");
+
+        UiStyle.styleClass(proceedButton, UiStyle.PRIMARY);
+        cancelButton.putClientProperty(FlatClientProperties.BUTTON_TYPE,
+                FlatClientProperties.BUTTON_TYPE_BORDERLESS);
+
+        int row = 0;
+        addRow(form, logo, row++, 0);
+        addRow(form, title, row++, 14);
+        addRow(form, messageLabel, row++, 4);
+        addRow(form, Box.createHorizontalStrut(FORM_WIDTH), row++, 18);
+        for (Component[] field : new Component[][] {
+                { usernameLabel, usernameField },
+                { passwordLabel, passwordField },
+                { confirmPasswordLabel, confirmPasswordField },
+                { licenseLabel, licenseKeyField } }) {
+            field[0].setFont(UiStyle.font("semibold.font"));
+            addRow(form, field[0], row++, 12);
+            addRow(form, field[1], row++, 6);
+        }
+        addRow(form, proceedButton, row++, 24);
+        addRow(form, cancelButton, row, 8);
+
+        container = new JPanel(new GridBagLayout());
+        container.add(form);
+    }
+
+    /**
+     * Adds a component as the next full-width row of the form.
+     *
+     * @param form      the form panel
+     * @param component the component to add
+     * @param row       the row index
+     * @param gapAbove  the space above the component, in pixels
+     */
+    private static void addRow(JPanel form, Component component, int row, int gapAbove) {
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = row;
+        constraints.weightx = 1;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.insets = new Insets(gapAbove, 0, 0, 0);
+        form.add(component, constraints);
     }
 
     /**

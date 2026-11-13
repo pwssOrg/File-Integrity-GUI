@@ -13,6 +13,10 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
+import org.pwss.view.theme.AppIcons;
+import org.pwss.view.theme.UiStyle;
+
+import com.formdev.flatlaf.FlatClientProperties;
 
 /**
  * Screen class that represents the details of a scan, providing UI components
@@ -48,6 +52,43 @@ public class ScanDetailsScreen extends BaseScreen {
      * Label to display the count of differences (diffs) detected.
      */
     private JLabel diffsCountLabel;
+    /**
+     * The panel shown in the application window: a header with the back button
+     * above the designer layout.
+     */
+    private JPanel container;
+
+    /**
+     * Creates the scan details screen and applies the application styling on top
+     * of the designer generated layout.
+     */
+    public ScanDetailsScreen() {
+        applyStyle();
+    }
+
+    /**
+     * Moves the back button into a page header and themes the tabs.
+     */
+    private void applyStyle() {
+        UiStyle.polish(rootPanel);
+
+        // The back button moves from its full-width row at the bottom to the header
+        rootPanel.remove(backButton.getParent());
+        backButton.setIcon(AppIcons.of(AppIcons.Glyph.BACK));
+        backButton.setToolTipText("Back to the home screen");
+
+        UiStyle.find(rootPanel, JTabbedPane.class).ifPresent(tabs -> {
+            tabs.setTitleAt(0, "Summaries");
+            tabs.setIconAt(0, AppIcons.of(AppIcons.Glyph.LIST));
+            tabs.setTitleAt(1, "Diffs detected");
+            tabs.setIconAt(1, AppIcons.of(AppIcons.Glyph.WARNING));
+            tabs.putClientProperty(FlatClientProperties.TABBED_PANE_SHOW_CONTENT_SEPARATOR, true);
+        });
+        UiStyle.styleClass(diffsCountLabel, UiStyle.MUTED);
+
+        container = UiStyle.page("Scan details", "Every file covered by this scan and the diffs it detected.",
+                rootPanel, backButton);
+    }
 
     @Override
     public String getScreenName() {
@@ -79,7 +120,7 @@ public class ScanDetailsScreen extends BaseScreen {
      */
     @Override
     public JPanel getRootPanel() {
-        return rootPanel;
+        return container;
     }
 
     /**
