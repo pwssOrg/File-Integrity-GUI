@@ -7,6 +7,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URISyntaxException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,7 +25,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.pwss.app_settings.AppConfig;
 import org.pwss.controller.util.NavigationContext;
-import org.pwss.data_structure.RingBuffer;
 import org.pwss.exception.metadata.MetadataKeyNameRetrievalException;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
@@ -44,6 +44,7 @@ import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.entity.QuarantineMetadata;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.entity.ScanSummary;
+import org.pwss.model.livefeed.ScanLogEntry;
 import org.pwss.model.response.LiveFeedResponse;
 import org.pwss.model.table.DiffTableModel;
 import org.pwss.model.table.FileTableModel;
@@ -64,6 +65,7 @@ import org.pwss.service.ScanSummaryService;
 import org.pwss.util.AppTheme;
 import org.pwss.util.ConversionUtil;
 import org.pwss.util.ErrorUtil;
+import org.pwss.util.LiveFeedParser;
 import org.pwss.util.LiveFeedUtil;
 import org.pwss.util.MonitoredDirectoryUtil;
 import org.pwss.util.MonitoredDirectoryUtil.DirNotificationStatus;
@@ -74,6 +76,7 @@ import org.pwss.util.StringConstants;
 import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
+import org.pwss.view.screen.NewDirectoryScreen;
 import org.pwss.view.theme.AppIcons;
 import org.pwss.view.theme.UiStyle;
 import org.slf4j.LoggerFactory;
@@ -123,6 +126,11 @@ public final class HomeController extends BaseController<HomeScreen> {
      * Factory for creating popup menus related to monitored directories.
      */
     private final MonitoredDirectoryPopupFactory monitoredDirectoryPopupFactory;
+
+    /**
+     * Controller of the "add a monitored directory" dialog, created on first use.
+     */
+    private NewDirectoryController newDirectoryController;
 
     /**
      * List of all monitored directories.
@@ -330,10 +338,22 @@ public final class HomeController extends BaseController<HomeScreen> {
         fetchDataAndRefreshView();
     }
 
+    /**
+     * Opens the "add a monitored directory" dialog over the home window and
+     * refreshes the lists in place when a directory was added.
+     */
+    private void addNewDirectory() {
+        if (newDirectoryController == null) {
+            newDirectoryController = new NewDirectoryController(new NewDirectoryScreen());
+        }
+        if (newDirectoryController.showDialog(screen.getRootPanel())) {
+            fetchDataAndRefreshView();
+        }
+    }
+
     @Override
     protected void initListeners() {
-        screen.getAddNewDirectoryButton()
-                .addActionListener(e -> NavigationEvents.navigateTo(Screen.NEW_DIRECTORY));
+        screen.getAddNewDirectoryButton().addActionListener(e -> addNewDirectory());
         screen.getScanButton().addActionListener(e -> handleScanButtonClick(false));
         screen.getMonitoredDirectoriesTable().addMouseListener(new MouseAdapter() {
             @Override
@@ -415,9 +435,9 @@ public final class HomeController extends BaseController<HomeScreen> {
             int selectedRow = screen.getFileScanSummaryTable().getSelectedRow();
             if (selectedRow >= 0 && selectedRow < fileSummaries.size()) {
                 ScanSummary selectedSummary = fileSummaries.get(selectedRow);
-                screen.getScanSummaryDetails().setText(ReportUtil.formatSummary(selectedSummary));
+                screen.getScanSummaryDetails().show(selectedSummary);
             } else {
-                screen.getScanSummaryDetails().setText("");
+                screen.getScanSummaryDetails().clear();
             }
         });
         screen.getThemePicker().addItemListener(e -> {
@@ -494,12 +514,12 @@ public final class HomeController extends BaseController<HomeScreen> {
         boolean hasNotifications = !notifications.isEmpty();
 
         // Scan running views
-        boolean showLiveFeed = !screen.getLiveFeedText().getText().isEmpty() || scanRunning;
-        boolean showClearLiveFeed = !scanRunning && !screen.getLiveFeedText().getText().isEmpty();
+        boolean showLiveFeed = !screen.getScanLog().isEmpty() || scanRunning;
+        boolean showClearLiveFeed = !scanRunning && !screen.getScanLog().isEmpty();
+        screen.getScanLog().setScanning(scanRunning);
         screen.getScanProgressContainer().setVisible(scanRunning);
         screen.getLiveFeedContainer().setVisible(showLiveFeed);
         screen.getLiveFeedTitle().setVisible(showLiveFeed);
-        screen.getLiveFeedDiffCount().setVisible(showLiveFeed);
         screen.getClearFeedButton().setVisible(showClearLiveFeed);
         screen.getNotificationPanel().setVisible(hasNotifications);
 
@@ -814,15 +834,13 @@ public final class HomeController extends BaseController<HomeScreen> {
     }
 
     /**
-     * Clears the live feed text area and resets the total difference count.
+     * Clears the scan log and resets the total difference count.
      */
     private void clearLiveFeed() {
-        // Clear the live feed text area
-        screen.getLiveFeedText().setText("");
+        // Clear the scan log
+        screen.getScanLog().clear();
         // Reset diff count for the next scan
         totalDiffCount.set(0);
-        // Update the live feed diff count in preparation for the next scan
-        screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
         // Refresh the view to reflect the cleared live feed
         refreshView();
     }
@@ -845,15 +863,13 @@ public final class HomeController extends BaseController<HomeScreen> {
         for (MonitoredDirectory dir : scanningDirs) {
             if (!dir.baselineEstablished()) {
                 log.debug("Establishing baseline for {}", dir.path());
-                String currentLiveFeedText = screen.getLiveFeedText().getText();
-                String newEntry = StringConstants.SCAN_ESTABLISHING_BASELINE + dir.path() + "\n";
-                String updatedLiveFeedText = currentLiveFeedText + newEntry;
-                screen.getLiveFeedText().setText(updatedLiveFeedText);
+                screen.getScanLog().append(List.of(ScanLogEntry.info(
+                        StringConstants.SCAN_ESTABLISHING_BASELINE + dir.path(), LocalTime.now())));
             }
         }
 
-        // Create a ring buffer with a capacity to hold the last 100 updates
-        RingBuffer<String> liveFeedBuffer = new RingBuffer<>(100);
+        // Turns the raw text from the backend into log entries
+        LiveFeedParser liveFeedParser = new LiveFeedParser();
 
         // Create and start a polling timer
         scanStatusTimer = new Timer(1000, e -> {
@@ -861,24 +877,11 @@ public final class HomeController extends BaseController<HomeScreen> {
                 // Get live feed from backend
                 LiveFeedResponse liveFeed = scanService.getLiveFeed();
 
-                // Format the new update from the backend
-                String newEntry = LiveFeedUtil.formatLiveFeedEntry(liveFeed.livefeed());
-
-                // Add the new update to the ring buffer
-                liveFeedBuffer.add(newEntry);
-
-                // Build the text for the live feed based on the latest updates in the buffer
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < liveFeedBuffer.size(); i++) {
-                    sb.append(liveFeedBuffer.get(i));
-                }
-
-                // Update UI with the latest text
-                screen.getLiveFeedText().setText(sb.toString());
+                // Add the new results to the scan log
+                screen.getScanLog().append(liveFeedParser.parse(liveFeed.livefeed(), LocalTime.now()));
 
                 // Update the diff counter
                 totalDiffCount.addAndGet(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
-                screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
 
                 // Update scan status and UI as needed
                 if (liveFeed.isScanRunning() != scanRunning) {
@@ -893,18 +896,10 @@ public final class HomeController extends BaseController<HomeScreen> {
                     // Do a final pull without time pressure
                     liveFeed = scanService.getLiveFeed(); // The last pull to get any final updates
 
-                    // Add the last update to the buffer
-                    newEntry = LiveFeedUtil.formatLiveFeedEntry(liveFeed.livefeed());
-                    if (!org.pwss.util.StringUtil.isEmpty(newEntry)) {
-                        liveFeedBuffer.add(newEntry); // Add the last pull to the buffer
-
-                        // Update UI with the last text
-                        sb.setLength(0); // Clear StringBuilder
-                        for (int i = 0; i < liveFeedBuffer.size(); i++) {
-                            sb.append(liveFeedBuffer.get(i)); // Add all updates to the buffer
-                        }
-                        screen.getLiveFeedText().setText(sb.toString());
-                    }
+                    // Add the last results to the scan log, including any leftover text
+                    screen.getScanLog().append(liveFeedParser.parse(liveFeed.livefeed(), LocalTime.now()));
+                    screen.getScanLog().append(liveFeedParser.flush(LocalTime.now()));
+                    totalDiffCount.addAndGet(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
 
                     // Stop polling and end the process
                     scanStatusTimer.stop();

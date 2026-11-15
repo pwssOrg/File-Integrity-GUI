@@ -32,7 +32,10 @@ import javax.swing.text.StyleContext;
 import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.util.AppTheme;
 import org.pwss.util.StringConstants;
+import org.pwss.view.component.ScanLogView;
+import org.pwss.view.component.ScanSummaryView;
 import org.pwss.view.theme.AppIcons;
+import org.pwss.view.theme.Palette;
 import org.pwss.view.theme.UiStyle;
 
 import com.formdev.flatlaf.FlatClientProperties;
@@ -129,6 +132,16 @@ public class HomeScreen extends BaseScreen {
      * Label displaying the count of diffs in the live feed.
      */
     private JLabel liveFeedDiffCount;
+
+    /**
+     * The scan log shown inside the live feed container. It takes the place of
+     * the designer's text pane and diff count label.
+     */
+    private final ScanLogView scanLog = new ScanLogView();
+    /**
+     * Card view replacing the designer's scan summary text pane.
+     */
+    private final ScanSummaryView scanSummaryView = new ScanSummaryView();
 
     /**
      * Panel representing the settings tab of the application.
@@ -314,12 +327,12 @@ public class HomeScreen extends BaseScreen {
     }
 
     /**
-     * Returns the live feed text pane.
+     * Returns the scan log.
      *
-     * @return JTextPane displaying live feed information.
+     * @return the view listing what the running scan found.
      */
-    public JTextPane getLiveFeedText() {
-        return liveFeedText;
+    public ScanLogView getScanLog() {
+        return scanLog;
     }
 
     /**
@@ -329,15 +342,6 @@ public class HomeScreen extends BaseScreen {
      */
     public JLabel getLiveFeedTitle() {
         return liveFeedTitle;
-    }
-
-    /**
-     * Returns the label displaying the count of diffs in the live feed.
-     *
-     * @return JLabel showing the live feed diff count.
-     */
-    public JLabel getLiveFeedDiffCount() {
-        return liveFeedDiffCount;
     }
 
     /**
@@ -413,12 +417,12 @@ public class HomeScreen extends BaseScreen {
     }
 
     /**
-     * Returns the text pane for displaying scan summary details.
+     * Returns the view displaying scan summary details.
      *
-     * @return JTextPane showing details about scan summaries.
+     * @return the scan summary view
      */
-    public JTextPane getScanSummaryDetails() {
-        return scanSummaryDetails;
+    public ScanSummaryView getScanSummaryDetails() {
+        return scanSummaryView;
     }
 
     /**
@@ -565,15 +569,15 @@ public class HomeScreen extends BaseScreen {
         tabbedPane.putClientProperty(FlatClientProperties.TABBED_PANE_LEADING_COMPONENT, brand);
 
         // ---- Pages ----
-        setUpPage(homeTab, "Home", AppIcons.Glyph.HOME,
+        setUpPage(homeTab, "Home", AppIcons.Glyph.HOME, Palette.BLUE,
                 "Recent activity and the state of your monitored directories.", newDirectoryButton);
-        setUpPage(scanTab, "Scan", AppIcons.Glyph.SCAN,
+        setUpPage(scanTab, "Scan", AppIcons.Glyph.SCAN, Palette.TEAL,
                 "Run integrity scans and follow their progress live.", scanButton);
-        setUpPage(filesTab, "Files", AppIcons.Glyph.FILES,
+        setUpPage(filesTab, "Files", AppIcons.Glyph.FILES, Palette.VIOLET,
                 "Search scanned files and review their scan history.");
-        setUpPage(recentDiffsTab, "Recent diffs", AppIcons.Glyph.WARNING,
+        setUpPage(recentDiffsTab, "Recent diffs", AppIcons.Glyph.WARNING, Palette.ORANGE,
                 "Files whose contents no longer match their baseline.");
-        setUpPage(settingsTab, "Settings", AppIcons.Glyph.SETTINGS,
+        setUpPage(settingsTab, "Settings", AppIcons.Glyph.SETTINGS, Palette.PINK,
                 "Appearance, scan limits and quarantined files.");
 
         // The page headers replace these in-page headings
@@ -604,11 +608,19 @@ public class HomeScreen extends BaseScreen {
         fileSearchField.putClientProperty(FlatClientProperties.TEXT_FIELD_SHOW_CLEAR_BUTTON, true);
         UiStyle.styleClass(searchResultCount, UiStyle.MUTED);
         UiStyle.styleClass(diffsCountLabel, UiStyle.MUTED);
-        UiStyle.styleClass(liveFeedDiffCount, UiStyle.MUTED);
         UiStyle.styleClass(maxHashExtractionFileSizeValueLabel, UiStyle.MUTED);
         UiStyle.findLabel(settingsTab, "© 2025 PWSS ORG").ifPresent(l -> UiStyle.styleClass(l, UiStyle.MUTED));
 
         scanProgressContainer.setBorder(BorderFactory.createEmptyBorder(2, 14, 2, 14));
+
+        // ---- Scan log ----
+        scanLog.installIn(liveFeedContainer);
+
+        // ---- Scan summary ----
+        UiStyle.find(rootPanel, JScrollPane.class, s -> s.getViewport().getView() == scanSummaryDetails)
+                .ifPresent(scanSummaryView::installIn);
+        liveFeedDiffCount.setVisible(false);
+        clearFeedButton.setText("Clear log");
     }
 
     /**
@@ -618,10 +630,12 @@ public class HomeScreen extends BaseScreen {
      * @param tab      the designer panel holding the tab content
      * @param title    the tab and page title
      * @param glyph    the tab icon
+     * @param hue      the page colour, one of the {@link Palette} hues
      * @param subtitle a one-line description of the page
      * @param actions  the main actions of the page, shown in its header
      */
-    private void setUpPage(JPanel tab, String title, AppIcons.Glyph glyph, String subtitle, JComponent... actions) {
+    private void setUpPage(JPanel tab, String title, AppIcons.Glyph glyph, int hue, String subtitle,
+            JComponent... actions) {
         int index = tabbedPane.indexOfComponent(tab);
         if (index < 0) {
             return;
@@ -630,9 +644,9 @@ public class HomeScreen extends BaseScreen {
         // while it still belongs to the tabbed pane would remove the whole tab.
         JPanel page = new JPanel();
         tabbedPane.setComponentAt(index, page);
-        UiStyle.fillPage(page, title, subtitle, tab, null, actions);
+        UiStyle.fillPage(page, title, subtitle, tab, null, glyph, () -> Palette.hue(hue), actions);
         tabbedPane.setTitleAt(index, title);
-        tabbedPane.setIconAt(index, AppIcons.of(glyph, 18, null));
+        tabbedPane.setIconAt(index, AppIcons.tile(glyph, () -> Palette.hue(hue), 28));
     }
 
     /**

@@ -1,6 +1,7 @@
 package org.pwss.model.table.cell;
 
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import javax.swing.JButton;
@@ -26,12 +27,17 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
      */
     private final JButton button;
 
+    private JTable table;
+    private int row;
+    private int column;
+    private boolean selected;
+
     /**
      * Constructs a new `ButtonRenderer`.
      */
     public ButtonRenderer() {
         super(new GridBagLayout());
-        setOpaque(true);
+        setOpaque(false);
         button = createCellButton("");
         add(button);
     }
@@ -53,8 +59,18 @@ public class ButtonRenderer extends JPanel implements TableCellRenderer {
                                                    boolean isSelected, boolean hasFocus, int row, int column) {
         button.setText((value == null) ? "" : value.toString());
         button.setEnabled(table.isCellEditable(row, column));
-        setBackground(TableStyle.rowBackground(table, row, isSelected));
+        this.table = table;
+        this.row = row;
+        this.column = column;
+        this.selected = isSelected;
         return this;
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        if (table != null) {
+            TableStyle.paintRowCard(g, table, row, column, selected, getWidth(), getHeight());
+        }
     }
 }
 

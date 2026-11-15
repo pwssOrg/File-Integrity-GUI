@@ -7,6 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
+import org.pwss.view.theme.TableStyle;
 
 
 /**
@@ -35,6 +36,12 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
     private CellButtonListener listener;
 
     /**
+     * The cell being edited, so the editor can paint its row card.
+     */
+    private int editingRow;
+    private int editingColumn;
+
+    /**
      * Constructs a ButtonEditor with the specified button text.
      *
      * @param text the text to display on the button
@@ -42,7 +49,16 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
     public ButtonEditor(String text, CellButtonListener listener) {
         // Same compact button as the renderer, so the cell does not change when clicked
         button = ButtonRenderer.createCellButton(text);
-        cell = new JPanel(new GridBagLayout());
+        cell = new JPanel(new GridBagLayout()) {
+            @Override
+            protected void paintComponent(java.awt.Graphics g) {
+                if (ButtonEditor.this.table != null) {
+                    TableStyle.paintRowCard(g, ButtonEditor.this.table, editingRow, editingColumn, true,
+                            getWidth(), getHeight());
+                }
+            }
+        };
+        cell.setOpaque(false);
         cell.add(button);
 
         this.listener = listener;
@@ -56,7 +72,9 @@ public class ButtonEditor extends AbstractCellEditor implements TableCellEditor 
                                                  boolean isSelected, int row, int column) {
         this.table = table;
         clicked = true;
-        cell.setBackground(table.getSelectionBackground());
+        editingRow = row;
+        editingColumn = column;
+        cell.repaint();
         return cell;
     }
 

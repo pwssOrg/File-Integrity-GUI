@@ -16,7 +16,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.pwss.view.component.Card;
 import org.pwss.view.theme.AppIcons;
+import org.pwss.view.theme.Palette;
 import org.pwss.view.theme.UiStyle;
 
 /**
@@ -55,6 +57,8 @@ public class NewDirectoryScreen extends BaseScreen {
      * and the actions at the bottom.
      */
     private void applyStyle() {
+        JLabel tile = new JLabel(AppIcons.tile(AppIcons.Glyph.FOLDER, () -> Palette.hue(Palette.TEAL), 48));
+        tile.setHorizontalAlignment(JLabel.LEADING);
         JLabel title = new JLabel("Add a monitored directory");
         title.setFont(UiStyle.font("h2.font"));
         JLabel subtitle = UiStyle.mutedLabel("Files in this directory are hashed and checked on every scan.");
@@ -74,19 +78,22 @@ public class NewDirectoryScreen extends BaseScreen {
         pathWell.add(pathLabel, BorderLayout.CENTER);
         selectPathButton.setText("Browse...");
         JPanel pathRow = new JPanel(new BorderLayout(8, 0));
+        pathRow.setOpaque(false);
         pathRow.add(pathWell, BorderLayout.CENTER);
         pathRow.add(selectPathButton, BorderLayout.LINE_END);
 
         UiStyle.styleClass(createButton, UiStyle.PRIMARY);
         createButton.setIcon(AppIcons.of(AppIcons.Glyph.PLUS));
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.TRAILING, 8, 0));
+        actions.setOpaque(false);
         actions.add(cancelButton);
         actions.add(createButton);
 
         JPanel form = new JPanel(new GridBagLayout());
         form.setBorder(BorderFactory.createEmptyBorder(28, 36, 28, 36));
         int row = 0;
-        addRow(form, title, row++, 0);
+        addRow(form, tile, row++, 0);
+        addRow(form, title, row++, 14);
         addRow(form, subtitle, row++, 4);
         addRow(form, Box.createHorizontalStrut(FORM_WIDTH), row++, 0);
         addRow(form, pathCaption, row++, 22);
@@ -96,8 +103,14 @@ public class NewDirectoryScreen extends BaseScreen {
         addRow(form, makeDirectoryActiveCheckBox, row++, 4);
         addRow(form, actions, row, 28);
 
+        // The form floats on a card with a soft gradient in the page colour
+        form.setOpaque(false);
+        Card card = Card.gradient(new BorderLayout(), () -> Palette.hue(Palette.TEAL), Palette::accent).arc(24);
+        card.add(form, BorderLayout.CENTER);
+
         container = new JPanel(new GridBagLayout());
-        container.add(form);
+        container.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+        container.add(card);
     }
 
     /**

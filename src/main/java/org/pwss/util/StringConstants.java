@@ -33,7 +33,6 @@ public final class StringConstants {
     public static final String SCAN_COMPLETED_NO_DIFFS = "Scan completed with no differences found.\nDo you wish to see the details?\nYou can always view results later in the recent scans table.";
     public static final String SCAN_NOT_COMPLETED = "Scan not completed.";
     public static final String SCAN_ESTABLISHING_BASELINE = "Establishing baseline for directory: ";
-    public static final String SCAN_DIFFS_PREFIX = "Diffs: ";
     public static final String SCAN_LIVE_FEED_ERROR_PREFIX = "An error occurred while retrieving the live feed: ";
     public static final String SCAN_SHOW_RESULTS_ERROR_PREFIX = "Error displaying scan results: ";
 

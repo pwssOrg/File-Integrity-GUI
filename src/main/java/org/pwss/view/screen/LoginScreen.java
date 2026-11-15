@@ -20,7 +20,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
+import org.pwss.view.component.Card;
 import org.pwss.view.theme.AppIcons;
+import org.pwss.view.theme.Palette;
 import org.pwss.view.theme.UiStyle;
 
 import com.formdev.flatlaf.FlatClientProperties;
@@ -115,8 +117,12 @@ public class LoginScreen extends BaseScreen {
         addRow(form, proceedButton, row++, 24);
         addRow(form, cancelButton, row, 8);
 
-        container = new JPanel(new GridBagLayout());
-        container.add(form);
+        // The gradient covers the whole window, with the form centred on it
+        form.setOpaque(false);
+        Card background = Card.gradient(new GridBagLayout(), Palette::accent, () -> Palette.hue(Palette.VIOLET))
+                .arc(0);
+        background.add(form);
+        container = background;
     }
 
     /**

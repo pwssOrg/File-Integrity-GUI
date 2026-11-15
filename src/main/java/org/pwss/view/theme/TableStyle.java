@@ -4,10 +4,12 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
+import java.awt.geom.RoundRectangle2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
@@ -24,8 +26,9 @@ import javax.swing.table.TableCellRenderer;
 
 /**
  * The shared look of every table in the application: quiet upper-case
- * headers, striped rows that highlight under the mouse, an accent marker on
- * the selected row, icons in front of paths and coloured badges for states.
+ * headers and rows drawn as separate rounded cards that light up under the
+ * mouse and take an accent gradient with a coloured strip when selected,
+ * tinted icon tiles in front of paths and coloured badges for states.
  */
 public final class TableStyle {
 
@@ -55,9 +58,21 @@ public final class TableStyle {
     private static final String STATUS_COLUMN = "Status";
 
     /**
-     * Width of the accent marker on the selected row, in pixels.
+     * Width of the accent strip on the selected row, in pixels.
      */
-    private static final int SELECTION_MARKER_WIDTH = 3;
+    private static final int SELECTION_MARKER_WIDTH = 4;
+
+    /**
+     * Height of a row, including the gap between row cards.
+     */
+    public static final int ROW_HEIGHT = 46;
+
+    /**
+     * Space between a row card and the row edges: horizontal, vertical.
+     */
+    private static final int CARD_MARGIN_X = 8;
+    private static final int CARD_MARGIN_Y = 3;
+    private static final int CARD_ARC = 12;
 
     private TableStyle() {
     }
@@ -72,7 +87,7 @@ public final class TableStyle {
         table.setFillsViewportHeight(true);
         table.setShowGrid(false);
         table.setIntercellSpacing(new java.awt.Dimension(0, 0));
-        table.setRowHeight(38);
+        table.setRowHeight(ROW_HEIGHT);
 
         table.getTableHeader().setReorderingAllowed(false);
         table.getTableHeader().setDefaultRenderer(new HeaderRenderer());
@@ -113,13 +128,69 @@ public final class TableStyle {
      * @return the background colour
      */
     public static Color rowBackground(JTable table, int row, boolean selected) {
+        Color rest = Palette.mix(table.getForeground(), table.getBackground(), 0.045);
         if (selected) {
-            return table.getSelectionBackground();
+            return Palette.mix(Palette.accent(), table.getBackground(), 0.24);
         }
-        if (Integer.valueOf(row).equals(table.getClientProperty(HOVER_ROW))) {
-            return color("App.tableHoverBackground", table.getBackground());
+        if (isHovered(table, row)) {
+            return Palette.mix(Palette.accent(), rest, 0.10);
         }
-        return row % 2 == 1 ? color("App.tableStripeBackground", table.getBackground()) : table.getBackground();
+        return rest;
+    }
+
+    /**
+     * Paints the part of a row card that falls into one cell. Together the
+     * cells of a row form one rounded card, inset from the row edges, so rows
+     * read as separate tiles. Selected rows get a horizontal accent gradient
+     * and a coloured strip at their leading edge.
+     *
+     * @param g        the graphics of the cell renderer
+     * @param table    the table
+     * @param row      the view row of the cell
+     * @param column   the view column of the cell
+     * @param selected whether the row is selected
+     * @param width    the cell width
+     * @param height   the cell height
+     */
+    public static void paintRowCard(Graphics g, JTable table, int row, int column, boolean selected,
+            int width, int height) {
+        Graphics2D g2 = (Graphics2D) g.create();
+        try {
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(table.getBackground());
+            g2.fillRect(0, 0, width, height);
+
+            boolean first = column == 0;
+            boolean last = column == table.getColumnCount() - 1;
+            // Stretch the shape past the cell edges that join a neighbour, so
+            // only the outer cells show rounded corners
+            double x = first ? CARD_MARGIN_X : -CARD_ARC;
+            double right = last ? width - CARD_MARGIN_X : width + CARD_ARC;
+            RoundRectangle2D shape = new RoundRectangle2D.Double(x, CARD_MARGIN_Y, right - x,
+                    height - 2 * CARD_MARGIN_Y, CARD_ARC, CARD_ARC);
+
+            if (selected) {
+                int cellX = table.getCellRect(row, column, true).x;
+                Color strong = Palette.mix(Palette.accent(), table.getBackground(), 0.30);
+                Color soft = Palette.mix(Palette.accent(), table.getBackground(), 0.12);
+                g2.setPaint(new GradientPaint(-cellX, 0, strong, table.getWidth() - cellX, 0, soft));
+            } else {
+                g2.setColor(rowBackground(table, row, false));
+            }
+            g2.fill(shape);
+
+            if (selected && first) {
+                g2.clip(shape);
+                g2.setColor(Palette.accent());
+                g2.fillRect(CARD_MARGIN_X, 0, SELECTION_MARKER_WIDTH, height);
+            }
+        } finally {
+            g2.dispose();
+        }
+    }
+
+    private static boolean isHovered(JTable table, int row) {
+        return Integer.valueOf(row).equals(table.getClientProperty(HOVER_ROW));
     }
 
     private static void setHoverRow(JTable table, int row) {
@@ -152,7 +223,7 @@ public final class TableStyle {
             setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, 0, 1, 0,
                             color("TableHeader.bottomSeparatorColor", table.getGridColor())),
-                    BorderFactory.createEmptyBorder(0, 14, 0, 12)));
+                    BorderFactory.createEmptyBorder(0, CARD_MARGIN_X + 14, 0, 12)));
             return this;
         }
     }
@@ -163,20 +234,22 @@ public final class TableStyle {
      */
     private static final class CellRenderer extends DefaultTableCellRenderer {
         private final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_PATTERN);
-        private final Icon folderIcon;
-        private final Icon fileIcon;
+        private final Icon folderIcon = AppIcons.tile(AppIcons.Glyph.FOLDER, () -> Palette.hue(Palette.TEAL), 26);
+        private final Icon fileIcon = AppIcons.tile(AppIcons.Glyph.FILE, () -> Palette.hue(Palette.VIOLET), 26);
+        private final Icon dateIcon = AppIcons.of(AppIcons.Glyph.CLOCK, 14, null);
 
         /**
          * Colour of the badge to paint instead of plain text, or null.
          */
         private Color badgeColor;
-        private boolean selectionMarker;
+        private JTable table;
+        private int row;
+        private int column;
+        private boolean selected;
 
         private CellRenderer() {
-            Color muted = color("App.mutedForeground", Color.GRAY);
-            folderIcon = AppIcons.of(AppIcons.Glyph.FOLDER, 16, muted);
-            fileIcon = AppIcons.of(AppIcons.Glyph.FILE, 16, muted);
             setIconTextGap(10);
+            setOpaque(false);
         }
 
         @Override
@@ -184,9 +257,16 @@ public final class TableStyle {
                 boolean hasFocus, int row, int column) {
             // No per-cell focus frame: the whole row is the selection
             super.getTableCellRendererComponent(table, value, isSelected, false, row, column);
-            setBackground(rowBackground(table, row, isSelected));
-            setBorder(BorderFactory.createEmptyBorder(0, 14, 0, 12));
-            selectionMarker = isSelected && column == 0;
+            this.table = table;
+            this.row = row;
+            this.column = column;
+            this.selected = isSelected;
+            setOpaque(false);
+            // The selection is shown by the row card, so the text keeps its colour
+            setForeground(table.getForeground());
+            int leading = column == 0 ? CARD_MARGIN_X + 14 : 14;
+            int trailing = column == table.getColumnCount() - 1 ? CARD_MARGIN_X + 12 : 12;
+            setBorder(BorderFactory.createEmptyBorder(0, leading, 0, trailing));
 
             String columnName = table.getColumnName(column);
             Object shown = value;
@@ -195,6 +275,9 @@ public final class TableStyle {
 
             if (value instanceof Date date) {
                 shown = dateFormat.format(date);
+                setIcon(dateIcon);
+                setIconTextGap(8);
+                setForeground(Palette.muted());
             } else if (value instanceof Boolean flag) {
                 shown = flag ? "Yes" : "No";
                 badgeColor = flag ? AppLookAndFeel.okColor() : color("App.mutedForeground", Color.GRAY);
@@ -211,6 +294,9 @@ public final class TableStyle {
                 } else if (FILE_COLUMNS.contains(columnName)) {
                     setIcon(fileIcon);
                 }
+            }
+            if (getIcon() != dateIcon) {
+                setIconTextGap(10);
             }
             setText(shown == null ? "" : shown.toString());
             return this;
@@ -231,14 +317,11 @@ public final class TableStyle {
 
         @Override
         protected void paintComponent(Graphics g) {
+            paintRowCard(g, table, row, column, selected, getWidth(), getHeight());
             if (badgeColor == null) {
                 super.paintComponent(g);
             } else {
                 paintBadge(g);
-            }
-            if (selectionMarker) {
-                g.setColor(color("Component.accentColor", getForeground()));
-                g.fillRect(0, 0, SELECTION_MARKER_WIDTH, getHeight());
             }
         }
 
@@ -249,8 +332,6 @@ public final class TableStyle {
         private void paintBadge(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             try {
-                g2.setColor(getBackground());
-                g2.fillRect(0, 0, getWidth(), getHeight());
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 Object textHint = UIManager.get(RenderingHints.KEY_TEXT_ANTIALIASING);
                 g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
@@ -268,7 +349,7 @@ public final class TableStyle {
                 int x = insets.left;
                 int y = (getHeight() - height) / 2;
 
-                g2.setColor(new Color(badgeColor.getRed(), badgeColor.getGreen(), badgeColor.getBlue(), 40));
+                g2.setColor(new Color(badgeColor.getRed(), badgeColor.getGreen(), badgeColor.getBlue(), 48));
                 g2.fillRoundRect(x, y, width, height, height, height);
                 g2.setColor(badgeColor);
                 g2.fillOval(x + padding, y + (height - dot) / 2, dot, dot);

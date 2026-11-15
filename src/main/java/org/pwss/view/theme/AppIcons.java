@@ -15,6 +15,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.util.function.Supplier;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.JComponent;
@@ -35,7 +36,8 @@ public final class AppIcons {
      * The available icon shapes.
      */
     public enum Glyph {
-        HOME, SCAN, FILES, WARNING, SETTINGS, LIST, PLUS, PLAY, STOP, BACK, FOLDER, FILE, RESTART, TRASH
+        HOME, SCAN, FILES, WARNING, SETTINGS, LIST, PLUS, PLAY, STOP, BACK, FOLDER, FILE, RESTART, TRASH, CHECK,
+        SKIP, INFO, COPY, CLOCK
     }
 
     /**
@@ -81,6 +83,43 @@ public final class AppIcons {
      */
     public static Icon dot(Color color) {
         return new DotIcon(color);
+    }
+
+    /**
+     * Creates a glyph centred on a rounded square tinted with its colour, as
+     * used for page, navigation and card icons.
+     *
+     * @param glyph the shape to draw
+     * @param color the colour of the glyph and the tint, looked up on every
+     *              paint so it follows theme changes
+     * @param size  the size of the square in pixels
+     * @return the icon
+     */
+    public static Icon tile(Glyph glyph, Supplier<Color> color, int size) {
+        return new TileIcon(glyph, color, size);
+    }
+
+    /**
+     * Creates a glyph on a tinted rounded square in a fixed colour.
+     *
+     * @param glyph the shape to draw
+     * @param color the colour of the glyph and the tint
+     * @param size  the size of the square in pixels
+     * @return the icon
+     */
+    public static Icon tile(Glyph glyph, Color color, int size) {
+        return new TileIcon(glyph, () -> color, size);
+    }
+
+    /**
+     * Creates a short, rounded vertical bar, used as a coloured marker in front
+     * of section headings.
+     *
+     * @param color the bar colour, looked up on every paint
+     * @return the icon
+     */
+    public static Icon bar(Supplier<Color> color) {
+        return new BarIcon(color);
     }
 
     /**
@@ -304,6 +343,44 @@ public final class AppIcons {
                     can.lineTo(18, 7);
                     g.draw(can);
                 }
+                case CHECK -> {
+                    g.draw(new Ellipse2D.Double(3, 3, 18, 18));
+                    Path2D p = new Path2D.Double();
+                    p.moveTo(8, 12.5);
+                    p.lineTo(11, 15.5);
+                    p.lineTo(16.5, 9);
+                    g.draw(p);
+                }
+                case SKIP -> {
+                    g.draw(new Ellipse2D.Double(3, 3, 18, 18));
+                    g.draw(new Line2D.Double(8, 12, 16, 12));
+                }
+                case INFO -> {
+                    g.draw(new Ellipse2D.Double(3, 3, 18, 18));
+                    g.draw(new Line2D.Double(12, 11.5, 12, 16.5));
+                    g.fill(new Ellipse2D.Double(10.9, 6.9, 2.2, 2.2));
+                }
+                case COPY -> {
+                    g.draw(new RoundRectangle2D.Double(8, 8, 13, 13, 3, 3));
+                    Path2D back = new Path2D.Double();
+                    back.moveTo(5, 16);
+                    back.lineTo(4.5, 16);
+                    back.quadTo(3, 16, 3, 14.5);
+                    back.lineTo(3, 4.5);
+                    back.quadTo(3, 3, 4.5, 3);
+                    back.lineTo(14.5, 3);
+                    back.quadTo(16, 3, 16, 4.5);
+                    back.lineTo(16, 5);
+                    g.draw(back);
+                }
+                case CLOCK -> {
+                    g.draw(new Ellipse2D.Double(3, 3, 18, 18));
+                    Path2D hands = new Path2D.Double();
+                    hands.moveTo(12, 7);
+                    hands.lineTo(12, 12);
+                    hands.lineTo(15.5, 14);
+                    g.draw(hands);
+                }
             }
         }
     }
@@ -335,6 +412,78 @@ public final class AppIcons {
             try {
                 g2.setColor(color);
                 g2.fill(new Ellipse2D.Double(1, 1, SIZE - 2, SIZE - 2));
+            } finally {
+                g2.dispose();
+            }
+        }
+    }
+
+    /**
+     * A glyph centred on a rounded, tinted square.
+     */
+    private static final class TileIcon implements Icon {
+        private final Glyph glyph;
+        private final Supplier<Color> color;
+        private final int size;
+
+        private TileIcon(Glyph glyph, Supplier<Color> color, int size) {
+            this.glyph = glyph;
+            this.color = color;
+            this.size = size;
+        }
+
+        @Override
+        public int getIconWidth() {
+            return size;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return size;
+        }
+
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            Color tint = color.get();
+            Graphics2D g2 = prepare(g, x, y);
+            try {
+                g2.setColor(Palette.tint(tint, 0.22));
+                g2.fill(new RoundRectangle2D.Double(0, 0, size, size, size * 0.4, size * 0.4));
+            } finally {
+                g2.dispose();
+            }
+            int glyphSize = Math.round(size * 0.55f);
+            int offset = (size - glyphSize) / 2;
+            new GlyphIcon(glyph, glyphSize, tint).paintIcon(c, g, x + offset, y + offset);
+        }
+    }
+
+    /**
+     * A short, rounded vertical bar.
+     */
+    private static final class BarIcon implements Icon {
+        private final Supplier<Color> color;
+
+        private BarIcon(Supplier<Color> color) {
+            this.color = color;
+        }
+
+        @Override
+        public int getIconWidth() {
+            return 4;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return 18;
+        }
+
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            Graphics2D g2 = prepare(g, x, y);
+            try {
+                g2.setColor(color.get());
+                g2.fill(new RoundRectangle2D.Double(0, 0, 4, 18, 4, 4));
             } finally {
                 g2.dispose();
             }

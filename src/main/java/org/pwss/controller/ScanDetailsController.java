@@ -123,9 +123,9 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
             int selectedRow = screen.getScanSummaryTable().getSelectedRow();
             if (selectedRow >= 0 && selectedRow < scanSummaries.size()) {
                 ScanSummary selectedSummary = scanSummaries.get(selectedRow);
-                screen.getScanSummaryDetails().setText(ReportUtil.formatSummary(selectedSummary));
+                screen.getScanSummaryDetails().show(selectedSummary);
             } else {
-                screen.getScanSummaryDetails().setText("");
+                screen.getScanSummaryDetails().clear();
                 screen.getDiffDetails().setText("");
             }
         });

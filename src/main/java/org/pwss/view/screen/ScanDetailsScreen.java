@@ -13,7 +13,9 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextPane;
+import org.pwss.view.component.ScanSummaryView;
 import org.pwss.view.theme.AppIcons;
+import org.pwss.view.theme.Palette;
 import org.pwss.view.theme.UiStyle;
 
 import com.formdev.flatlaf.FlatClientProperties;
@@ -45,6 +47,10 @@ public class ScanDetailsScreen extends BaseScreen {
      */
     private JTextPane scanSummaryDetails;
     /**
+     * Card view replacing the designer's scan summary text pane.
+     */
+    private final ScanSummaryView scanSummaryView = new ScanSummaryView();
+    /**
      * Text pane to show details of the differences (diffs) between scans.
      */
     private JTextPane diffDetails;
@@ -71,6 +77,8 @@ public class ScanDetailsScreen extends BaseScreen {
      */
     private void applyStyle() {
         UiStyle.polish(rootPanel);
+        UiStyle.find(rootPanel, JScrollPane.class, s -> s.getViewport().getView() == scanSummaryDetails)
+                .ifPresent(scanSummaryView::installIn);
 
         // The back button moves from its full-width row at the bottom to the header
         rootPanel.remove(backButton.getParent());
@@ -79,15 +87,15 @@ public class ScanDetailsScreen extends BaseScreen {
 
         UiStyle.find(rootPanel, JTabbedPane.class).ifPresent(tabs -> {
             tabs.setTitleAt(0, "Summaries");
-            tabs.setIconAt(0, AppIcons.of(AppIcons.Glyph.LIST));
+            tabs.setIconAt(0, AppIcons.of(AppIcons.Glyph.LIST, 16, Palette.accent()));
             tabs.setTitleAt(1, "Diffs detected");
-            tabs.setIconAt(1, AppIcons.of(AppIcons.Glyph.WARNING));
+            tabs.setIconAt(1, AppIcons.of(AppIcons.Glyph.WARNING, 16, Palette.hue(Palette.ORANGE)));
             tabs.putClientProperty(FlatClientProperties.TABBED_PANE_SHOW_CONTENT_SEPARATOR, true);
         });
         UiStyle.styleClass(diffsCountLabel, UiStyle.MUTED);
 
         container = UiStyle.page("Scan details", "Every file covered by this scan and the diffs it detected.",
-                rootPanel, backButton);
+                rootPanel, backButton, AppIcons.Glyph.LIST, () -> Palette.hue(Palette.VIOLET));
     }
 
     @Override
@@ -143,12 +151,12 @@ public class ScanDetailsScreen extends BaseScreen {
     }
 
     /**
-     * Returns the text pane used to display details about a selected scan summary.
+     * Returns the view used to display details about a selected scan summary.
      *
-     * @return The JTextPane instance showing scan summary details
+     * @return the scan summary view
      */
-    public JTextPane getScanSummaryDetails() {
-        return scanSummaryDetails;
+    public ScanSummaryView getScanSummaryDetails() {
+        return scanSummaryView;
     }
 
     /**

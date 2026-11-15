@@ -15,11 +15,6 @@ public enum Screen {
     HOME(1600, 800),
 
     /**
-     * The screen for creating a new monitored directory.
-     */
-    NEW_DIRECTORY(640, 460),
-
-    /**
      * The screen for viewing scan summaries.
      */
     SCAN_SUMMARY(1600, 800);
