@@ -1,1 +1,17 @@
-@pwgit-create @lilstiffy
+# Controller
+/src/main/java/org/pwss/controller/ @lilstiffy
+
+# Service
+/src/main/java/org/pwss/service/ @lilstiffy
+
+# Navigation
+/src/main/java/org/pwss/navigation/ @lilstiffy
+
+# View
+/src/main/java/org/pwss/view/ @lilstiffy
+
+# Data structures
+/src/main/java/org/pwss/data_structure/ @pwgit-create 
+
+# Default owners for everything else
+* @pwgit-create  @lilstiffy
