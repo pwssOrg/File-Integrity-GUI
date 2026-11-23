@@ -51,7 +51,7 @@ public final class LiveFeedParser {
         Matcher matcher = TOKEN.matcher(text);
         int consumed = 0;
         while (matcher.find()) {
-            String before = text.substring(consumed, matcher.start()).strip();
+            String before = text.substring(consumed, matcher.start());
             if (matcher.group("msg") != null) {
                 addInfo(entries, before, time);
                 addInfo(entries, matcher.group("text").strip(), time);

@@ -309,7 +309,6 @@ public final class ScanSummaryView extends JPanel implements Scrollable {
             JButton copy = new JButton(AppIcons.of(Glyph.COPY, 14, null));
             copy.setToolTipText("Copy " + algorithm);
             copy.putClientProperty(FlatClientProperties.BUTTON_TYPE, FlatClientProperties.BUTTON_TYPE_TOOLBAR_BUTTON);
-            copy.setFocusable(false);
             copy.addActionListener(e -> {
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(hash), null);
                 copy.setIcon(AppIcons.of(Glyph.CHECK, 14, AppLookAndFeel.okColor()));

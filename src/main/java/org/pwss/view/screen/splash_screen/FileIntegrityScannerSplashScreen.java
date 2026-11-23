@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JWindow;
 import javax.swing.Timer;
+import javax.swing.UIManager;
 
 /**
  * This class is responsible for displaying a splash screen: the splash picture
@@ -105,7 +106,11 @@ public final class FileIntegrityScannerSplashScreen {
             splash.setBackground(new Color(0, 0, 0, 0));
         } catch (UnsupportedOperationException | IllegalArgumentException e) {
             // No per-pixel transparency on this system: cut the window shape instead
-            splash.setShape(cardShape);
+            try {
+                splash.setShape(cardShape);
+            } catch (UnsupportedOperationException | IllegalArgumentException ignored) {
+                splash.setBackground(UIManager.getColor("Panel.background"));
+            }
         }
         splash.pack();
         splash.setLocationRelativeTo(null);

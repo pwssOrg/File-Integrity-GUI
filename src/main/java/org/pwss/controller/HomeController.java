@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.pwss.app_settings.AppConfig;
@@ -871,49 +872,60 @@ public final class HomeController extends BaseController<HomeScreen> {
         // Turns the raw text from the backend into log entries
         LiveFeedParser liveFeedParser = new LiveFeedParser();
 
-        // Create and start a polling timer
+        // The timer only schedules work; backend calls and parsing stay off the EDT.
         scanStatusTimer = new Timer(1000, e -> {
-            try {
-                // Get live feed from backend
-                LiveFeedResponse liveFeed = scanService.getLiveFeed();
-
-                // Add the new results to the scan log
-                screen.getScanLog().append(liveFeedParser.parse(liveFeed.livefeed(), LocalTime.now()));
-
-                // Update the diff counter
-                totalDiffCount.addAndGet(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
-
-                // Update scan status and UI as needed
-                if (liveFeed.isScanRunning() != scanRunning) {
-                    scanRunning = liveFeed.isScanRunning();
-                    refreshView();
+            SwingWorker<PollResult, Void> worker = new SwingWorker<>() {
+                @Override
+                protected PollResult doInBackground()
+                        throws LiveFeedException, ExecutionException, InterruptedException, JsonProcessingException {
+                    LiveFeedResponse liveFeed = scanService.getLiveFeed();
+                    List<ScanLogEntry> entries = liveFeedParser.parse(liveFeed.livefeed(), LocalTime.now());
+                    int warnings = LiveFeedUtil.countWarnings(liveFeed.livefeed());
+                    if (!liveFeed.isScanRunning()) {
+                        log.debug("Scan completed, making final pull...");
+                        LiveFeedResponse finalFeed = scanService.getLiveFeed();
+                        entries.addAll(liveFeedParser.parse(finalFeed.livefeed(), LocalTime.now()));
+                        entries.addAll(liveFeedParser.flush(LocalTime.now()));
+                        warnings += LiveFeedUtil.countWarnings(finalFeed.livefeed());
+                    }
+                    return new PollResult(liveFeed, entries, warnings);
                 }
 
-                // When the scan is complete, do a final pull
-                if (!liveFeed.isScanRunning()) {
-                    log.debug("Scan completed, making final pull...");
-
-                    // Do a final pull without time pressure
-                    liveFeed = scanService.getLiveFeed(); // The last pull to get any final updates
-
-                    // Add the last results to the scan log, including any leftover text
-                    screen.getScanLog().append(liveFeedParser.parse(liveFeed.livefeed(), LocalTime.now()));
-                    screen.getScanLog().append(liveFeedParser.flush(LocalTime.now()));
-                    totalDiffCount.addAndGet(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
-
-                    // Stop polling and end the process
-                    scanStatusTimer.stop();
-                    onFinishScan(true, singleDirectory); // Complete the scan
+                @Override
+                protected void done() {
+                    try {
+                        PollResult result = get();
+                        screen.getScanLog().append(result.entries());
+                        totalDiffCount.addAndGet(result.warningCount());
+                        if (result.liveFeed().isScanRunning() != scanRunning) {
+                            scanRunning = result.liveFeed().isScanRunning();
+                            refreshView();
+                        }
+                        if (!result.liveFeed().isScanRunning()) {
+                            scanStatusTimer.stop();
+                            onFinishScan(true, singleDirectory);
+                        } else {
+                            scanStatusTimer.start();
+                        }
+                    } catch (ExecutionException | InterruptedException ex) {
+                        log.error("Error fetching live feed: {}", ex.getMessage());
+                        log.debug("Live Feed Exception", ex);
+                        screen.showError("Live feed error");
+                        scanStatusTimer.stop();
+                        onFinishScan(false, singleDirectory);
+                        if (ex instanceof InterruptedException) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
                 }
-            } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
-                log.error("Error fetching live feed: {}", ex.getMessage());
-                log.debug("Live Feed Exception", ex);
-                SwingUtilities.invokeLater(() -> screen.showError("Live feed error"));
-                scanStatusTimer.stop(); // Stop polling on error
-                onFinishScan(false, singleDirectory); // Handling errors
-            }
+            };
+            scanStatusTimer.setRepeats(false);
+            worker.execute();
         });
         scanStatusTimer.start();
+    }
+
+    private record PollResult(LiveFeedResponse liveFeed, List<ScanLogEntry> entries, int warningCount) {
     }
 
     /**

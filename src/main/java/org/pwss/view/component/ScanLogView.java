@@ -12,6 +12,8 @@ import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +87,6 @@ public final class ScanLogView {
             totals.add(label);
         }
         hideUnchanged.setOpaque(false);
-        hideUnchanged.setFocusable(false);
         hideUnchanged.addActionListener(e -> {
             model.setHideUnchanged(hideUnchanged.isSelected());
             scrollToEnd();
@@ -100,6 +101,12 @@ public final class ScanLogView {
 
         list.setModel(model);
         list.setCellRenderer(new RowRenderer());
+        list.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                list.setCellRenderer(new RowRenderer());
+            }
+        });
         list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         list.getActionMap().put("copy", new AbstractAction() {
             @Override
@@ -139,11 +146,26 @@ public final class ScanLogView {
                 }
             }
         }
+        List<ScanLogEntry> selected = list.getSelectedValuesList();
         model.add(entries);
+        restoreSelection(selected);
         updateTotals();
         if (follow) {
             scrollToEnd();
         }
+    }
+
+    private void restoreSelection(List<ScanLogEntry> selected) {
+        if (selected.isEmpty()) {
+            return;
+        }
+        List<Integer> indices = new ArrayList<>();
+        for (int i = 0; i < model.getSize(); i++) {
+            if (selected.contains(model.getElementAt(i))) {
+                indices.add(i);
+            }
+        }
+        list.setSelectedIndices(indices.stream().mapToInt(Integer::intValue).toArray());
     }
 
     /**
@@ -328,7 +350,7 @@ public final class ScanLogView {
          * Drops the oldest entries, unchanged files first.
          */
         private void trim() {
-            int[] excess = { all.size() - MAX_ENTRIES };
+            int[] excess = { all.size() - (MAX_ENTRIES - 100) };
             all.removeIf(entry -> excess[0] > 0 && entry.kind() == Kind.UNCHANGED && excess[0]-- > 0);
             if (excess[0] > 0) {
                 all.subList(0, excess[0]).clear();

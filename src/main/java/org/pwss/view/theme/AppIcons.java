@@ -16,12 +16,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.function.Supplier;
+import java.util.HashMap;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
-import javax.swing.JComponent;
 import javax.swing.UIManager;
-
-import com.formdev.flatlaf.FlatClientProperties;
 
 /**
  * Small vector icon set used across the application.
@@ -219,13 +218,6 @@ public final class AppIcons {
             }
             if (!c.isEnabled()) {
                 return UIManager.getColor("Label.disabledForeground");
-            }
-            // Filled accent/danger buttons always carry white content
-            if (c instanceof JComponent jc) {
-                Object styleClass = jc.getClientProperty(FlatClientProperties.STYLE_CLASS);
-                if (UiStyle.PRIMARY.equals(styleClass) || UiStyle.DANGER.equals(styleClass)) {
-                    return Color.WHITE;
-                }
             }
             return c.getForeground();
         }
@@ -499,7 +491,7 @@ public final class AppIcons {
          */
         private static final double CROP_INSET = 64 / 1024.0;
         private final int size;
-        private Image scaled;
+        private final Map<Integer, Image> scaled = new HashMap<>();
 
         private LogoIcon(int size) {
             this.size = size;
@@ -517,22 +509,20 @@ public final class AppIcons {
 
         @Override
         public void paintIcon(Component c, Graphics g, int x, int y) {
-            if (scaled == null) {
+            Graphics2D g2 = prepare(g, x, y);
+            try {
                 BufferedImage source = loadLogo();
                 int inset = (int) Math.round(source.getWidth() * CROP_INSET);
                 int side = Math.max(1, source.getWidth() - 2 * inset);
                 BufferedImage cropped = source.getWidth() > 2 * inset && source.getHeight() > 2 * inset
                         ? source.getSubimage(inset, inset, side, Math.max(1, source.getHeight() - 2 * inset))
                         : source;
-                // Keep extra resolution for HiDPI displays
-                scaled = downscale(cropped, size * 3);
-            }
-            Graphics2D g2 = prepare(g, x, y);
-            try {
-                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                int target = Math.max(1, (int) Math.ceil(size * g2.getTransform().getScaleX()));
+                Image image = scaled.computeIfAbsent(target, key -> downscale(cropped, key));
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
                 double arc = size * 0.42;
                 g2.clip(new RoundRectangle2D.Double(0, 0, size, size, arc, arc));
-                g2.drawImage(scaled, 0, 0, size, size, null);
+                g2.drawImage(image, 0, 0, size, size, null);
             } finally {
                 g2.dispose();
             }
