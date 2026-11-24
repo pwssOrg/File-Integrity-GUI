@@ -420,6 +420,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getClearFeedButton().addActionListener(e -> clearLiveFeed());
         screen.getFileSearchField().addActionListener(e -> searchForFiles());
         screen.getSearchContainingCheckBox().addActionListener(e -> searchForFiles());
+        screen.getSearchContainingCheckBox().setSelected(true);
         screen.getDescendingCheckBox().addActionListener(e -> searchForFiles());
         screen.getFilesTable().getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && screen.getFilesTable().getSelectedRow() != -1) {
