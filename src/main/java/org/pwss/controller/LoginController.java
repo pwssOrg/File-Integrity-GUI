@@ -65,11 +65,10 @@ public class LoginController extends BaseController<LoginScreen> {
         screen.getPasswordField().setText("");
         log.debug("Current LICENSE_KEY: {}", licenseKeySet ? "SET" : "NOT SET");
         log.debug("Create User Mode: {}", createUserMode);
-        // Adjust frame size based on create user mode
-        final int frameHeight = createUserMode ? 225 : 200;
-        final int offset = licenseKeySet ? 0 : 50;
-        screen.getParentFrame().setSize(450, frameHeight + offset);
         refreshView();
+        // Fit the frame to the form, which depends on the fields that are shown
+        screen.getParentFrame().pack();
+        screen.getParentFrame().setLocationRelativeTo(null);
     }
 
     @Override

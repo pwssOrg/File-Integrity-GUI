@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import org.pwss.model.entity.MonitoredDirectory;
+import org.pwss.view.theme.AppLookAndFeel;
 import org.slf4j.Logger;
 
 /**
@@ -40,9 +41,9 @@ public final class MonitoredDirectoryUtil {
          */
         public Color getForegroundColor() {
             return switch (this) {
-                case UP_TO_DATE -> Color.GREEN;
-                case WEEK_OLD, TWO_WEEKS_OLD -> Color.ORANGE;
-                case NEVER_SCANNED, NO_BASELINE, YEAR_OLD, MONTH_OLD -> Color.RED;
+                case UP_TO_DATE -> AppLookAndFeel.okColor();
+                case WEEK_OLD, TWO_WEEKS_OLD -> AppLookAndFeel.warnColor();
+                case NEVER_SCANNED, NO_BASELINE, YEAR_OLD, MONTH_OLD -> AppLookAndFeel.errorColor();
             };
         }
 

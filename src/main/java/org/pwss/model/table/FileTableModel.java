@@ -7,7 +7,7 @@ import org.pwss.model.entity.File;
 
 public class FileTableModel extends AbstractTableModel {
     private final List<File> data;
-    private final String[] columns = {"\uD83D\uDEA6 Basename", "Directory"};
+    private final String[] columns = {"File name", "Directory"};
 
     public FileTableModel(List<File> data) {
         this.data = data;

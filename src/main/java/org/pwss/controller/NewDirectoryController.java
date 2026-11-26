@@ -1,43 +1,96 @@
 package org.pwss.controller;
 
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dialog;
+import java.awt.Window;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import org.pwss.navigation.NavigationEvents;
-import org.pwss.navigation.Screen;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
 import org.pwss.service.MonitoredDirectoryService;
 import org.pwss.util.OSUtil;
 import org.pwss.util.StringConstants;
 import org.pwss.view.screen.NewDirectoryScreen;
 
 /**
- * Controller class that handles operations related to the New Directory screen.
+ * Controller for adding a monitored directory.
+ * <p>
+ * The form opens as a modal dialog on top of the current window (see
+ * {@link #showDialog(Component)}), so the main window keeps its size, page
+ * and state while a directory is added.
  */
 public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
 
     /**
-     * Service responsible for managing monitored directories.
+     * Service used to create the monitored directory.
      */
     private final MonitoredDirectoryService monitoredDirectoryService;
 
     /**
-     * The currently selected directory path. This can be null if no path is selected.
+     * The directory picked by the user, or null if none was picked yet.
      */
     private String selectedPath;
 
     /**
+     * The open dialog, or null while the form is not shown.
+     */
+    private JDialog dialog;
+
+    /**
+     * Whether a directory was added while the dialog was open.
+     */
+    private boolean created;
+
+    /**
      * Constructs a NewDirectoryController with the given screen.
      *
-     * @param screen The screen instance that this controller will manage
+     * @param screen the form to control
      */
     public NewDirectoryController(NewDirectoryScreen screen) {
         super(screen);
         this.monitoredDirectoryService = new MonitoredDirectoryService();
     }
 
+    /**
+     * Shows the form as a modal dialog over the window holding the given
+     * component and waits until it is closed.
+     *
+     * @param parent a component of the window to open the dialog over
+     * @return true if a directory was added
+     */
+    public boolean showDialog(Component parent) {
+        Window owner = parent instanceof Window window ? window : SwingUtilities.getWindowAncestor(parent);
+        dialog = new JDialog(owner, "Add a monitored directory", Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        dialog.setContentPane(screen.getRootPanel());
+        dialog.getRootPane().setDefaultButton(screen.getCreateButton());
+        dialog.getRootPane().registerKeyboardAction(e -> closeDialog(),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
+        dialog.setResizable(false);
+
+        created = false;
+        onShow();
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(owner);
+        dialog.setVisible(true); // blocks until the dialog is closed
+
+        dialog = null;
+        return created;
+    }
+
     @Override
     public void onShow() {
         super.onShow();
-        // Reset selected path when the screen is shown
+        // Start every time with an empty form
         selectedPath = null;
         refreshView();
     }
@@ -45,8 +98,18 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
     @Override
     void initListeners() {
         screen.getSelectPathButton().addActionListener(e -> openFolderPicker());
-        screen.getCancelButton().addActionListener(e -> NavigationEvents.navigateTo(Screen.HOME));
+        screen.getCancelButton().addActionListener(e -> closeDialog());
         screen.getCreateButton().addActionListener(e -> createNewDirectory());
+
+        // The path field itself opens the picker too
+        screen.getPathLabel().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        screen.getPathLabel().setToolTipText("Click to choose a directory");
+        screen.getPathLabel().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                openFolderPicker();
+            }
+        });
     }
 
     @Override
@@ -61,16 +124,25 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
                 screen.showError("Cannot monitor directories under /dev or /proc on Unix-based systems.");
             }
         }
+        if (dialog != null) {
+            dialog.pack();
+        }
+    }
+
+    private void closeDialog() {
+        if (dialog != null) {
+            dialog.dispose();
+        }
     }
 
     /**
-     * Opens a folder picker dialog to allow the user to select a directory.
-     * Updates the selected path and refreshes the view accordingly.
+     * Opens a folder picker, starting at the previously picked directory.
      */
     private void openFolderPicker() {
-        JFileChooser folderChooser = new JFileChooser();
+        JFileChooser folderChooser = new JFileChooser(selectedPath != null ? new File(selectedPath) : null);
         folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnValue = folderChooser.showOpenDialog(getScreen().getRootPanel());
+        folderChooser.setDialogTitle("Choose a directory to monitor");
+        int returnValue = folderChooser.showOpenDialog(screen.getRootPanel());
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             selectedPath = folderChooser.getSelectedFile().getAbsolutePath();
             refreshView();
@@ -78,9 +150,8 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
     }
 
     /**
-     * Creates a new monitored directory with the selected path and options.
-     * Displays success or error messages based on the operation result.
-     * Navigates back to the home screen upon successful creation.
+     * Creates the monitored directory. On success the dialog closes; on failure
+     * it stays open with the form intact, so the user can try again.
      */
     private void createNewDirectory() {
         boolean includeSubdirectories = screen.getIncludeSubdirectoriesCheckBox().isSelected();
@@ -88,9 +159,8 @@ public class NewDirectoryController extends BaseController<NewDirectoryScreen> {
         if (selectedPath != null && !selectedPath.isEmpty()) {
             try {
                 monitoredDirectoryService.createNewMonitoredDirectory(selectedPath, includeSubdirectories, makeActive);
-                JOptionPane.showMessageDialog(screen.getRootPanel(), StringConstants.NEW_DIR_SUCCESS_TEXT,
-                        StringConstants.GENERIC_SUCCESS, JOptionPane.INFORMATION_MESSAGE);
-                NavigationEvents.navigateTo(Screen.HOME);
+                created = true;
+                closeDialog();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(screen.getRootPanel(),
                         StringConstants.NEW_DIR_ERROR_PREFIX + e.getMessage(), StringConstants.GENERIC_ERROR,

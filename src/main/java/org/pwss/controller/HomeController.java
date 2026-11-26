@@ -2,12 +2,12 @@ package org.pwss.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ItemEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URISyntaxException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,11 +21,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingWorker;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import org.pwss.app_settings.AppConfig;
 import org.pwss.controller.util.NavigationContext;
-import org.pwss.data_structure.RingBuffer;
 import org.pwss.exception.metadata.MetadataKeyNameRetrievalException;
 import org.pwss.exception.monitored_directory.MonitoredDirectoryGetAllException;
 import org.pwss.exception.scan.GetAllMostRecentScansException;
@@ -45,6 +45,7 @@ import org.pwss.model.entity.MonitoredDirectory;
 import org.pwss.model.entity.QuarantineMetadata;
 import org.pwss.model.entity.Scan;
 import org.pwss.model.entity.ScanSummary;
+import org.pwss.model.livefeed.ScanLogEntry;
 import org.pwss.model.response.LiveFeedResponse;
 import org.pwss.model.table.DiffTableModel;
 import org.pwss.model.table.FileTableModel;
@@ -65,6 +66,7 @@ import org.pwss.service.ScanSummaryService;
 import org.pwss.util.AppTheme;
 import org.pwss.util.ConversionUtil;
 import org.pwss.util.ErrorUtil;
+import org.pwss.util.LiveFeedParser;
 import org.pwss.util.LiveFeedUtil;
 import org.pwss.util.MonitoredDirectoryUtil;
 import org.pwss.util.MonitoredDirectoryUtil.DirNotificationStatus;
@@ -75,6 +77,9 @@ import org.pwss.util.StringConstants;
 import org.pwss.view.popup_menu.MonitoredDirectoryPopupFactory;
 import org.pwss.view.popup_menu.listener.MonitoredDirectoryPopupListenerImpl;
 import org.pwss.view.screen.HomeScreen;
+import org.pwss.view.screen.NewDirectoryScreen;
+import org.pwss.view.theme.AppIcons;
+import org.pwss.view.theme.UiStyle;
 import org.slf4j.LoggerFactory;
 
 import static org.pwss.app_settings.AppConfig.APP_THEME;
@@ -122,6 +127,11 @@ public final class HomeController extends BaseController<HomeScreen> {
      * Factory for creating popup menus related to monitored directories.
      */
     private final MonitoredDirectoryPopupFactory monitoredDirectoryPopupFactory;
+
+    /**
+     * Controller of the "add a monitored directory" dialog, created on first use.
+     */
+    private NewDirectoryController newDirectoryController;
 
     /**
      * List of all monitored directories.
@@ -329,10 +339,22 @@ public final class HomeController extends BaseController<HomeScreen> {
         fetchDataAndRefreshView();
     }
 
+    /**
+     * Opens the "add a monitored directory" dialog over the home window and
+     * refreshes the lists in place when a directory was added.
+     */
+    private void addNewDirectory() {
+        if (newDirectoryController == null) {
+            newDirectoryController = new NewDirectoryController(new NewDirectoryScreen());
+        }
+        if (newDirectoryController.showDialog(screen.getRootPanel())) {
+            fetchDataAndRefreshView();
+        }
+    }
+
     @Override
     protected void initListeners() {
-        screen.getAddNewDirectoryButton()
-                .addActionListener(e -> NavigationEvents.navigateTo(Screen.NEW_DIRECTORY));
+        screen.getAddNewDirectoryButton().addActionListener(e -> addNewDirectory());
         screen.getScanButton().addActionListener(e -> handleScanButtonClick(false));
         screen.getMonitoredDirectoriesTable().addMouseListener(new MouseAdapter() {
             @Override
@@ -398,6 +420,7 @@ public final class HomeController extends BaseController<HomeScreen> {
         screen.getClearFeedButton().addActionListener(e -> clearLiveFeed());
         screen.getFileSearchField().addActionListener(e -> searchForFiles());
         screen.getSearchContainingCheckBox().addActionListener(e -> searchForFiles());
+        screen.getSearchContainingCheckBox().setSelected(true);
         screen.getDescendingCheckBox().addActionListener(e -> searchForFiles());
         screen.getFilesTable().getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && screen.getFilesTable().getSelectedRow() != -1) {
@@ -414,9 +437,9 @@ public final class HomeController extends BaseController<HomeScreen> {
             int selectedRow = screen.getFileScanSummaryTable().getSelectedRow();
             if (selectedRow >= 0 && selectedRow < fileSummaries.size()) {
                 ScanSummary selectedSummary = fileSummaries.get(selectedRow);
-                screen.getScanSummaryDetails().setText(ReportUtil.formatSummary(selectedSummary));
+                screen.getScanSummaryDetails().show(selectedSummary);
             } else {
-                screen.getScanSummaryDetails().setText("");
+                screen.getScanSummaryDetails().clear();
             }
         });
         screen.getThemePicker().addItemListener(e -> {
@@ -493,12 +516,12 @@ public final class HomeController extends BaseController<HomeScreen> {
         boolean hasNotifications = !notifications.isEmpty();
 
         // Scan running views
-        boolean showLiveFeed = !screen.getLiveFeedText().getText().isEmpty() || scanRunning;
-        boolean showClearLiveFeed = !scanRunning && !screen.getLiveFeedText().getText().isEmpty();
+        boolean showLiveFeed = !screen.getScanLog().isEmpty() || scanRunning;
+        boolean showClearLiveFeed = !scanRunning && !screen.getScanLog().isEmpty();
+        screen.getScanLog().setScanning(scanRunning);
         screen.getScanProgressContainer().setVisible(scanRunning);
         screen.getLiveFeedContainer().setVisible(showLiveFeed);
         screen.getLiveFeedTitle().setVisible(showLiveFeed);
-        screen.getLiveFeedDiffCount().setVisible(showLiveFeed);
         screen.getClearFeedButton().setVisible(showClearLiveFeed);
         screen.getNotificationPanel().setVisible(hasNotifications);
 
@@ -532,7 +555,9 @@ public final class HomeController extends BaseController<HomeScreen> {
                 if (value instanceof MonitoredDirectory dir) {
                     setText(dir.path());
                     DirNotificationStatus status = MonitoredDirectoryUtil.getDirNotificationStatus(dir);
-                    setForeground(status.getForegroundColor());
+                    // A coloured dot carries the status; the path itself stays readable
+                    setIcon(AppIcons.dot(status.getForegroundColor()));
+                    setIconTextGap(10);
                     setToolTipText(status.getTooltipText());
                 }
                 return this;
@@ -542,6 +567,9 @@ public final class HomeController extends BaseController<HomeScreen> {
         MonitoredDirectoryTableModel monitoredDirectoryTableModel = new MonitoredDirectoryTableModel(
                 allMonitoredDirectories != null ? allMonitoredDirectories : List.of());
         screen.getMonitoredDirectoriesTable().setModel(monitoredDirectoryTableModel);
+        // Give the path and the note the room; the remaining columns hold short values
+        screen.getMonitoredDirectoriesTable().getColumnModel().getColumn(0).setPreferredWidth(320);
+        screen.getMonitoredDirectoriesTable().getColumnModel().getColumn(1).setPreferredWidth(180);
         screen.getMonitoredDirectoriesTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         // Update diffs count label
@@ -550,9 +578,12 @@ public final class HomeController extends BaseController<HomeScreen> {
         DiffTableModel diffTableModel = new DiffTableModel(recentDiffs != null ? recentDiffs : List.of());
         screen.getDiffTable().setModel(diffTableModel);
         screen.getDiffTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        UiStyle.fixColumnWidth(screen.getDiffTable(), DiffTableModel.columns[3], ButtonRenderer.COLUMN_WIDTH);
+        // The file path gets the room; the dates next to it are short
+        screen.getDiffTable().getColumnModel().getColumn(0).setPreferredWidth(420);
         screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
         screen.getDiffTable().getColumn(DiffTableModel.columns[3])
-                .setCellEditor(new ButtonEditor("\uD83D\uDCE5", (row, column) -> {
+                .setCellEditor(new ButtonEditor(DiffTableModel.ACTION_QUARANTINE, (row, column) -> {
                     DiffTableModel model = (DiffTableModel) screen.getDiffTable().getModel();
                     Optional<Diff> diff = model.getDiffAt(row);
 
@@ -590,9 +621,11 @@ public final class HomeController extends BaseController<HomeScreen> {
         QuarantineTableModel quarantineTableModel = new QuarantineTableModel(quarantinedFiles);
         screen.getQuarantineTable().setModel(quarantineTableModel);
         screen.getQuarantineTable().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        UiStyle.fixColumnWidth(screen.getQuarantineTable(), QuarantineTableModel.columns[2],
+                ButtonRenderer.COLUMN_WIDTH);
         screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2]).setCellRenderer(new ButtonRenderer());
         screen.getQuarantineTable().getColumn(QuarantineTableModel.columns[2])
-                .setCellEditor(new ButtonEditor("\uD83D\uDCE4", (row, column) -> {
+                .setCellEditor(new ButtonEditor(QuarantineTableModel.ACTION_RESTORE, (row, column) -> {
                     QuarantineTableModel model = (QuarantineTableModel) screen.getQuarantineTable().getModel();
                     Optional<QuarantineMetadata> optMetadata = model.getMetadataAt(row);
 
@@ -803,15 +836,13 @@ public final class HomeController extends BaseController<HomeScreen> {
     }
 
     /**
-     * Clears the live feed text area and resets the total difference count.
+     * Clears the scan log and resets the total difference count.
      */
     private void clearLiveFeed() {
-        // Clear the live feed text area
-        screen.getLiveFeedText().setText("");
+        // Clear the scan log
+        screen.getScanLog().clear();
         // Reset diff count for the next scan
         totalDiffCount.set(0);
-        // Update the live feed diff count in preparation for the next scan
-        screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
         // Refresh the view to reflect the cleared live feed
         refreshView();
     }
@@ -834,80 +865,68 @@ public final class HomeController extends BaseController<HomeScreen> {
         for (MonitoredDirectory dir : scanningDirs) {
             if (!dir.baselineEstablished()) {
                 log.debug("Establishing baseline for {}", dir.path());
-                String currentLiveFeedText = screen.getLiveFeedText().getText();
-                String newEntry = StringConstants.SCAN_ESTABLISHING_BASELINE + dir.path() + "\n";
-                String updatedLiveFeedText = currentLiveFeedText + newEntry;
-                screen.getLiveFeedText().setText(updatedLiveFeedText);
+                screen.getScanLog().append(List.of(ScanLogEntry.info(
+                        StringConstants.SCAN_ESTABLISHING_BASELINE + dir.path(), LocalTime.now())));
             }
         }
 
-        // Create a ring buffer with a capacity to hold the last 100 updates
-        RingBuffer<String> liveFeedBuffer = new RingBuffer<>(100);
+        // Turns the raw text from the backend into log entries
+        LiveFeedParser liveFeedParser = new LiveFeedParser();
 
-        // Create and start a polling timer
+        // The timer only schedules work; backend calls and parsing stay off the EDT.
         scanStatusTimer = new Timer(1000, e -> {
-            try {
-                // Get live feed from backend
-                LiveFeedResponse liveFeed = scanService.getLiveFeed();
-
-                // Format the new update from the backend
-                String newEntry = LiveFeedUtil.formatLiveFeedEntry(liveFeed.livefeed());
-
-                // Add the new update to the ring buffer
-                liveFeedBuffer.add(newEntry);
-
-                // Build the text for the live feed based on the latest updates in the buffer
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < liveFeedBuffer.size(); i++) {
-                    sb.append(liveFeedBuffer.get(i));
-                }
-
-                // Update UI with the latest text
-                screen.getLiveFeedText().setText(sb.toString());
-
-                // Update the diff counter
-                totalDiffCount.addAndGet(LiveFeedUtil.countWarnings(liveFeed.livefeed()));
-                screen.getLiveFeedDiffCount().setText(StringConstants.SCAN_DIFFS_PREFIX + totalDiffCount);
-
-                // Update scan status and UI as needed
-                if (liveFeed.isScanRunning() != scanRunning) {
-                    scanRunning = liveFeed.isScanRunning();
-                    refreshView();
-                }
-
-                // When the scan is complete, do a final pull
-                if (!liveFeed.isScanRunning()) {
-                    log.debug("Scan completed, making final pull...");
-
-                    // Do a final pull without time pressure
-                    liveFeed = scanService.getLiveFeed(); // The last pull to get any final updates
-
-                    // Add the last update to the buffer
-                    newEntry = LiveFeedUtil.formatLiveFeedEntry(liveFeed.livefeed());
-                    if (!org.pwss.util.StringUtil.isEmpty(newEntry)) {
-                        liveFeedBuffer.add(newEntry); // Add the last pull to the buffer
-
-                        // Update UI with the last text
-                        sb.setLength(0); // Clear StringBuilder
-                        for (int i = 0; i < liveFeedBuffer.size(); i++) {
-                            sb.append(liveFeedBuffer.get(i)); // Add all updates to the buffer
-                        }
-                        screen.getLiveFeedText().setText(sb.toString());
+            SwingWorker<PollResult, Void> worker = new SwingWorker<>() {
+                @Override
+                protected PollResult doInBackground()
+                        throws LiveFeedException, ExecutionException, InterruptedException, JsonProcessingException {
+                    LiveFeedResponse liveFeed = scanService.getLiveFeed();
+                    List<ScanLogEntry> entries = liveFeedParser.parse(liveFeed.livefeed(), LocalTime.now());
+                    int warnings = LiveFeedUtil.countWarnings(liveFeed.livefeed());
+                    if (!liveFeed.isScanRunning()) {
+                        log.debug("Scan completed, making final pull...");
+                        LiveFeedResponse finalFeed = scanService.getLiveFeed();
+                        entries.addAll(liveFeedParser.parse(finalFeed.livefeed(), LocalTime.now()));
+                        entries.addAll(liveFeedParser.flush(LocalTime.now()));
+                        warnings += LiveFeedUtil.countWarnings(finalFeed.livefeed());
                     }
-
-                    // Stop polling and end the process
-                    scanStatusTimer.stop();
-                    onFinishScan(true, singleDirectory); // Complete the scan
+                    return new PollResult(liveFeed, entries, warnings);
                 }
-            } catch (LiveFeedException | ExecutionException | InterruptedException | JsonProcessingException ex) {
-                log.error("Error fetching live feed: {}", ex.getMessage());
-                log.debug("Live Feed Exception", ex);
-                SwingUtilities.invokeLater(() -> screen.showError("Live feed error"));
-                scanStatusTimer.stop(); // Stop polling on error
-                onFinishScan(false, singleDirectory); // Handling errors
-            }
+
+                @Override
+                protected void done() {
+                    try {
+                        PollResult result = get();
+                        screen.getScanLog().append(result.entries());
+                        totalDiffCount.addAndGet(result.warningCount());
+                        if (result.liveFeed().isScanRunning() != scanRunning) {
+                            scanRunning = result.liveFeed().isScanRunning();
+                            refreshView();
+                        }
+                        if (!result.liveFeed().isScanRunning()) {
+                            scanStatusTimer.stop();
+                            onFinishScan(true, singleDirectory);
+                        } else {
+                            scanStatusTimer.start();
+                        }
+                    } catch (ExecutionException | InterruptedException ex) {
+                        log.error("Error fetching live feed: {}", ex.getMessage());
+                        log.debug("Live Feed Exception", ex);
+                        screen.showError("Live feed error");
+                        scanStatusTimer.stop();
+                        onFinishScan(false, singleDirectory);
+                        if (ex instanceof InterruptedException) {
+                            Thread.currentThread().interrupt();
+                        }
+                    }
+                }
+            };
+            scanStatusTimer.setRepeats(false);
+            worker.execute();
         });
         scanStatusTimer.start();
+    }
+
+    private record PollResult(LiveFeedResponse liveFeed, List<ScanLogEntry> entries, int warningCount) {
     }
 
     /**

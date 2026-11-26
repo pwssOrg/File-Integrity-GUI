@@ -1,5 +1,9 @@
 package org.pwss.navigation;
 
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JFrame;
@@ -26,6 +30,12 @@ public class NavigationHandler {
      * A factory for creating controllers for the screens.
      */
     private final ControllerFactory factory;
+
+    /**
+     * The size the frame was last given by a navigation, or null before the
+     * first navigation.
+     */
+    private Dimension lastScreenSize;
 
     /**
      * Constructs a `NavigationHandler` with the specified frame and controller factory.
@@ -55,12 +65,32 @@ public class NavigationHandler {
         controller.reloadData();
 
         frame.getContentPane().removeAll();
-        frame.setSize(screen.frameWidth, screen.frameHeight);
+        resizeFrameFor(screen);
         frame.getContentPane().add(baseScreen.getRootPanel());
         frame.revalidate();
         frame.repaint();
 
         // Notify the controller that its screen is now visible
         controller.onShow();
+    }
+
+    /**
+     * Sizes and centres the frame for the given screen.
+     * The frame is left alone when it is maximized, or when the screen wants the
+     * same size as the previous one (so a size chosen by the user is kept).
+     *
+     * @param screen The `Screen` that is about to be shown.
+     */
+    private void resizeFrameFor(Screen screen) {
+        final Rectangle available = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        final Dimension size = new Dimension(
+                Math.min(screen.frameWidth, available.width),
+                Math.min(screen.frameHeight, available.height));
+        final boolean maximized = (frame.getExtendedState() & Frame.MAXIMIZED_BOTH) != 0;
+        if (!maximized && !size.equals(lastScreenSize)) {
+            frame.setSize(size);
+            frame.setLocationRelativeTo(null); // center on screen
+        }
+        lastScreenSize = size;
     }
 }

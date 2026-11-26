@@ -19,6 +19,7 @@ import org.pwss.util.OSUtil;
 import org.pwss.util.ReportUtil;
 import org.pwss.util.StringConstants;
 import org.pwss.view.screen.ScanDetailsScreen;
+import org.pwss.view.theme.UiStyle;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -122,9 +123,9 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
             int selectedRow = screen.getScanSummaryTable().getSelectedRow();
             if (selectedRow >= 0 && selectedRow < scanSummaries.size()) {
                 ScanSummary selectedSummary = scanSummaries.get(selectedRow);
-                screen.getScanSummaryDetails().setText(ReportUtil.formatSummary(selectedSummary));
+                screen.getScanSummaryDetails().show(selectedSummary);
             } else {
-                screen.getScanSummaryDetails().setText("");
+                screen.getScanSummaryDetails().clear();
                 screen.getDiffDetails().setText("");
             }
         });
@@ -156,9 +157,12 @@ public class ScanDetailsController extends BaseController<ScanDetailsScreen> imp
         DiffTableModel diffTableModel = new DiffTableModel(diffs);
         screen.getDiffTable().setModel(diffTableModel);
 
+        UiStyle.fixColumnWidth(screen.getDiffTable(), DiffTableModel.columns[3], ButtonRenderer.COLUMN_WIDTH);
+        // The file path gets the room; the dates next to it are short
+        screen.getDiffTable().getColumnModel().getColumn(0).setPreferredWidth(420);
         screen.getDiffTable().getColumn(DiffTableModel.columns[3]).setCellRenderer(new ButtonRenderer());
         screen.getDiffTable().getColumn(DiffTableModel.columns[3])
-                .setCellEditor(new ButtonEditor("\uD83D\uDCE5", this));
+                .setCellEditor(new ButtonEditor(DiffTableModel.ACTION_QUARANTINE, this));
     }
 
     @Override

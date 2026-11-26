@@ -4,12 +4,10 @@ package org.pwss.controller.factory;
 import org.pwss.controller.BaseController;
 import org.pwss.controller.HomeController;
 import org.pwss.controller.LoginController;
-import org.pwss.controller.NewDirectoryController;
 import org.pwss.controller.ScanDetailsController;
 import org.pwss.navigation.Screen;
 import org.pwss.view.screen.HomeScreen;
 import org.pwss.view.screen.LoginScreen;
-import org.pwss.view.screen.NewDirectoryScreen;
 import org.pwss.view.screen.ScanDetailsScreen;
 
 /**
@@ -30,7 +28,6 @@ public class AppControllerFactory implements ControllerFactory {
         return switch (screen) {
             case LOGIN -> new LoginController(new LoginScreen());
             case HOME -> new HomeController(new HomeScreen());
-            case NEW_DIRECTORY -> new NewDirectoryController(new NewDirectoryScreen());
             case SCAN_SUMMARY -> new ScanDetailsController(new ScanDetailsScreen());
         };
     }
