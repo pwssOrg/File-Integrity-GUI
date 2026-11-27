@@ -10,8 +10,5 @@
 # View
 /src/main/java/org/pwss/view/ @lilstiffy
 
-# Data structures
-/src/main/java/org/pwss/data_structure/ @pwgit-create 
-
 # Default owners for everything else
 * @pwgit-create  @lilstiffy
